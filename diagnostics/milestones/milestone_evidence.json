@@ -765,7 +765,7 @@
       {
         "arm": "llm_tools",
         "status": "SKIP",
-        "reason": "ImportError: cannot import name 'build_toolset' from 'src.llm.scientist' (C:\\Users\\hcsme\\Desktop\\FlyBain LLM Evolve\\src\\llm\\scientist.py)"
+        "reason": "ImportError: cannot import name 'build_toolset' from 'src.llm.scientist' (<HOME>\\Desktop\\FlyBain LLM Evolve\\src\\llm\\scientist.py)"
       }
     ]
   },

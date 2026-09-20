@@ -23,17 +23,17 @@
   "tools": {
     "git": "C:\\Program Files\\Git\\cmd\\git.EXE",
     "cmake": "C:\\Program Files\\Python314\\Scripts\\cmake.EXE",
-    "ninja": "C:\\Users\\hcsme\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Ninja-build.Ninja_Microsoft.Winget.Source_8wekyb3d8bbwe\\ninja.EXE",
+    "ninja": "<HOME>\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Ninja-build.Ninja_Microsoft.Winget.Source_8wekyb3d8bbwe\\ninja.EXE",
     "cl": null,
     "clang": "C:\\Program Files\\AMD\\ROCm\\7.1\\bin\\clang.EXE",
     "gcc": null,
     "g++": null,
     "vulkaninfo": "C:\\WINDOWS\\system32\\vulkaninfo.EXE",
     "vkvia": null,
-    "cargo": "C:\\Users\\hcsme\\.cargo\\bin\\cargo.EXE",
-    "rustc": "C:\\Users\\hcsme\\.cargo\\bin\\rustc.EXE",
+    "cargo": "<HOME>\\.cargo\\bin\\cargo.EXE",
+    "rustc": "<HOME>\\.cargo\\bin\\rustc.EXE",
     "ollama": null,
-    "ffmpeg": "C:\\Users\\hcsme\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-9.0-full_build\\bin\\ffmpeg.EXE"
+    "ffmpeg": "<HOME>\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-9.0-full_build\\bin\\ffmpeg.EXE"
   },
   "vulkan": {
     "vulkan_sdk_env": "C:\\VulkanSDK\\1.4.357.0",
@@ -312,7 +312,7 @@
     {
       "name": "cqhecs",
       "version": "4.5.0",
-      "editable_project_location": "C:\\Users\\hcsme\\Desktop\\quanten emulator"
+      "editable_project_location": "<HOME>\\Desktop\\quanten emulator"
     },
     {
       "name": "crashtest",
