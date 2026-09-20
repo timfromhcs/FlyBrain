@@ -19,6 +19,11 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
+# Native Vulkan loader (import-safe probing; no GPU on Spaces -> honest
+# cpu_reference fallback). Pinned CPU-only Python deps next.
+RUN apt-get update && apt-get install -y --no-install-recommends libvulkan1 \
+    && rm -rf /var/lib/apt/lists/*
+
 # Pinned CPU-only dependencies first (better layer caching).
 COPY requirements-hf.txt ./requirements-hf.txt
 RUN pip install --no-cache-dir -r requirements-hf.txt

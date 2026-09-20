@@ -3,7 +3,10 @@ import time
 import struct
 import numpy as np
 from typing import Tuple, List, Dict, Optional, Any
-import vulkan as vk
+try:
+    import vulkan as vk
+except (ImportError, OSError):  # minimal hosts (e.g. HF Space slim image):
+    vk = None  # without the native loader; engine init degrades honestly
 
 from src.paths import resource
 
@@ -63,7 +66,10 @@ class VulkanComputeEngine:
         self.last_step_latency_ms = 0.0
         self.last_plasticity_latency_ms = 0.0
         self.total_steps_executed = 0
-        
+
+        if vk is None:
+            raise RuntimeError("Vulkan bindings unavailable on this host "
+                               "(no native loader); CPU reference is the honest fallback.")
         self._init_vulkan()
 
     def _find_memory_type(self, type_filter: int, properties: int) -> int:

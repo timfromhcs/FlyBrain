@@ -5,7 +5,7 @@ import sys
 
 sys.path.insert(0, ".")
 BLOCKED = {"torch", "diffusers", "transformers", "llama_cpp", "sounddevice",
-           "soundfile"}
+           "soundfile", "vulkan"}
 
 real_import = builtins.__import__
 
