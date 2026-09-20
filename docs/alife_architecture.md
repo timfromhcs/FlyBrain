@@ -74,7 +74,7 @@ hash-verified replay (`diagnostics/milestones/milestone_evidence.json`).
   `communication_tendency`, `curiosity_drive`.
 - v1 organisms keep the exact legacy path (bit-exact with pre-v2 replays).
 
-## Acceptance matrix (32/32 PASS, last run)
+## Acceptance matrix (canonical; totals generated, never copied)
 
 All gates are executable behavioral assertions, including:
 CSR directionality (`csr_directionality`), biological edge semantics and provenance
@@ -82,4 +82,6 @@ CSR directionality (`csr_directionality`), biological edge semantics and provena
 plasticity reward causal effect (`plasticity_causal_effect`), checkpoint/resume
 equivalence (`checkpoint_continuation`), local model discovery/inference
 (`llm_model_discovery_and_inference`), and LLM failure mode/tool safety
-(`llm_failure_mode_and_tool_safety`). See `diagnostics/acceptance_matrix.json`.
+(`llm_failure_mode_and_tool_safety`). Totals live in
+`diagnostics/acceptance_matrix.json` (schema
+`verification/acceptance_schema.json`).

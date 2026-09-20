@@ -1,0 +1,60 @@
+{
+  "version": "4.1.0",
+  "version_tag": "v4.1.0",
+  "generated_at": "2026-09-20T23:00:12Z",
+  "overall": "PASS",
+  "checks": {
+    "pyproject": {
+      "pass": true,
+      "detail": "pyproject=4.1.0 src=4.1.0"
+    },
+    "cli": {
+      "pass": true,
+      "detail": "FlyBrain 4.1.0"
+    },
+    "api": {
+      "pass": true,
+      "detail": "{'version': '4.1.0', 'release': 'FlyBrain V4.1.0'}"
+    },
+    "api_tag": {
+      "pass": true,
+      "detail": "FlyBrain V4.1.0"
+    },
+    "acceptance_version_gate": {
+      "pass": true,
+      "detail": "FlyBrain version metadata = 4.1.0 (v4.1.0)."
+    },
+    "artifact:shaders/brain_step.spv": {
+      "pass": true,
+      "detail": "5964 bytes"
+    },
+    "artifact:shaders/plasticity.spv": {
+      "pass": true,
+      "detail": "4224 bytes"
+    },
+    "artifact:manifests/malecns_provenance.json": {
+      "pass": true,
+      "detail": "2202 bytes"
+    },
+    "artifact:verification/acceptance_schema.json": {
+      "pass": true,
+      "detail": "4428 bytes"
+    },
+    "artifact:huggingface/Dockerfile": {
+      "pass": true,
+      "detail": "1586 bytes"
+    },
+    "artifact:huggingface/app.py": {
+      "pass": true,
+      "detail": "1032 bytes"
+    },
+    "artifact:huggingface/requirements-hf.txt": {
+      "pass": true,
+      "detail": "633 bytes"
+    },
+    "space_no_version_pin": {
+      "pass": true,
+      "detail": "versions found in Dockerfile: []"
+    }
+  }
+}

@@ -7,11 +7,12 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SPACE_ID = os.environ.get("FLYBRAIN_SPACE_ID", "timfromhcs/FlyBrain-Lab")
 TOKEN = os.environ.get("HF_TOKEN", "")
 FILES = ["src/tools/speech.py", "src/tools/audio.py", "src/tools/image_gen.py",
+         "src/compute/vulkan_backend.py",
          "src/ui/server.py", "src/brain/simulation_engine.py",
          "src/backup/service.py", "src/backup/gdrive.py", "src/backup/__init__.py",
          "src/runtime/__init__.py", "src/runtime/watchdog.py",
          "src/main.py", "src/version.py",
-         "huggingface/requirements-hf.txt"]
+         "huggingface/Dockerfile", "huggingface/requirements-hf.txt"]
 
 
 def main():
