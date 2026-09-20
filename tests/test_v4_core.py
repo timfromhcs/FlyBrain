@@ -123,6 +123,18 @@ class TestResearchLedger(unittest.TestCase):
         self.assertEqual(a["event_id"], b["event_id"])
         self.assertEqual(a["record_hash"], b["record_hash"])
 
+    def test_record_ids_survive_wall_clock_gap(self):
+        import time as _t
+        l1 = ResearchLedger("exp-g", seed=6)
+        a = l1.append("birth", 3, 0, {"oid": "x"})
+        _t.sleep(0.06)  # cross Windows clock ticks: ts MUST differ...
+        l2 = ResearchLedger("exp-g", seed=6)
+        b = l2.append("birth", 3, 0, {"oid": "x"})
+        self.assertNotEqual(a["ts"], b["ts"])
+        # ...yet identity must not (wall-clock is never identity)
+        self.assertEqual(a["event_id"], b["event_id"])
+        self.assertEqual(a["record_hash"], b["record_hash"])
+
 
 class TestDeepTimeExact(unittest.TestCase):
     def test_exact_mode_is_tick_by_tick(self):

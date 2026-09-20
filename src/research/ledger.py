@@ -48,7 +48,11 @@ def shader_sha(shader_dir: str = "shaders") -> str:
 
 
 def _record_hash(rec: Dict[str, Any]) -> str:
-    payload = json.dumps({k: v for k, v in rec.items() if k != "record_hash"},
+    # Identity covers content + sequence + chain only. Operational metadata
+    # (ts wall-clock, record_hash itself) is NEVER identity: two identical
+    # appends must hash identically or deterministic replay breaks.
+    payload = json.dumps({k: v for k, v in rec.items()
+                          if k not in ("record_hash", "ts")},
                          sort_keys=True, default=str)
     return hashlib.sha256(payload.encode()).hexdigest()
 

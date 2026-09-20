@@ -1,10 +1,10 @@
 {
   "repository": "timfromhcs/FlyBrain",
   "branch": "main",
-  "commit": "2f747cc317a774cc082c9ffd65096cd252d5161f",
+  "commit": "44c50fabac5d1445d78e2378f93f73447f43d241",
   "version": "5.0.0",
   "release_tag": "v5.0.0",
-  "generated_at": "2026-09-20T23:24:04Z",
+  "generated_at": "2026-09-20T23:40:22Z",
   "dataset_identities": {
     "soma_sides_csv": "",
     "connections_csv": "",
