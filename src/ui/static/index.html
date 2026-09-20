@@ -30,12 +30,15 @@
 
     <nav>
         <button class="nav-tab active" onclick="switchTab('overview')">Overview</button>
+        <button class="nav-tab" onclick="switchTab('stream')">Live Stream</button>
         <button class="nav-tab" onclick="switchTab('connectome')">Connectome 3D</button>
+        <button class="nav-tab" onclick="switchTab('colony')">Colony</button>
         <button class="nav-tab" onclick="switchTab('provenance')">Provenance</button>
         <button class="nav-tab" onclick="switchTab('experiments')">Experiments & Determinism</button>
         <button class="nav-tab" onclick="switchTab('memory')">Memory Explorer</button>
         <button class="nav-tab" onclick="switchTab('evolution')">Evolution Lineage</button>
         <button class="nav-tab" onclick="switchTab('dreams')">Dream Studio</button>
+        <button class="nav-tab" onclick="switchTab('backups')">Backups</button>
         <button class="nav-tab" onclick="switchTab('diagnostics')">Diagnostics & Hardware</button>
     </nav>
 
@@ -96,6 +99,45 @@
                         <button class="btn btn-green" onclick="injectReward(1.0)">+Reward</button>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Tab: Live Stream (24/7 mode) -->
+        <div id="tab-stream" class="tab-content">
+            <div class="card" style="margin-bottom: 20px;">
+                <div class="card-header"><span>24/7 Stream Control</span><span id="stream-mode-badge" class="badge badge-state">STOPPED</span></div>
+                <div class="prov-grid">
+                    <div class="prov-row"><span class="prov-label">Uptime</span><span class="prov-val" id="stream-uptime">—</span></div>
+                    <div class="prov-row"><span class="prov-label">Simulation step</span><span class="prov-val" id="stream-step">—</span></div>
+                    <div class="prov-row"><span class="prov-label">Spikes / latency p95</span><span class="prov-val" id="stream-perf">—</span></div>
+                    <div class="prov-row"><span class="prov-label">Watchdog</span><span class="prov-val" id="stream-watchdog">—</span></div>
+                </div>
+                <div style="display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;">
+                    <button class="btn btn-green" onclick="streamCmd('start')">▶ START</button>
+                    <button class="btn btn-amber" onclick="streamCmd('pause')">⏸ PAUSE</button>
+                    <button class="btn" onclick="streamCmd('resume')">⏵ RESUME</button>
+                    <button class="btn btn-red" onclick="streamCmd('stop')">⏹ STOP</button>
+                    <button class="btn" onclick="stepSimulation(1)">+1 STEP</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Colony (organisms) -->
+        <div id="tab-colony" class="tab-content">
+            <div class="card" style="margin-bottom: 20px;">
+                <div class="card-header"><span>ALife Colony</span><span id="colony-meta">—</span></div>
+                <div style="margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button class="btn btn-green" onclick="colonyCmd('step')">+ Step 5 ticks</button>
+                    <button class="btn" onclick="colonyCmd('reproduce')">+ Reproduce</button>
+                    <button class="btn btn-amber" onclick="colonyCmd('reset')">Reset colony</button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header"><span>Organisms (live state)</span><span>sort/filter in place</span></div>
+                <table style="margin-top: 10px;">
+                    <thead><tr><th>ID</th><th>Gen</th><th>Stage</th><th>Alive</th><th>Age</th><th>Energy</th><th>Neurons</th><th>Genome</th></tr></thead>
+                    <tbody id="tbody-colony"></tbody>
+                </table>
             </div>
         </div>
 
@@ -249,6 +291,25 @@
             <div class="card">
                 <div class="card-header"><span>Consolidated Dream Records</span><span>Counterfactual Simulations</span></div>
                 <div id="dreams-list" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;"></div>
+            </div>
+        </div>
+
+        <!-- Tab: Backups -->
+        <div id="tab-backups" class="tab-content">
+            <div class="card" style="margin-bottom: 20px;">
+                <div class="card-header"><span>Backup Management (local disk)</span><span id="gdrive-badge" class="badge badge-state">drive: …</span></div>
+                <div style="margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button class="btn btn-green" onclick="backupCreate()">⬇ BACKUP NOW</button>
+                    <button class="btn" onclick="fetchBackups()">Refresh</button>
+                </div>
+                <div class="prov-val" id="gdrive-detail" style="margin-top: 8px; font-size: 12px;"></div>
+            </div>
+            <div class="card">
+                <div class="card-header"><span>Backup generations (hash-verified)</span><span>restore refuses corrupt/invalid</span></div>
+                <table style="margin-top: 10px;">
+                    <thead><tr><th>Name</th><th>Trigger</th><th>Step</th><th>State hash</th><th>Actions</th></tr></thead>
+                    <tbody id="tbody-backups"></tbody>
+                </table>
             </div>
         </div>
 

@@ -1,0 +1,517 @@
+{
+  "generated_at": "2026-09-20T22:34:23Z",
+  "commit": "d3988c0fc5bb281b8db976c367ed1afdfe3006c8",
+  "branch": "main",
+  "version": "4.1.0",
+  "source_modules": [
+    "src\\agents\\protocols.py",
+    "src\\autonomy\\__init__.py",
+    "src\\autonomy\\engine.py",
+    "src\\brain\\eligibility.py",
+    "src\\brain\\living.py",
+    "src\\brain\\plasticity.py",
+    "src\\brain\\runtime.py",
+    "src\\brain\\simulation_engine.py",
+    "src\\brain\\state.py",
+    "src\\common\\determinism.py",
+    "src\\common\\events.py",
+    "src\\common\\hashing.py",
+    "src\\common\\provenance.py",
+    "src\\compute\\cpu_reference.py",
+    "src\\compute\\validator.py",
+    "src\\compute\\vulkan_backend.py",
+    "src\\connectome\\loader.py",
+    "src\\connectome\\types.py",
+    "src\\culture\\transmission.py",
+    "src\\development\\engine.py",
+    "src\\diagnostics\\__init__.py",
+    "src\\diagnostics\\doctor.py",
+    "src\\dream\\engine.py",
+    "src\\embodiment\\__init__.py",
+    "src\\embodiment\\body.py",
+    "src\\evolution\\mutation.py",
+    "src\\evolution\\scheduler.py",
+    "src\\evolution\\speciation.py",
+    "src\\experiment\\manager.py",
+    "src\\genome\\operators.py",
+    "src\\genome\\schema.py",
+    "src\\language\\__init__.py",
+    "src\\language\\grounded.py",
+    "src\\llm\\control.py",
+    "src\\llm\\discovery.py",
+    "src\\llm\\research_memory.py",
+    "src\\llm\\runtime.py",
+    "src\\llm\\scientist.py",
+    "src\\llm\\tools.py",
+    "src\\main.py",
+    "src\\memory\\persistence.py",
+    "src\\memory\\working.py",
+    "src\\organism\\organism.py",
+    "src\\paths.py",
+    "src\\population\\checkpoint.py",
+    "src\\population\\population.py",
+    "src\\provenance\\__init__.py",
+    "src\\provenance\\identity_layers.py",
+    "src\\provenance\\v4.py",
+    "src\\research\\__init__.py",
+    "src\\research\\ablation.py",
+    "src\\research\\benchmark.py",
+    "src\\research\\ledger.py",
+    "src\\science\\__init__.py",
+    "src\\science\\milestones.py",
+    "src\\social\\__init__.py",
+    "src\\social\\model.py",
+    "src\\timeline\\__init__.py",
+    "src\\timeline\\deeptime.py",
+    "src\\tools\\audio.py",
+    "src\\tools\\base.py",
+    "src\\tools\\environment.py",
+    "src\\tools\\image_gen.py",
+    "src\\tools\\memory_tool.py",
+    "src\\tools\\registry.py",
+    "src\\tools\\speech.py",
+    "src\\tools\\visual.py",
+    "src\\trainer\\cognitive.py",
+    "src\\trainer\\curriculum.py",
+    "src\\trainer\\vision_teacher.py",
+    "src\\ui\\server.py",
+    "src\\version.py",
+    "src\\world\\environment.py"
+  ],
+  "api_routes": [
+    {
+      "method": "GET",
+      "path": "/"
+    },
+    {
+      "method": "GET",
+      "path": "/api/colony"
+    },
+    {
+      "method": "GET",
+      "path": "/api/colony/experiments"
+    },
+    {
+      "method": "GET",
+      "path": "/api/colony/lineage"
+    },
+    {
+      "method": "GET",
+      "path": "/api/colony/organism/{organism_id}"
+    },
+    {
+      "method": "POST",
+      "path": "/api/colony/reproduce"
+    },
+    {
+      "method": "POST",
+      "path": "/api/colony/reset"
+    },
+    {
+      "method": "POST",
+      "path": "/api/colony/step"
+    },
+    {
+      "method": "GET",
+      "path": "/api/connectome"
+    },
+    {
+      "method": "GET",
+      "path": "/api/diagnostics"
+    },
+    {
+      "method": "GET",
+      "path": "/api/doctor"
+    },
+    {
+      "method": "GET",
+      "path": "/api/dreams"
+    },
+    {
+      "method": "POST",
+      "path": "/api/dreams/replay"
+    },
+    {
+      "method": "POST",
+      "path": "/api/evolution/generation"
+    },
+    {
+      "method": "GET",
+      "path": "/api/evolution/lineage"
+    },
+    {
+      "method": "GET",
+      "path": "/api/experiments"
+    },
+    {
+      "method": "POST",
+      "path": "/api/experiments/run"
+    },
+    {
+      "method": "POST",
+      "path": "/api/experiments/verify"
+    },
+    {
+      "method": "GET",
+      "path": "/api/health"
+    },
+    {
+      "method": "POST",
+      "path": "/api/llm/generate"
+    },
+    {
+      "method": "GET",
+      "path": "/api/llm/status"
+    },
+    {
+      "method": "POST",
+      "path": "/api/llm/tool"
+    },
+    {
+      "method": "GET",
+      "path": "/api/llm/tools"
+    },
+    {
+      "method": "GET",
+      "path": "/api/memory"
+    },
+    {
+      "method": "GET",
+      "path": "/api/provenance"
+    },
+    {
+      "method": "POST",
+      "path": "/api/simulation/pause"
+    },
+    {
+      "method": "POST",
+      "path": "/api/simulation/reset"
+    },
+    {
+      "method": "POST",
+      "path": "/api/simulation/start"
+    },
+    {
+      "method": "POST",
+      "path": "/api/simulation/step"
+    },
+    {
+      "method": "GET",
+      "path": "/api/state"
+    },
+    {
+      "method": "GET",
+      "path": "/api/telemetry"
+    },
+    {
+      "method": "GET",
+      "path": "/api/tools"
+    },
+    {
+      "method": "POST",
+      "path": "/api/tools/execute"
+    },
+    {
+      "method": "GET",
+      "path": "/api/version"
+    },
+    {
+      "method": "WEBSOCKET",
+      "path": "/ws/telemetry"
+    }
+  ],
+  "api_versioned_v1": [],
+  "legacy_api": [
+    {
+      "method": "GET",
+      "path": "/"
+    },
+    {
+      "method": "GET",
+      "path": "/api/colony"
+    },
+    {
+      "method": "GET",
+      "path": "/api/colony/experiments"
+    },
+    {
+      "method": "GET",
+      "path": "/api/colony/lineage"
+    },
+    {
+      "method": "GET",
+      "path": "/api/colony/organism/{organism_id}"
+    },
+    {
+      "method": "POST",
+      "path": "/api/colony/reproduce"
+    },
+    {
+      "method": "POST",
+      "path": "/api/colony/reset"
+    },
+    {
+      "method": "POST",
+      "path": "/api/colony/step"
+    },
+    {
+      "method": "GET",
+      "path": "/api/connectome"
+    },
+    {
+      "method": "GET",
+      "path": "/api/diagnostics"
+    },
+    {
+      "method": "GET",
+      "path": "/api/doctor"
+    },
+    {
+      "method": "GET",
+      "path": "/api/dreams"
+    },
+    {
+      "method": "POST",
+      "path": "/api/dreams/replay"
+    },
+    {
+      "method": "POST",
+      "path": "/api/evolution/generation"
+    },
+    {
+      "method": "GET",
+      "path": "/api/evolution/lineage"
+    },
+    {
+      "method": "GET",
+      "path": "/api/experiments"
+    },
+    {
+      "method": "POST",
+      "path": "/api/experiments/run"
+    },
+    {
+      "method": "POST",
+      "path": "/api/experiments/verify"
+    },
+    {
+      "method": "GET",
+      "path": "/api/health"
+    },
+    {
+      "method": "POST",
+      "path": "/api/llm/generate"
+    },
+    {
+      "method": "GET",
+      "path": "/api/llm/status"
+    },
+    {
+      "method": "POST",
+      "path": "/api/llm/tool"
+    },
+    {
+      "method": "GET",
+      "path": "/api/llm/tools"
+    },
+    {
+      "method": "GET",
+      "path": "/api/memory"
+    },
+    {
+      "method": "GET",
+      "path": "/api/provenance"
+    },
+    {
+      "method": "POST",
+      "path": "/api/simulation/pause"
+    },
+    {
+      "method": "POST",
+      "path": "/api/simulation/reset"
+    },
+    {
+      "method": "POST",
+      "path": "/api/simulation/start"
+    },
+    {
+      "method": "POST",
+      "path": "/api/simulation/step"
+    },
+    {
+      "method": "GET",
+      "path": "/api/state"
+    },
+    {
+      "method": "GET",
+      "path": "/api/telemetry"
+    },
+    {
+      "method": "GET",
+      "path": "/api/tools"
+    },
+    {
+      "method": "POST",
+      "path": "/api/tools/execute"
+    },
+    {
+      "method": "GET",
+      "path": "/api/version"
+    },
+    {
+      "method": "WEBSOCKET",
+      "path": "/ws/telemetry"
+    }
+  ],
+  "ui_tabs": [
+    "connectome",
+    "diagnostics",
+    "dreams",
+    "evolution",
+    "experiments",
+    "memory",
+    "overview",
+    "provenance"
+  ],
+  "ui_assets": [
+    "src/ui/static\\css",
+    "src/ui/static\\css\\lab.css",
+    "src/ui/static\\index.html",
+    "src/ui/static\\js",
+    "src/ui/static\\js\\lab.js",
+    "src/ui/static\\vendor",
+    "src/ui/static\\vendor\\OrbitControls.js",
+    "src/ui/static\\vendor\\three.min.js"
+  ],
+  "cli": {
+    "subcommands": [
+      "acceptance-matrix",
+      "benchmark",
+      "compare",
+      "diagnostics",
+      "docs-verify",
+      "doctor",
+      "evolve",
+      "experiment",
+      "lab",
+      "run",
+      "test",
+      "validate-vulkan",
+      "verify",
+      "version"
+    ],
+    "global_flags": [
+      "--a",
+      "--b",
+      "--circuit-size",
+      "--generations",
+      "--host",
+      "--id",
+      "--mode",
+      "--no-gpu",
+      "--port",
+      "--result",
+      "--scale",
+      "--seed",
+      "--spec",
+      "--steps"
+    ]
+  },
+  "graph_modes": [
+    "REAL",
+    "SPATIAL_SURROGATE",
+    "SYNTHETIC_TEST"
+  ],
+  "graph_identities": [
+    "REAL_FULL",
+    "REAL_SUBGRAPH",
+    "SPATIAL_SURROGATE",
+    "SYNTHETIC_TEST"
+  ],
+  "simulation_backends": [
+    "vulkan_gpu",
+    "cpu_reference"
+  ],
+  "model_providers": [
+    "local_gguf_llama_cpp"
+  ],
+  "storage_backends": [
+    "sqlite",
+    "npz_snapshot",
+    "json_manifest"
+  ],
+  "deployment_targets": [
+    "local_uvicorn",
+    "huggingface_docker_space"
+  ],
+  "backup_targets": [
+    "local_disk"
+  ],
+  "tests": {
+    "files": [
+      "tests\\test_adversarial.py",
+      "tests\\test_alife.py",
+      "tests\\test_autonomy.py",
+      "tests\\test_benchmark.py",
+      "tests\\test_campaign.py",
+      "tests\\test_checkpoint_v41.py",
+      "tests\\test_control_plane.py",
+      "tests\\test_deeptime_milestones.py",
+      "tests\\test_directionality.py",
+      "tests\\test_eligibility.py",
+      "tests\\test_engine_stress.py",
+      "tests\\test_evolution_robustness.py",
+      "tests\\test_genome_v2_speciation.py",
+      "tests\\test_language_social.py",
+      "tests\\test_lif.py",
+      "tests\\test_living_brain.py",
+      "tests\\test_llm_local.py",
+      "tests\\test_memory_robustness.py",
+      "tests\\test_parity.py",
+      "tests\\test_plasticity_causal.py",
+      "tests\\test_provenance.py",
+      "tests\\test_provenance_v4.py",
+      "tests\\test_runtime_continuation.py",
+      "tests\\test_suite.py",
+      "tests\\test_ui_api.py",
+      "tests\\test_v4_core.py",
+      "tests\\test_vulkan_lifecycle.py"
+    ],
+    "test_methods": {
+      "tests\\test_adversarial.py": 13,
+      "tests\\test_alife.py": 13,
+      "tests\\test_autonomy.py": 18,
+      "tests\\test_benchmark.py": 6,
+      "tests\\test_campaign.py": 2,
+      "tests\\test_checkpoint_v41.py": 3,
+      "tests\\test_control_plane.py": 15,
+      "tests\\test_deeptime_milestones.py": 11,
+      "tests\\test_directionality.py": 4,
+      "tests\\test_eligibility.py": 14,
+      "tests\\test_engine_stress.py": 1,
+      "tests\\test_evolution_robustness.py": 3,
+      "tests\\test_genome_v2_speciation.py": 18,
+      "tests\\test_language_social.py": 11,
+      "tests\\test_lif.py": 14,
+      "tests\\test_living_brain.py": 12,
+      "tests\\test_llm_local.py": 14,
+      "tests\\test_memory_robustness.py": 5,
+      "tests\\test_parity.py": 2,
+      "tests\\test_plasticity_causal.py": 4,
+      "tests\\test_provenance.py": 7,
+      "tests\\test_provenance_v4.py": 13,
+      "tests\\test_runtime_continuation.py": 3,
+      "tests\\test_suite.py": 11,
+      "tests\\test_ui_api.py": 10,
+      "tests\\test_v4_core.py": 17,
+      "tests\\test_vulkan_lifecycle.py": 5
+    },
+    "total_methods": 249
+  },
+  "shaders": {
+    "shaders/brain_step.comp": 2512,
+    "shaders/brain_step.spv": 5964,
+    "shaders/plasticity.comp": 1588,
+    "shaders/plasticity.spv": 4224
+  }
+}

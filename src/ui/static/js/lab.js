@@ -26,6 +26,12 @@
             if (tabId === 'connectome') {
                 if (!threeScene) init3DViewer();
                 fetchConnectome();
+            } else if (tabId === 'stream') {
+                fetchStream();
+            } else if (tabId === 'colony') {
+                fetchColony();
+            } else if (tabId === 'backups') {
+                fetchBackups();
             } else if (tabId === 'provenance') {
                 fetchProvenance();
             } else if (tabId === 'experiments') {
@@ -477,6 +483,104 @@
             const data = await res.json();
             showToast(`Dream cycle consolidated ${data.length} counterfactual replay(s) into memory!`);
             fetchDreams();
+        }
+
+        // Stream Tab (24/7 mode)
+        async function fetchStream() {
+            try {
+                const [s, w] = await Promise.all([
+                    fetch('/api/v1/stream/status').then(r => r.json()),
+                    fetch('/api/v1/watchdog/status').then(r => r.json()).catch(() => null)
+                ]);
+                document.getElementById('stream-mode-badge').innerText = s.stream_mode;
+                document.getElementById('stream-mode-badge').className =
+                    'badge ' + (s.stream_mode === 'RUNNING' ? 'badge-verified' : 'badge-state');
+                document.getElementById('stream-uptime').innerText =
+                    `${Math.floor(s.uptime_sec / 3600)}h ${Math.floor((s.uptime_sec % 3600) / 60)}m ${Math.floor(s.uptime_sec % 60)}s`;
+                document.getElementById('stream-step').innerText =
+                    `step ${s.simulation_step} @ ${s.target_hz} Hz (${s.backend})`;
+                document.getElementById('stream-perf').innerText =
+                    `${s.active_spikes} active spikes, ${s.total_spikes} total, p95 ${s.p95_latency_ms} ms`;
+                document.getElementById('stream-watchdog').innerText = w
+                    ? `running=${w.running}, restarts=${w.restarts}/${w.max_restarts}, last step=${w.last_step_seen}`
+                    : 'watchdog disabled';
+            } catch (e) { showToast('Stream status unreachable'); }
+        }
+
+        async function streamCmd(action) {
+            const map = { start: ['/api/v1/stream/start', 'POST'], pause: ['/api/simulation/pause', 'POST'],
+                          resume: ['/api/v1/simulation/resume', 'POST'], stop: ['/api/v1/stream/stop', 'POST'] };
+            const [url, method] = map[action];
+            const res = await fetch(url, { method });
+            const data = await res.json();
+            showToast(`Stream ${action}: ${data.status || data.stream_mode}`);
+            fetchStream();
+        }
+
+        // Colony Tab (organisms)
+        async function fetchColony() {
+            const res = await fetch('/api/v1/organisms');
+            const data = await res.json();
+            document.getElementById('colony-meta').innerText =
+                `tick ${data.tick} · living ${data.living}/${data.total} · ${String(data.population_hash).slice(0, 12)}…`;
+            document.getElementById('tbody-colony').innerHTML = data.organisms.map(o => `
+                <tr><td style="font-family: monospace; font-size: 11px;">${o.id.slice(0, 10)}…</td>
+                <td>${o.generation}</td><td>${o.stage}</td><td>${o.alive ? 'yes' : 'no'}</td>
+                <td>${o.age}</td><td>${o.energy}</td><td>${o.neurons}</td>
+                <td style="font-family: monospace; font-size: 11px;">${o.genome_hash.slice(0, 12)}…</td></tr>`).join('');
+        }
+
+        async function colonyCmd(action) {
+            const map = { step: ['/api/colony/step?ticks=5', 'POST'], reproduce: ['/api/colony/reproduce?n_offspring=2', 'POST'],
+                          reset: ['/api/colony/reset', 'POST'] };
+            const [url, method] = map[action];
+            const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: '{}' });
+            const data = await res.json();
+            showToast(`Colony ${action}: ${JSON.stringify(data).slice(0, 120)}`);
+            fetchColony();
+        }
+
+        // Backups Tab
+        async function fetchBackups() {
+            const [list, gd] = await Promise.all([
+                fetch('/api/v1/backup/list').then(r => r.json()),
+                fetch('/api/v1/backup/google').then(r => r.json()).catch(() => ({ state: 'ERROR' }))
+            ]);
+            document.getElementById('gdrive-badge').innerText = `drive: ${gd.state}`;
+            document.getElementById('gdrive-detail').innerText =
+                `Google Drive: ${gd.state} — ${gd.detail || ''} ${gd.consent_step ? 'Next: ' + gd.consent_step : ''}`;
+            document.getElementById('tbody-backups').innerHTML = list.backups.map(b => `
+                <tr><td style="font-family: monospace; font-size: 11px;">${b.backup}</td>
+                <td>${b.trigger || ''}</td><td>${b.step ?? ''}</td>
+                <td style="font-family: monospace; font-size: 11px;">${String(b.state_hash || '').slice(0, 16)}…</td>
+                <td><button class="btn" onclick="backupVerify('${b.backup}')">Verify</button>
+                <button class="btn" onclick="backupRestore('${b.backup}')">Restore</button>
+                <button class="btn" onclick="backupDownload('${b.backup}')">Download</button></td></tr>`).join('')
+                || '<tr><td colspan="5">No backups yet — press BACKUP NOW.</td></tr>';
+        }
+
+        async function backupCreate() {
+            const res = await fetch('/api/v1/backup/create?label=ui&trigger=manual', { method: 'POST' });
+            const data = await res.json();
+            showToast(`Backup ${data.backup_name} (${String(data.state_hash).slice(0, 12)}…)`);
+            fetchBackups();
+        }
+
+        async function backupVerify(name) {
+            const res = await fetch(`/api/v1/backup/verify?name=${encodeURIComponent(name)}`);
+            const data = await res.json();
+            showToast(`Backup ${name}: ${data.status}`);
+        }
+
+        async function backupRestore(name) {
+            const res = await fetch(`/api/v1/backup/restore?name=${encodeURIComponent(name)}`, { method: 'POST' });
+            const data = await res.json();
+            showToast(`Restore ${name}: ${data.status || data.detail}`);
+            fetchBackups();
+        }
+
+        function backupDownload(name) {
+            window.open(`/api/v1/backup/download?name=${encodeURIComponent(name)}`, '_blank');
         }
 
         // Diagnostics Tab

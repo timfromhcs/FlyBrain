@@ -48,6 +48,43 @@ def run_app(host="127.0.0.1", port=8080):
     print(f"Starting FlyBrain Lab Scientific Workstation at http://{host}:{port}")
     uvicorn.run(app, host=host, port=port)
 
+
+# First-run presets (V5 phase_29): real configurations, never unusable.
+# Each maps to the FLYBRAIN_* env contract consumed by src/ui/server.py.
+PRESETS = {
+    "QUICK_DEMO": {"FLYBRAIN_CIRCUIT_SIZE": "128",
+                   "FLYBRAIN_GRAPH_MODE": "SYNTHETIC_TEST",
+                   "FLYBRAIN_USE_GPU": "0", "FLYBRAIN_AUTOSTART": "1"},
+    "BIOLOGICAL_SUBGRAPH": {"FLYBRAIN_CIRCUIT_SIZE": "512",
+                            "FLYBRAIN_GRAPH_MODE": "REAL_SUBGRAPH",
+                            "FLYBRAIN_USE_GPU": "1", "FLYBRAIN_AUTOSTART": "0"},
+    "GPU_PERFORMANCE": {"FLYBRAIN_CIRCUIT_SIZE": "1024",
+                        "FLYBRAIN_GRAPH_MODE": "REAL_SUBGRAPH",
+                        "FLYBRAIN_USE_GPU": "1", "FLYBRAIN_AUTOSTART": "1"},
+    "CPU_SAFE": {"FLYBRAIN_CIRCUIT_SIZE": "256",
+                 "FLYBRAIN_GRAPH_MODE": "REAL_SUBGRAPH",
+                 "FLYBRAIN_USE_GPU": "0", "FLYBRAIN_AUTOSTART": "0"},
+    "ALIFE_COLONY": {"FLYBRAIN_CIRCUIT_SIZE": "256",
+                     "FLYBRAIN_GRAPH_MODE": "SYNTHETIC_TEST",
+                     "FLYBRAIN_USE_GPU": "0", "FLYBRAIN_AUTOSTART": "0"},
+    "RESEARCH": {"FLYBRAIN_CIRCUIT_SIZE": "512",
+                 "FLYBRAIN_GRAPH_MODE": "REAL_SUBGRAPH",
+                 "FLYBRAIN_USE_GPU": "1", "FLYBRAIN_AUTOSTART": "0"},
+    "24_7_STREAM": {"FLYBRAIN_CIRCUIT_SIZE": "512",
+                    "FLYBRAIN_GRAPH_MODE": "REAL_SUBGRAPH",
+                    "FLYBRAIN_USE_GPU": "1", "FLYBRAIN_AUTOSTART": "1",
+                    "FLYBRAIN_WATCHDOG": "1"},
+}
+
+
+def apply_preset(name: str) -> None:
+    if name not in PRESETS:
+        raise ValueError(f"unknown preset {name!r}; choices: {sorted(PRESETS)}")
+    for k, v in PRESETS[name].items():
+        os.environ.setdefault(k, v)
+    print(f"[flybrain] preset {name}: " +
+          ", ".join(f"{k}={v}" for k, v in PRESETS[name].items()))
+
 def run_acceptance_matrix():
     from scripts.run_acceptance_matrix import evaluate_acceptance_matrix
     rep = evaluate_acceptance_matrix()
@@ -81,10 +118,18 @@ def main():
     sub_run = subparsers.add_parser("run", help="Start FlyBrain Lab interactive server")
     sub_run.add_argument("--host", default="127.0.0.1")
     sub_run.add_argument("--port", type=int, default=8080)
+    sub_run.add_argument("--preset", default=None,
+                         choices=["QUICK_DEMO", "BIOLOGICAL_SUBGRAPH", "GPU_PERFORMANCE",
+                                  "CPU_SAFE", "ALIFE_COLONY", "RESEARCH", "24_7_STREAM"],
+                         help="First-run configuration preset (real configs)")
 
     sub_lab = subparsers.add_parser("lab", help="Launch FlyBrain Lab scientific workstation")
     sub_lab.add_argument("--host", default="127.0.0.1")
     sub_lab.add_argument("--port", type=int, default=8080)
+    sub_lab.add_argument("--preset", default=None,
+                         choices=["QUICK_DEMO", "BIOLOGICAL_SUBGRAPH", "GPU_PERFORMANCE",
+                                  "CPU_SAFE", "ALIFE_COLONY", "RESEARCH", "24_7_STREAM"],
+                         help="First-run configuration preset (real configs)")
 
     # flybrain experiment (run, verify, compare)
     sub_exp = subparsers.add_parser("experiment", help="Manage deterministic research experiments")
@@ -144,6 +189,8 @@ def main():
     if target in ("run", "lab"):
         h = getattr(args, "host", "127.0.0.1")
         p = getattr(args, "port", 8080)
+        if getattr(args, "preset", None):
+            apply_preset(args.preset)
         run_app(host=h, port=p)
     elif target == "experiment":
         exp_mgr = ExperimentManager()

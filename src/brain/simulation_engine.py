@@ -61,6 +61,10 @@ class SimulationEngine:
         # Performance Telemetry
         self.last_step_time_ms = 0.0
         self.step_history: List[float] = []
+        # Stream mode (V5 phase_10): 24/7 supervision surface.
+        self.boot_time = time.time()
+        self.stream_mode = "STOPPED"  # STOPPED | RUNNING | PAUSED
+        self.heartbeat = {"ts": time.time(), "step": 0, "note": "boot"}
 
     def set_event_loop(self, loop: asyncio.AbstractEventLoop):
         self._loop = loop
@@ -69,6 +73,7 @@ class SimulationEngine:
         with self.lock:
             if not self.is_running:
                 self.is_running = True
+                self.stream_mode = "RUNNING"
                 self._stop_event.clear()
                 self._worker_thread = threading.Thread(target=self._run_loop, daemon=True, name="FlyBrainSimWorker")
                 self._worker_thread.start()
@@ -76,10 +81,76 @@ class SimulationEngine:
     def pause(self):
         with self.lock:
             self.is_running = False
+            if self.stream_mode == "RUNNING":
+                self.stream_mode = "PAUSED"
             self._stop_event.set()
         if self._worker_thread and self._worker_thread.is_alive():
             self._worker_thread.join(timeout=1.0)
             self._worker_thread = None
+
+    def resume(self) -> Dict[str, Any]:
+        """Resume a paused stream (no-op when already running)."""
+        with self.lock:
+            was = self.stream_mode
+        if was == "PAUSED":
+            self.start()
+        return {"status": "RESUMED" if was == "PAUSED" else "NOOP",
+                "previous": was, "stream_mode": self.stream_mode}
+
+    def stop(self) -> Dict[str, Any]:
+        """Stop the stream loop; simulation state is preserved."""
+        self.pause()
+        with self.lock:
+            self.stream_mode = "STOPPED"
+        return {"status": "STOPPED", "step": self.brain.state.step_count}
+
+    def safe_shutdown(self) -> Dict[str, Any]:
+        """Stop loop + close GPU; state stays in memory for backup/snapshot."""
+        res = self.stop()
+        try:
+            self.brain.cleanup()
+        except Exception:
+            pass
+        return {**res, "status": "SAFE_SHUTDOWN"}
+
+    def restart_runtime(self) -> Dict[str, Any]:
+        """Destructive fallback: rebuild BrainRuntime on the same circuit
+        (fresh neural state). Prefer restore-from-backup; this is the
+        watchdog's third recovery rung, always logged by the caller."""
+        self.pause()
+        try:
+            self.brain.cleanup()
+        except Exception:
+            pass
+        self.brain = BrainRuntime(self.circuit, use_gpu=self.use_gpu, seed=self.seed)
+        self.last_step_time_ms = 0.0
+        self.step_history = []
+        return {"status": "RUNTIME_RESTARTED", "step": 0}
+
+    def stream_status(self) -> Dict[str, Any]:
+        """24/7 stream status: uptime, sim time, population vitals, backend."""
+        with self.lock:
+            now = time.time()
+            hb = dict(self.heartbeat)
+            hb.update({"ts": now, "step": self.brain.state.step_count,
+                       "stream_mode": self.stream_mode, "is_running": self.is_running})
+            self.heartbeat = dict(hb)
+            lat = list(self.step_history)
+            return {
+                "stream_mode": self.stream_mode,
+                "is_running": self.is_running,
+                "uptime_sec": round(now - self.boot_time, 1),
+                "simulation_step": self.brain.state.step_count,
+                "simulation_time_note": "1 step per loop iteration at target_hz",
+                "target_hz": self.target_hz,
+                "active_spikes": int(np.sum(self.brain.state.spikes > 0.5)),
+                "total_spikes": self.brain.state.total_spikes,
+                "mean_latency_ms": round(float(np.mean(lat)), 3) if lat else 0.0,
+                "p95_latency_ms": round(float(np.percentile(lat, 95)), 3) if lat else 0.0,
+                "backend": "vulkan_gpu" if (self.brain.gpu_engine
+                                            and self.brain.use_gpu) else "cpu_reference",
+                "heartbeat": hb,
+            }
 
     def _run_loop(self):
         """Authoritative single simulation thread."""

@@ -63,6 +63,9 @@ def get_engine() -> SimulationEngine:
 async def startup_event():
     engine = get_engine()
     engine.set_event_loop(asyncio.get_event_loop())
+    if os.environ.get("FLYBRAIN_AUTOSTART", "0") == "1":
+        engine.start()
+    _get_watchdog()
 
 
 def _server_event_loop():
@@ -499,6 +502,310 @@ def list_alife_experiments():
             except Exception:
                 pass
     return out
+
+
+# ---------------- API v1 (V5 phase_07, typed contracts; legacy routes above stay) ----------------
+# v1 delegates to the same live handlers: one backend, two contract versions.
+
+def _v1_backend() -> str:
+    engine = get_engine()
+    return "vulkan_gpu" if (engine.brain.gpu_engine and engine.brain.use_gpu) else "cpu_reference"
+
+
+@app.get("/api/v1/health")
+def v1_health():
+    h = get_health()
+    return {"api": "v1", **h}
+
+
+@app.get("/api/v1/readiness")
+def v1_readiness():
+    """Readiness for orchestrators: engine loaded + dataset files present."""
+    engine = get_engine()
+    soma = os.path.join("malecns", "data-raw", "2023-27-2 soma_sides.csv")
+    conn = os.path.join("malecns", "data-raw", "malecns_v1_0_connections.csv")
+    ready = (engine.circuit.num_neurons > 0
+             and os.path.exists(soma) and os.path.exists(conn))
+    return {"api": "v1", "ready": ready,
+            "checks": {"circuit_loaded": engine.circuit.num_neurons > 0,
+                       "soma_csv": os.path.exists(soma),
+                       "connections_csv": os.path.exists(conn)},
+            "backend": _v1_backend(), "version": get_version()["version"]}
+
+
+@app.get("/api/v1/version")
+def v1_version():
+    return {"api": "v1", **get_version(),
+            "commit": get_git_commit()}
+
+
+@app.get("/api/v1/doctor")
+def v1_doctor():
+    return {"api": "v1", **get_doctor()}
+
+
+@app.get("/api/v1/state")
+def v1_state():
+    return {"api": "v1", **get_state()}
+
+
+@app.get("/api/v1/runtime")
+def v1_runtime():
+    """Runtime vitals: stream status + resources + backup/drive status."""
+    from src.backup import gdrive
+    engine = get_engine()
+    vm = psutil.virtual_memory()
+    return {"api": "v1", "stream": engine.stream_status(),
+            "resources": {"ram_percent": vm.percent,
+                          "ram_available_gb": round(vm.available / (1024 ** 3), 2),
+                          "cpu_percent": psutil.cpu_percent(interval=None)},
+            "backup": {"service": "local_disk", "root": os.path.abspath(
+                os.environ.get("FLYBRAIN_BACKUP_DIR", "backups"))},
+            "google_drive": gdrive.status()}
+
+
+@app.get("/api/v1/metrics")
+def v1_metrics():
+    engine = get_engine()
+    lat = list(engine.step_history)
+    vm = psutil.virtual_memory()
+    tele = engine.get_telemetry_payload()
+    return {"api": "v1", "step": tele["step"], "spikes": tele["spikes"],
+            "total_spikes": tele["total_spikes"],
+            "latency_ms": {"last": engine.last_step_time_ms,
+                           "mean": round(float(np.mean(lat)), 3) if lat else 0.0,
+                           "p50": round(float(np.median(lat)), 3) if lat else 0.0,
+                           "p95": round(float(np.percentile(lat, 95)), 3) if lat else 0.0,
+                           "p99": round(float(np.percentile(lat, 99)), 3) if lat else 0.0},
+            "memory": {"ram_percent": vm.percent},
+            "backend": tele["backend"], "uptime_sec": engine.stream_status()["uptime_sec"]}
+
+
+@app.get("/api/v1/events")
+def v1_events(limit: int = 20):
+    """Honest event surface: recent experiment manifests + dreams + heartbeat."""
+    exps = list_experiments()[:max(1, min(limit, 20))]
+    dreams = get_dreams(limit=5)
+    engine = get_engine()
+    return {"api": "v1", "heartbeat": engine.stream_status()["heartbeat"],
+            "experiments": [{"experiment_id": e.get("experiment_id"),
+                             "seed": e.get("seed"),
+                             "final_state_hash": e.get("final_state_hash")}
+                            for e in exps],
+            "dreams": dreams}
+
+
+@app.get("/api/v1/provenance")
+def v1_provenance():
+    return {"api": "v1", **get_provenance()}
+
+
+@app.get("/api/v1/connectome")
+def v1_connectome(max_nodes: int = 512, max_edges: int = 384):
+    return {"api": "v1", **get_connectome(max_nodes=max_nodes, max_edges=max_edges)}
+
+
+@app.get("/api/v1/neuron/{body_id}")
+def v1_neuron(body_id: int):
+    """Single-neuron sync point: metadata + live activity + capped connectivity."""
+    engine = get_engine()
+    g = engine.circuit
+    idx = [i for i, b in enumerate(g.neuron_ids) if int(b) == int(body_id)]
+    if not idx:
+        raise HTTPException(status_code=404, detail="neuron body_id not in sampled circuit")
+    i = idx[0]
+    st = engine.brain.state
+    row_s, row_e = int(g.row_offsets[i]), int(g.row_offsets[i + 1])
+    incoming = [{"from_idx": int(g.col_indices[k]),
+                 "from_body": int(g.neuron_ids[int(g.col_indices[k])]),
+                 "w": round(float(g.weights[k]), 4)}
+                for k in range(row_s, min(row_e, row_s + 64))]
+    # outgoing: scan rows owning i as source (capped)
+    outgoing = []
+    for r in range(g.num_neurons):
+        if len(outgoing) >= 64:
+            break
+        s, e = int(g.row_offsets[r]), int(g.row_offsets[r + 1])
+        for k in range(s, e):
+            if int(g.col_indices[k]) == i:
+                outgoing.append({"to_idx": r, "to_body": int(g.neuron_ids[r]),
+                                 "w": round(float(g.weights[k]), 4)})
+                if len(outgoing) >= 64:
+                    break
+    pops = g.populations.to_dict() if g.populations else {}
+    member_of = [n for n, p in pops.items() if i in p.get("neuron_indices", [])]
+    return {"api": "v1", "body_id": int(body_id), "idx": i,
+            "side": g.sides[i], "tbars": int(g.tbars[i]),
+            "coordinates_nm": [float(x) for x in g.coordinates[i]],
+            "annotation": {"position": "EMPIRICAL", "side": "EMPIRICAL",
+                           "cell_type": "UNKNOWN", "hemilineage": "UNKNOWN",
+                           "neurotransmitter": "UNKNOWN"},
+            "populations": [{"name": n, "classification": "HEURISTIC"} for n in member_of],
+            "activity": {"potential": round(float(st.membrane_potentials[i]), 4),
+                         "spike": int(st.spikes[i] > 0.5),
+                         "activation": round(float(st.activations[i]), 4)},
+            "incoming": incoming, "outgoing": outgoing,
+            "incoming_total": row_e - row_s}
+
+
+@app.post("/api/v1/simulation/start")
+def v1_sim_start():
+    return {"api": "v1", **post_start(), **get_engine().stream_status()}
+
+
+@app.post("/api/v1/simulation/pause")
+def v1_sim_pause():
+    return {"api": "v1", **post_pause()}
+
+
+@app.post("/api/v1/simulation/resume")
+def v1_sim_resume():
+    return {"api": "v1", **get_engine().resume()}
+
+
+@app.post("/api/v1/simulation/stop")
+def v1_sim_stop():
+    return {"api": "v1", **get_engine().stop()}
+
+
+@app.post("/api/v1/simulation/reset")
+def v1_sim_reset(req: ResetRequest):
+    return {"api": "v1", **post_reset(req)}
+
+
+@app.post("/api/v1/simulation/step")
+def v1_sim_step(req: StepRequest):
+    return {"api": "v1", **post_step(req)}
+
+
+@app.post("/api/v1/stream/start")
+def v1_stream_start(hz: float = 10.0):
+    engine = get_engine()
+    engine.target_hz = max(0.5, min(hz, 100.0))
+    engine.start()
+    return {"api": "v1", **engine.stream_status()}
+
+
+@app.post("/api/v1/stream/stop")
+def v1_stream_stop():
+    return {"api": "v1", **get_engine().stop()}
+
+
+@app.get("/api/v1/stream/status")
+def v1_stream_status():
+    return {"api": "v1", **get_engine().stream_status()}
+
+
+def _backup_service():
+    from src.backup.service import BackupService
+    return BackupService()
+
+
+@app.post("/api/v1/backup/create")
+def v1_backup_create(label: str = "manual", trigger: str = "manual"):
+    return {"api": "v1", **_backup_service().create_backup(get_engine(), None,
+                                                           label=label, trigger=trigger)}
+
+
+@app.get("/api/v1/backup/list")
+def v1_backup_list():
+    return {"api": "v1", "backups": _backup_service().list_backups()}
+
+
+@app.get("/api/v1/backup/verify")
+def v1_backup_verify(name: str):
+    return {"api": "v1", **_backup_service().verify_backup(name)}
+
+
+@app.post("/api/v1/backup/restore")
+def v1_backup_restore(name: str):
+    return {"api": "v1", **_backup_service().restore_backup(name, get_engine(), None)}
+
+
+@app.get("/api/v1/backup/google")
+def v1_backup_google():
+    from src.backup import gdrive
+    return {"api": "v1", **gdrive.status()}
+
+
+@app.get("/api/v1/backup/download")
+def v1_backup_download(name: str):
+    """Verified backup as a streamed zip (hash-checked before serving)."""
+    import shutil as _shutil
+    import tempfile as _tf
+    from fastapi.responses import FileResponse as _FR
+    svc = _backup_service()
+    verdict = svc.verify_backup(name)
+    if verdict["status"] != "VALID":
+        raise HTTPException(status_code=409,
+                            detail=f"backup {name!r} is {verdict['status']}; not served")
+    src = os.path.join(svc.root, name)
+    tmp = _tf.mkdtemp(prefix="flybrain_dl_")
+    archive = _shutil.make_archive(os.path.join(tmp, name), "zip", src)
+    return _FR(archive, media_type="application/zip", filename=f"{name}.zip")
+
+
+WATCHDOG = None
+
+
+def _get_watchdog():
+    global WATCHDOG
+    if WATCHDOG is None and os.environ.get("FLYBRAIN_WATCHDOG", "1") == "1":
+        from src.runtime.watchdog import Watchdog
+        WATCHDOG = Watchdog(get_engine, _backup_service())
+        WATCHDOG.start()
+    return WATCHDOG
+
+
+@app.get("/api/v1/watchdog/status")
+def v1_watchdog_status():
+    wd = _get_watchdog()
+    if wd is None:
+        return {"api": "v1", "running": False,
+                "detail": "watchdog disabled (FLYBRAIN_WATCHDOG=0)"}
+    return {"api": "v1", **wd.status()}
+
+
+@app.get("/api/v1/experiments")
+def v1_experiments():
+    return {"api": "v1", "experiments": list_experiments()}
+
+
+@app.post("/api/v1/experiments/run")
+def v1_experiments_run(req: RunExpRequest):
+    from src.connectome.types import coerce_graph_mode
+    req.graph_mode = coerce_graph_mode(req.graph_mode).value
+    return {"api": "v1", **post_run_experiment(req)}
+
+
+@app.get("/api/v1/organisms")
+def v1_organisms():
+    return {"api": "v1", **get_colony_status()}
+
+
+@app.get("/api/v1/organisms/{organism_id}")
+def v1_organism_detail(organism_id: str):
+    return {"api": "v1", **get_organism_detail(organism_id)}
+
+
+@app.get("/api/v1/evolution/lineage")
+def v1_evo_lineage():
+    return {"api": "v1", **get_evolution_lineage()}
+
+
+@app.get("/api/v1/memory")
+def v1_memory(query: Optional[str] = None, limit: int = 10):
+    return {"api": "v1", **get_memory(query=query, limit=limit)}
+
+
+@app.get("/api/v1/dreams")
+def v1_dreams(limit: int = 10):
+    return {"api": "v1", "dreams": get_dreams(limit=limit)}
+
+
+@app.get("/api/v1/llm/status")
+def v1_llm_status():
+    return {"api": "v1", **get_llm_status()}
 
 
 # ---------------- Local GGUF LLM endpoints (REAL runtime state) ----------------

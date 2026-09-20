@@ -442,6 +442,16 @@
             border: 1px solid var(--border-subtle);
         }
 
+        .btn-red {
+            background: rgba(255, 51, 102, 0.15);
+            border: 1px solid rgba(255, 51, 102, 0.5);
+            color: var(--accent-red);
+        }
+
+        .btn-red:hover {
+            background: rgba(255, 51, 102, 0.3);
+        }
+
         /* Accessibility: visible focus + reduced motion */
         button:focus-visible, select:focus-visible, input:focus-visible, canvas:focus-visible {
             outline: 2px solid var(--accent-cyan);
