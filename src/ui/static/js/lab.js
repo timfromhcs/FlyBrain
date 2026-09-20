@@ -16,11 +16,12 @@
             setTimeout(() => { toast.remove(); }, 3500);
         }
 
-        function switchTab(tabId) {
+        function switchTab(tabId, el) {
             activeTab = tabId;
             document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            event.target.classList.add('active');
+            const btn = el || document.querySelector(`.nav-tab[onclick*="'${tabId}'"]`);
+            if (btn) btn.classList.add('active');
             document.getElementById('tab-' + tabId).classList.add('active');
 
             if (tabId === 'connectome') {

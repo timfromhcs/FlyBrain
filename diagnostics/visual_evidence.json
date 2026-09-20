@@ -1,0 +1,60 @@
+{
+  "overall": "PASS",
+  "shots": [
+    {
+      "tab": "overview",
+      "file": "visual_evidence/screens/v5_overview.png",
+      "bytes": 60148
+    },
+    {
+      "tab": "stream",
+      "file": "visual_evidence/screens/v5_stream.png",
+      "bytes": 59647
+    },
+    {
+      "tab": "connectome",
+      "file": "visual_evidence/screens/v5_connectome.png",
+      "bytes": 118133
+    },
+    {
+      "tab": "colony",
+      "file": "visual_evidence/screens/v5_colony.png",
+      "bytes": 61183
+    },
+    {
+      "tab": "provenance",
+      "file": "visual_evidence/screens/v5_provenance.png",
+      "bytes": 84336
+    },
+    {
+      "tab": "experiments",
+      "file": "visual_evidence/screens/v5_experiments.png",
+      "bytes": 76118
+    },
+    {
+      "tab": "memory",
+      "file": "visual_evidence/screens/v5_memory.png",
+      "bytes": 44385
+    },
+    {
+      "tab": "evolution",
+      "file": "visual_evidence/screens/v5_evolution.png",
+      "bytes": 44814
+    },
+    {
+      "tab": "dreams",
+      "file": "visual_evidence/screens/v5_dreams.png",
+      "bytes": 101647
+    },
+    {
+      "tab": "backups",
+      "file": "visual_evidence/screens/v5_backups.png",
+      "bytes": 60008
+    },
+    {
+      "tab": "diagnostics",
+      "file": "visual_evidence/screens/v5_diagnostics.png",
+      "bytes": 79316
+    }
+  ]
+}

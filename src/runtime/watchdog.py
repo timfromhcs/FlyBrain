@@ -22,12 +22,19 @@ class WatchdogConfig:
     max_restarts: int = 3
 
 
+def _system_ram_percent() -> float:
+    import psutil
+    return float(psutil.virtual_memory().percent)
+
+
 class Watchdog:
     def __init__(self, engine_getter: Callable, backup_service=None,
-                 config: Optional[WatchdogConfig] = None):
+                 config: Optional[WatchdogConfig] = None,
+                 ram_reader: Callable[[], float] = _system_ram_percent):
         self._engine_getter = engine_getter
         self._backups = backup_service
         self.config = config or WatchdogConfig()
+        self._ram_reader = ram_reader
         self._stop = threading.Event()
         self._thread: Optional[threading.Thread] = None
         self.events: List[Dict[str, Any]] = []
@@ -72,8 +79,7 @@ class Watchdog:
         eng = self._engine_getter()
         findings: List[str] = []
         try:
-            import psutil
-            ram = psutil.virtual_memory().percent
+            ram = float(self._ram_reader())
             if ram >= self.config.ram_percent_limit:
                 findings.append(f"RAM_CRITICAL:{ram:.1f}%")
         except Exception as e:  # noqa: BLE001

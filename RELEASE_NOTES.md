@@ -1,3 +1,58 @@
+# FlyBrain Release Notes — v5.0.0 Stable
+
+**Tag:** `v5.0.0` · **Prior line:** `v4.1.0` · **Semver:** major (new API
+surface `/api/v1`, new subsystems; legacy `/api/*` routes unchanged and
+working).
+
+## New subsystems (all real, all tested)
+- **Versioned API contracts:** `/api/v1/*` (health, readiness, version,
+  doctor, state, runtime, metrics, events, provenance, connectome,
+  neuron/{body_id}, simulation, stream, backup, experiments, organisms,
+  evolution, memory, dreams, llm) alongside unchanged legacy routes.
+- **Backup service** (`src/backup/service.py`, schema `flybrain_backup_v1`):
+  create/list/verify/restore/download, retention generations, tamper-evident
+  verification, guarded restore (paused-only, pre-restore auto-backup,
+  post-restore hash match). Round trip proven on clean runtimes
+  (`tests/test_backup_roundtrip.py`) and on the live Space.
+- **24/7 stream mode:** START/PAUSE/RESUME/STOP/SAFE_SHUTDOWN, uptime,
+  heartbeat, p50/p95/p99 metrics, spectator-safe (WS disconnect never stops
+  the sim).
+- **Watchdog** (`src/runtime/watchdog.py`): stall/RAM/GPU supervision with
+  bounded RETRY → RESTORE → RESTART → SAFE_STOP (never hidden loops).
+- **First-run presets** (`flybrain lab --preset`): QUICK_DEMO,
+  BIOLOGICAL_SUBGRAPH, GPU_PERFORMANCE, CPU_SAFE, ALIFE_COLONY, RESEARCH,
+  24/7_STREAM — all real configurations via the `FLYBRAIN_*` env contract.
+- **Topology null controls** (`src/connectome/nulls.py`): EDGE_SHUFFLED,
+  DEGREE_PRESERVING_RANDOM (exact), WEIGHT_SHUFFLED — deterministic, flagged
+  non-empirical.
+- **Google Drive provider** (`src/backup/gdrive.py`): explicit status model;
+  `BLOCKED_AUTHENTICATION` with the exact consent step until valid OAuth
+  exists (see `deployment/GOOGLE_DRIVE.md`). Never faked.
+- **GUI:** Live Stream, Colony (organisms), Backups tabs; `switchTab` fixed
+  for programmatic/keyboard activation; 11/11 real screenshots in
+  `visual_evidence/screens/v5_*.png`.
+- **Release machinery:** stale-doc detector, release-integrity check,
+  canonical `diagnostics/release_certificate.json`, master inventory.
+
+## Space & chain
+- Hugging Face Docker Space verified live: boot, health (`cpu_reference`,
+  honest), version, provenance (`REAL_SUBGRAPH`), UI (zero CDN), simulation
+  step, backup create → download (hash-verified) → VALID → restore
+  (hash match). Deployed commit pinned in the release certificate.
+
+## Known limitations
+- Screenshots cover 11 tabs (HOME/LIVE/CONNECTOME/COLONY/PROVENANCE/
+  EXPERIMENTS/MEMORY/EVOLUTION/DREAMS/BACKUPS/DIAGNOSTICS); neuron-inspector
+  selection and dream-replay visuals are exercised via API, not captured.
+- Google Drive remote backup: `BLOCKED_AUTHENTICATION` until one-time OAuth
+  consent (external human step).
+- Endurance (1h/6h/24h): `UNVERIFIED` — no full soak run in this environment.
+- Carried from v4.1: no `REAL_FULL` live circuit; CPU population sim;
+  trajectory (not bit-exact) parity; 2B-class local LLM hypotheses only;
+  coarse deep-time approximation.
+
+---
+
 # FlyBrain Release Notes — v4.1.0 Stable
 
 **Tag:** `v4.1.0` · **Prior line:** `v4.0.0` · **Semver:** minor (additive

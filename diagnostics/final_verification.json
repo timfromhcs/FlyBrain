@@ -1,10 +1,10 @@
 {
   "repository": "timfromhcs/FlyBrain",
   "branch": "main",
-  "commit": "185370ee79b69c8e4f0c866fd7409d4089283c9f",
-  "version": "4.1.0",
-  "release_tag": "v4.1.0",
-  "generated_at": "2026-09-20T22:01:07Z",
+  "commit": "2f747cc317a774cc082c9ffd65096cd252d5161f",
+  "version": "5.0.0",
+  "release_tag": "v5.0.0",
+  "generated_at": "2026-09-20T23:24:04Z",
   "dataset_identities": {
     "soma_sides_csv": "",
     "connections_csv": "",
@@ -42,54 +42,54 @@
   },
   "benchmark": {
     "methodology": "20 measured steps after 5 warmup steps; external input constant; REAL graphs for Vulkan, SYNTHETIC_TEST for CPU (matches prior harness); seed 42; wall-clock via perf_counter.",
-    "commit": "185370ee79b69c8e4f0c866fd7409d4089283c9f",
+    "commit": "2f747cc317a774cc082c9ffd65096cd252d5161f",
     "seed": 42,
     "summary": [
       {
         "n": 64,
         "syn": 100,
-        "step_rb_ms": 0.2025,
-        "step_norb_ms": 0.1615,
-        "plas_rb_ms": 0.1562,
-        "plas_norb_ms": 0.2057
+        "step_rb_ms": 0.2378,
+        "step_norb_ms": 0.1886,
+        "plas_rb_ms": 0.1893,
+        "plas_norb_ms": 0.1596
       },
       {
         "n": 128,
         "syn": 395,
-        "step_rb_ms": 0.2058,
-        "step_norb_ms": 0.1692,
-        "plas_rb_ms": 0.157,
-        "plas_norb_ms": 0.1324
+        "step_rb_ms": 0.2106,
+        "step_norb_ms": 0.1843,
+        "plas_rb_ms": 0.1893,
+        "plas_norb_ms": 0.1564
       },
       {
         "n": 256,
         "syn": 1449,
-        "step_rb_ms": 0.2164,
-        "step_norb_ms": 0.1526,
-        "plas_rb_ms": 0.1737,
-        "plas_norb_ms": 0.1291
+        "step_rb_ms": 0.2748,
+        "step_norb_ms": 0.1953,
+        "plas_rb_ms": 0.2309,
+        "plas_norb_ms": 0.1662
       },
       {
         "n": 512,
         "syn": 6557,
-        "step_rb_ms": 0.2298,
-        "step_norb_ms": 0.1691,
-        "plas_rb_ms": 0.388,
-        "plas_norb_ms": 0.138
+        "step_rb_ms": 0.2867,
+        "step_norb_ms": 0.1867,
+        "plas_rb_ms": 0.4058,
+        "plas_norb_ms": 0.1599
       },
       {
         "n": 1024,
         "syn": 25749,
-        "step_rb_ms": 0.3822,
-        "step_norb_ms": 0.177,
-        "plas_rb_ms": 1.029,
-        "plas_norb_ms": 0.1739
+        "step_rb_ms": 0.3273,
+        "step_norb_ms": 0.1943,
+        "plas_rb_ms": 0.8073,
+        "plas_norb_ms": 0.1909
       }
     ],
     "design_conclusions": [
-      "Per-step host readback overhead (median): [0.041, 0.0366, 0.0638, 0.0607, 0.2052] ms across sizes; state readback stays because CPU owns telemetry/motor/decoding state.",
-      "Plasticity readback vs no-readback medians: [(0.1562, 0.2057), (0.157, 0.1324), (0.1737, 0.1291), (0.388, 0.138), (1.029, 0.1739)] ms; weight readback is the dominant GPU->CPU cost on rewarded steps, motivating lazy weight sync (v4.1).",
-      "Host-visible upload bandwidth: [31.7, 183.1, 689.2, 2486.1, 4243.8] MB/s on unified-memory AMD iGPU; device-local+staging would add copies without benefit here, so the host-visible/coherent design is retained (measured, AMD-compatible).",
+      "Per-step host readback overhead (median): [0.0492, 0.0263, 0.0795, 0.1, 0.133] ms across sizes; state readback stays because CPU owns telemetry/motor/decoding state.",
+      "Plasticity readback vs no-readback medians: [(0.1893, 0.1596), (0.1893, 0.1564), (0.2309, 0.1662), (0.4058, 0.1599), (0.8073, 0.1909)] ms; weight readback is the dominant GPU->CPU cost on rewarded steps, motivating lazy weight sync (v4.1).",
+      "Host-visible upload bandwidth: [38.6, 159.0, 547.3, 2148.1, 4925.7] MB/s on unified-memory AMD iGPU; device-local+staging would add copies without benefit here, so the host-visible/coherent design is retained (measured, AMD-compatible).",
       "Command buffer is re-recorded per step (reset + begin/dispatch/end); dispatch geometry is fixed per circuit so pre-recording is possible in principle, but re-record cost is inside the measured submit path and no material gain was demonstrated \u2014 retained as-is (no unmeasured optimization)."
     ]
   },

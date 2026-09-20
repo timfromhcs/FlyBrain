@@ -30,7 +30,8 @@
 8. [Multi-Store Persistent Memory](#multi-store-persistent-memory)
 9. [Installation & Quick Start](#installation--quick-start)
 10. [Hardware Benchmark Results](#hardware-benchmark-results)
-11. [What's New in v4.1](#whats-new-in-v41)
+11. [What's New in v5.0](#whats-new-in-v50)
+12. [What's New in v4.1](#whats-new-in-v41)
 12. [Hugging Face Space](#hugging-face-space)
 13. [Artificial-Life Layer — Honest Status](#artificial-life-layer--honest-status)
 14. [Citation & Third-Party Notices](#citation--third-party-notices)
@@ -240,7 +241,7 @@ behavioral assertion (no source-text-only checks). The table below is
 | 42 | `deeptime_escalation_replay` | **PASS** | Coarse deep-time escalates to full-res checkpoint; replay hash-verified. |
 | 43 | `milestone_evidence` | **PASS** | Detected ['STRUCTURAL_EXPANSION', 'OVERLAPPING_GENERATIONS'] with evidence + certificate. |
 | 44 | `benchmark_fairness` | **PASS** | Per-arm budgets documented; LLM arms SKIP with reason when unmet. |
-| 45 | `version_metadata` | **PASS** | FlyBrain version metadata = 4.1.0 (v4.1.0). |
+| 45 | `version_metadata` | **PASS** | FlyBrain version metadata = 5.0.0 (v5.0.0). |
 | 46 | `immutable_bio_baseline` | **PASS** | Biological baseline fingerprint unchanged after lifetime development. |
 | 47 | `synapse_identity_provenance` | **PASS** | Stable synapse IDs; seed records cite source dataset; new synapses are EMERGENT, never BIOLOGICAL. |
 | 48 | `brain_identity_layers` | **PASS** | 12-layer identity: same state -> same identity; weight change -> different identity. |
@@ -326,6 +327,18 @@ unified-memory iGPU). Methodology and design conclusions live in the report;
 no optimization is kept without a measurement behind it.
 
 ---
+
+## What's New in v5.0
+
+- **Versioned API:** `/api/v1/*` contracts (readiness, runtime, metrics,
+  events, `neuron/{body_id}`, stream, backup, watchdog) with legacy compat.
+- **Backups:** tamper-evident create/verify/restore/download, retention,
+  proven round trip locally and on the live Space.
+- **24/7 stream + watchdog:** bounded supervision and recovery, presets
+  (`flybrain lab --preset 24_7_STREAM`), Live/Colony/Backups UI tabs.
+- **Null topology controls** for honest treatment-vs-topology experiments.
+- **Release machinery:** stale-doc detector, integrity gate, release
+  certificate, 11 real UI screenshots.
 
 ## What's New in v4.1
 

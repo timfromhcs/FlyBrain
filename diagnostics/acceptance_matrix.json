@@ -1,5 +1,5 @@
 {
-  "timestamp": 1789940841.000345,
+  "timestamp": 1789945703.840016,
   "overall_status": "PASSED",
   "total_categories": 57,
   "passed": 56,
@@ -186,7 +186,7 @@
     },
     "version_metadata": {
       "status": "PASS",
-      "reason": "FlyBrain version metadata = 4.1.0 (v4.1.0)."
+      "reason": "FlyBrain version metadata = 5.0.0 (v5.0.0)."
     },
     "immutable_bio_baseline": {
       "status": "PASS",

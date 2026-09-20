@@ -19,6 +19,12 @@ def _engine(seed=91):
                                                  f"wd_test_{seed}.db"))
 
 
+def _wd(engine_getter, backups=None, ram=42.0, **cfg):
+    """Watchdog with deterministic RAM input (production reader is psutil)."""
+    return Watchdog(engine_getter, backups, WatchdogConfig(**cfg),
+                    ram_reader=lambda: ram)
+
+
 class FakeStalledEngine:
     """Deterministic fault fixture: GPU requested but absent on every pass,
     so the recovery chain is exercised without timing flakes."""
@@ -55,15 +61,21 @@ class TestWatchdog(unittest.TestCase):
     def test_healthy_engine_ok(self):
         eng = _engine()
         eng.step_single(n_steps=2)
-        wd = Watchdog(lambda: eng, None, WatchdogConfig(stall_timeout_sec=60.0))
+        wd = _wd(lambda: eng, None, stall_timeout_sec=60.0)
         rep = wd.check_once()
         self.assertEqual(rep["findings"], [])
         eng.cleanup()
 
+    def test_ram_critical_fires_at_limit(self):
+        eng = _engine(seed=94)
+        wd = _wd(lambda: eng, None, ram=95.0)
+        rep = wd.check_once()
+        self.assertTrue(any("RAM_CRITICAL" in f for f in rep["findings"]))
+        eng.cleanup()
+
     def test_stall_detected_and_bounded_recovery(self):
         eng = FakeStalledEngine()
-        wd = Watchdog(lambda: eng, None,
-                      WatchdogConfig(stall_timeout_sec=0.0, max_restarts=2))
+        wd = _wd(lambda: eng, None, stall_timeout_sec=0.0, max_restarts=2)
         rep = wd.check_once()
         self.assertIn("GPU_REQUESTED_BUT_ABSENT", rep["findings"])
         # restart rung (no backups configured)
@@ -84,8 +96,7 @@ class TestWatchdog(unittest.TestCase):
         eng.is_running = True
         eng.use_gpu = False  # isolate the stall fault (no GPU complaint)
         eng._worker_thread = type("T", (), {"is_alive": lambda self: True})()
-        wd = Watchdog(lambda: eng, None,
-                      WatchdogConfig(stall_timeout_sec=0.0, max_restarts=0))
+        wd = _wd(lambda: eng, None, stall_timeout_sec=0.0, max_restarts=0)
         wd.check_once()  # baseline: first sighting of step 5
         time.sleep(0.02)
         rep = wd.check_once()  # step still 5 -> stalled
@@ -98,7 +109,7 @@ class TestWatchdog(unittest.TestCase):
             eng = _engine(seed=92)
             eng.step_single(n_steps=4)
             man = svc.create_backup(eng, label="pre", trigger="manual")
-            wd = Watchdog(lambda: eng, svc, WatchdogConfig(stall_timeout_sec=1000.0))
+            wd = _wd(lambda: eng, svc, stall_timeout_sec=1000.0)
             # force a fault path directly: restore rung
             wd._recover(eng, ["SYNTHETIC_FAULT"])
             kinds = [e["kind"] for e in wd.events]
@@ -108,7 +119,7 @@ class TestWatchdog(unittest.TestCase):
 
     def test_status_surface(self):
         eng = _engine(seed=93)
-        wd = Watchdog(lambda: eng, None)
+        wd = _wd(lambda: eng, None)
         st = wd.status()
         self.assertIn("recent_events", st)
         self.assertEqual(st["restarts"], 0)
