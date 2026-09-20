@@ -87,6 +87,9 @@ class TestParityMetrics(unittest.TestCase):
             a.step(sensory_inputs={"visual": stim}, reward=rew)
             b.step(sensory_inputs={"visual": stim}, reward=rew)
             mism += int(np.sum(a.state.spikes != b.state.spikes))
+            # v4.1 lazy GPU weight sync: the CPU mirror refreshes at explicit
+            # sync points; sync before comparing (thresholds unchanged).
+            b.sync_gpu_weights()
             maxw = max(maxw, float(np.max(np.abs(a.graph.weights - b.graph.weights))))
         print(f"[parity] 25-step trajectory: spike_mismatches={mism}, max_weight_diff={maxw:.2e}")
         a.cleanup(); b.cleanup()

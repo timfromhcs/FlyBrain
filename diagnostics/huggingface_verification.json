@@ -1,0 +1,69 @@
+{
+  "timestamp": 1789940584.6123283,
+  "commit": "185370ee79b69c8e4f0c866fd7409d4089283c9f",
+  "version": "4.1.0",
+  "entrypoint": "huggingface/app.py (uvicorn app:app, port 7860 in image; 7861 for this smoke)",
+  "env": {
+    "FLYBRAIN_CIRCUIT_SIZE": "128",
+    "FLYBRAIN_GRAPH_MODE": "REAL_SUBGRAPH",
+    "FLYBRAIN_USE_GPU": "0",
+    "FLYBRAIN_SEED": "42"
+  },
+  "checks": {
+    "health": {
+      "status": 200,
+      "body": {
+        "status": "HEALTHY",
+        "timestamp": 1789940572.0316577,
+        "version": "4.1.0",
+        "graph_mode": "REAL",
+        "provenance_status": "VERIFIED",
+        "backend": "cpu_reference",
+        "device_name": "CPU Reference Mode"
+      }
+    },
+    "boot_seconds": 54.8,
+    "version": {
+      "status": 200,
+      "body": {
+        "version": "4.1.0",
+        "release": "FlyBrain V4.1.0"
+      }
+    },
+    "doctor": {
+      "status": 200,
+      "overall": "READY"
+    },
+    "provenance": {
+      "status": 200,
+      "graph_identity": "REAL_SUBGRAPH",
+      "backend_note": "live"
+    },
+    "telemetry": {
+      "status": 200,
+      "step": 0
+    },
+    "connectome": {
+      "status": 200,
+      "nodes": 64,
+      "edges": 64
+    },
+    "ui": {
+      "status": 200,
+      "has_title": true,
+      "local_js": true,
+      "no_cdn": true
+    },
+    "vendor_js": {
+      "status": 200,
+      "bytes": 603445
+    },
+    "step": {
+      "status": 200,
+      "spikes": 0
+    },
+    "backend_honest_cpu": true,
+    "overall": "PASS"
+  },
+  "startup_log_tail": "[flybrain-space] repo=E:\\FlyBain LLM Evolve circuit=128 mode=REAL_SUBGRAPH use_gpu=0\nINFO:     Started server process [11332]\nINFO:     Waiting for application startup.\nE:\\FlyBain LLM Evolve\\.venv\\Lib\\site-packages\\huggingface_hub\\utils\\_validators.py:205: UserWarning: The `local_dir_use_symlinks` argument is deprecated and ignored in `hf_hub_download`. Downloading to a local directory does not use symlinks anymore.\n  warnings.warn(\nINFO:     Application startup complete.\nINFO:     Uvicorn running on http://127.0.0.1:7861 (Press CTRL+C to quit)\n[GenerateImage] VAE source unavailable (E:\\FlyBain LLM Evolve\\src\\models\\dreamlite-vae): We couldn't connect to 'https://huggingface.co' to load this model, couldn't find it in the cached files and it looks like E:\\FlyBain LLM Evolve\\src\\models\\dreamlite-vae is not the path to a directory containing a config.json file.\nCheckout your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/diffusers/installation#offline-mode'.\nINFO:     127.0.0.1:65179 - \"GET /api/health HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:65182 - \"GET /api/version HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:65183 - \"GET /api/doctor HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:65192 - \"GET /api/provenance HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:65193 - \"GET /api/telemetry HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:65194 - \"GET /api/connectome?max_nodes=64&max_edges=64 HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:65195 - \"GET / HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:65196 - \"GET /static/vendor/three.min.js HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:65197 - \"POST /api/simulation/step HTTP/1.1\" 200 OK\n"
+}

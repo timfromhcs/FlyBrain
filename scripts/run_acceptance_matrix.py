@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 Automated Release Acceptance Matrix Runner for FlyBrain.
-Evaluates all 25 required acceptance categories and writes diagnostics/acceptance_matrix.json.
+Evaluates the canonical categories in verification/acceptance_schema.json
+and writes diagnostics/acceptance_matrix.json.
 """
 
 import os
@@ -91,19 +92,31 @@ def evaluate_acceptance_matrix() -> Dict[str, Any]:
     else:
         matrix["provenance_manifest_integrity"] = {"status": "FAIL", "reason": "Manifest file missing"}
 
-    # 3. connectome_contract_separation
+    # 3. connectome_contract_separation (incl. explicit REAL_SUBGRAPH identity)
     print("[3/57] Evaluating connectome_contract_separation...")
     modes = {m.value for m in GraphMode}
     expected_modes = {"REAL", "SPATIAL_SURROGATE", "SYNTHETIC_TEST"}
-    if modes == expected_modes:
+    from src.connectome.types import GRAPH_IDENTITIES, resolve_graph_identity as _rgi
+    _alias_ok = (GraphMode.REAL_SUBGRAPH is GraphMode.REAL
+                 and GraphMode.canonical(GraphMode.REAL) == "REAL_SUBGRAPH"
+                 and set(GRAPH_IDENTITIES) == {"REAL_FULL", "REAL_SUBGRAPH",
+                                               "SPATIAL_SURROGATE", "SYNTHETIC_TEST"})
+    try:
+        _rgi("REAL_FULL")
+        _full_raises = False
+    except ValueError:
+        _full_raises = True
+    if modes == expected_modes and _alias_ok and _full_raises:
         matrix["connectome_contract_separation"] = {
             "status": "PASS",
-            "reason": f"Explicit separation of GraphMode contracts: {sorted(list(modes))}"
+            "reason": f"Explicit separation of GraphMode contracts: {sorted(list(modes))}; "
+                      f"REAL canonicalizes to REAL_SUBGRAPH; REAL_FULL honestly raises."
         }
     else:
         matrix["connectome_contract_separation"] = {
             "status": "FAIL",
-            "reason": f"GraphMode mismatch: expected {expected_modes}, got {modes}"
+            "reason": f"GraphMode mismatch: expected {expected_modes}, got {modes}; "
+                      f"alias_ok={_alias_ok}, full_raises={_full_raises}"
         }
 
     # 4. biological_vs_synthetic_separation
@@ -406,26 +419,35 @@ def evaluate_acceptance_matrix() -> Dict[str, Any]:
             "reason": f"Plasticity evaluation failed: {e}"
         }
 
-    # 17. ui_no_blocking_alerts
+    # 17. ui_no_blocking_alerts (+ local-first frontend: no CDN runtime deps)
     print("[17/57] Evaluating ui_no_blocking_alerts...")
-    html_path = os.path.join(PROJECT_ROOT, "src", "ui", "static", "index.html")
-    if os.path.exists(html_path):
-        with open(html_path, "r", encoding="utf-8") as f:
-            html_src = f.read()
-        has_alert = ("alert(" in html_src)
-        has_prompt = ("prompt(" in html_src)
-        if not has_alert and not has_prompt:
+    _ui_files = [os.path.join(PROJECT_ROOT, "src", "ui", "static", "index.html"),
+                 os.path.join(PROJECT_ROOT, "src", "ui", "static", "js", "lab.js"),
+                 os.path.join(PROJECT_ROOT, "src", "ui", "static", "css", "lab.css")]
+    _missing = [p for p in _ui_files if not os.path.exists(p)]
+    if _missing:
+        matrix["ui_no_blocking_alerts"] = {"status": "FAIL",
+                                           "reason": f"frontend files missing: {_missing}"}
+    else:
+        _src = "".join(open(p, "r", encoding="utf-8").read() for p in _ui_files)
+        has_alert = ("alert(" in _src)
+        has_prompt = ("prompt(" in _src)
+        has_cdn = ("cdnjs.cloudflare.com" in _src or "cdn.jsdelivr.net" in _src
+                   or "unpkg.com" in _src)
+        _vendor_ok = (os.path.exists(os.path.join(PROJECT_ROOT, "src", "ui", "static",
+                                                  "vendor", "three.min.js")))
+        if not has_alert and not has_prompt and not has_cdn and _vendor_ok:
             matrix["ui_no_blocking_alerts"] = {
                 "status": "PASS",
-                "reason": "FlyBrain Lab workstation contains zero blocking alert() or prompt() calls (uses non-intrusive toast notifications)."
+                "reason": "FlyBrain Lab workstation contains zero blocking alert()/prompt() calls "
+                          "(non-intrusive toasts) and zero CDN runtime dependencies (vendored three.js)."
             }
         else:
             matrix["ui_no_blocking_alerts"] = {
                 "status": "FAIL",
-                "reason": f"Blocking calls detected: alert={has_alert}, prompt={has_prompt}"
+                "reason": f"Blocking calls or CDN deps: alert={has_alert}, prompt={has_prompt}, "
+                          f"cdn={has_cdn}, vendor_ok={_vendor_ok}"
             }
-    else:
-        matrix["ui_no_blocking_alerts"] = {"status": "FAIL", "reason": "index.html not found"}
 
     # 18. full_pipeline_e2e_runnable
     print("[18/57] Evaluating full_pipeline_e2e_runnable...")
@@ -1038,14 +1060,15 @@ def evaluate_acceptance_matrix() -> Dict[str, Any]:
     except Exception as e:
         matrix["benchmark_fairness"] = {"status": "FAIL", "reason": f"failed: {e}"}
 
-    # 45. version_metadata
+    # 45. version_metadata (canonical: must match src/version.py single source of truth)
     print("[45/57] Evaluating version_metadata...")
     try:
-        from src.version import VERSION as _V
-        _ok = _V == "4.0.0"
+        from src.version import VERSION as _V, VERSION_TAG as _VT
+        import re as _re
+        _ok = bool(_re.fullmatch(r"\d+\.\d+\.\d+", _V)) and _VT == f"v{_V}"
         matrix["version_metadata"] = {
             "status": "PASS" if _ok else "FAIL",
-            "reason": f"FlyBrain version metadata = {_V}."
+            "reason": f"FlyBrain version metadata = {_V} ({_VT})."
         }
     except Exception as e:
         matrix["version_metadata"] = {"status": "FAIL", "reason": f"failed: {e}"}
@@ -1237,9 +1260,10 @@ def evaluate_acceptance_matrix() -> Dict[str, Any]:
     print("[55/57] Evaluating doctor_functional...")
     try:
         from src.diagnostics.doctor import run_doctor as _rd
+        from src.version import VERSION as _VV
         _rep = _rd()
         _names = [c["name"] for c in _rep["checks"]]
-        _ok = (_rep["flybrain_version"] == "4.0.0" and _rep["summary"]["errors"] == 0
+        _ok = (_rep["flybrain_version"] == _VV and _rep["summary"]["errors"] == 0
                and all(n in _names for n in ("dataset", "gpu", "core_runtime"))
                and all(c["detail"] for c in _rep["checks"]))
         matrix["doctor_functional"] = {
@@ -1255,10 +1279,11 @@ def evaluate_acceptance_matrix() -> Dict[str, Any]:
     try:
         from fastapi.testclient import TestClient as _TC
         from src.ui.server import app as _app
+        from src.version import VERSION as _VVV
         _cl = _TC(_app)
         _v = _cl.get("/api/version")
         _d = _cl.get("/api/doctor")
-        _ok = (_v.status_code == 200 and _v.json()["version"] == "4.0.0"
+        _ok = (_v.status_code == 200 and _v.json()["version"] == _VVV
                and _d.status_code == 200 and _d.json()["overall"] in
                ("READY", "READY_DEGRADED", "DEGRADED"))
         matrix["ui_v4_endpoints"] = {
@@ -1292,12 +1317,24 @@ def evaluate_acceptance_matrix() -> Dict[str, Any]:
         matrix["portable_package"] = {"status": "FAIL", "reason": f"failed: {e}"}
 
     # Summary
+    # Schema conformance: runner categories must equal the canonical schema.
+    # Drift (renamed/missing/extra category) forces overall FAILED, never silent.
+    # Recorded at report level (not as a category) so totals stay schema-defined.
+    _schema_path = os.path.join(PROJECT_ROOT, "verification", "acceptance_schema.json")
+    _schema_drift = []
+    try:
+        with open(_schema_path, "r", encoding="utf-8") as _sf:
+            _schema = json.load(_sf)
+        _schema_cats = _schema.get("categories", [])
+        _schema_drift = sorted(set(matrix) ^ set(_schema_cats))
+    except Exception as _e:
+        _schema_drift = [f"acceptance schema unreadable: {_e}"]
     pass_count = sum(1 for v in matrix.values() if v["status"] == "PASS")
     fail_count = sum(1 for v in matrix.values() if v["status"] == "FAIL")
     skip_count = sum(1 for v in matrix.values() if v["status"].startswith("SKIP"))
     
-    overall_status = "PASSED" if fail_count == 0 else "FAILED"
-    
+    overall_status = "PASSED" if (fail_count == 0 and not _schema_drift) else "FAILED"
+
     report = {
         "timestamp": time.time(),
         "overall_status": overall_status,
@@ -1305,6 +1342,8 @@ def evaluate_acceptance_matrix() -> Dict[str, Any]:
         "passed": pass_count,
         "failed": fail_count,
         "skipped": skip_count,
+        "acceptance_schema": "verification/acceptance_schema.json",
+        "schema_drift": _schema_drift,
         "categories": matrix
     }
 

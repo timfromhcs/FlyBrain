@@ -94,7 +94,7 @@ def main():
     exp_run.add_argument("--spec", default=None, help="Path to experiment JSON spec file")
     exp_run.add_argument("--id", default=None, help="Custom experiment identifier")
     exp_run.add_argument("--seed", type=int, default=42, help="PRNG seed")
-    exp_run.add_argument("--mode", choices=["REAL", "SPATIAL_SURROGATE", "SYNTHETIC_TEST"], default="REAL", help="Connectome graph mode")
+    exp_run.add_argument("--mode", choices=["REAL", "REAL_SUBGRAPH", "SPATIAL_SURROGATE", "SYNTHETIC_TEST"], default="REAL", help="Connectome graph mode (REAL = REAL_SUBGRAPH sampled)")
     exp_run.add_argument("--scale", type=int, default=256, help="Number of neurons")
     exp_run.add_argument("--steps", type=int, default=50, help="Number of simulation steps")
     exp_run.add_argument("--no-gpu", action="store_true", help="Force CPU reference backend")
@@ -107,7 +107,7 @@ def main():
     exp_compare.add_argument("--b", required=True, help="Second experiment ID or manifest path")
 
     # flybrain acceptance-matrix
-    subparsers.add_parser("acceptance-matrix", help="Run 19-category release acceptance matrix")
+    subparsers.add_parser("acceptance-matrix", help="Run canonical release acceptance matrix (verification/acceptance_schema.json)")
 
     # flybrain docs-verify
     subparsers.add_parser("docs-verify", help="Verify consistency between code, shaders, and documentation")
@@ -151,15 +151,17 @@ def main():
             if args.spec and os.path.exists(args.spec):
                 with open(args.spec, "r", encoding="utf-8") as f:
                     spec_data = json.load(f)
+                from src.connectome.types import coerce_graph_mode as _coerce
                 seed = spec_data.get("seed", 42)
-                mode = GraphMode(spec_data.get("graph_mode", "REAL"))
+                mode = _coerce(spec_data.get("graph_mode", "REAL"))
                 scale = spec_data.get("neuron_scale", 256)
                 steps = spec_data.get("duration_steps", 50)
                 use_gpu = spec_data.get("use_gpu", True)
                 exp_id = spec_data.get("experiment_id", None)
             else:
+                from src.connectome.types import coerce_graph_mode
                 seed = args.seed
-                mode = GraphMode(args.mode)
+                mode = coerce_graph_mode(args.mode)
                 scale = args.scale
                 steps = args.steps
                 use_gpu = not args.no_gpu

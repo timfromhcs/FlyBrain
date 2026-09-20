@@ -1,0 +1,101 @@
+{
+  "schema_version": "acceptance_v1",
+  "description": "Single canonical acceptance schema for FlyBrain releases. The runner (scripts/run_acceptance_matrix.py) MUST evaluate exactly these categories; README/ARCHITECTURE/RESEARCH_STATUS/release notes MUST derive their totals from diagnostics/acceptance_matrix.json generated from this schema. Never hard-code stale totals into documents.",
+  "failure_policy": {
+    "FAIL": "a required check failed -> release blocked",
+    "SKIP_ENVIRONMENT": "allowed ONLY when the environment genuinely lacks the capability (no GPU, no GGUF weights, no portable bundle); reason must name the missing capability",
+    "ERROR": "ambiguous or unverifiable result -> treated as FAIL for release gating"
+  },
+  "profiles": {
+    "workstation": {
+      "description": "Windows 11 + AMD Vulkan GPU + local GGUF weights present",
+      "expected": "56 PASS / 1 SKIP (portable_package) / 0 FAIL, or 57 PASS with FLYBRAIN_PORTABLE_DIR built"
+    },
+    "vulkan": {
+      "description": "Any host with a Vulkan compute device",
+      "expected": "vulkan_discovery_and_selection, persistent_resource_lifecycle, cpu_vulkan_numerical_parity MUST PASS (never SKIP)"
+    },
+    "cpu-only": {
+      "description": "No Vulkan device",
+      "expected": "vulkan_discovery_and_selection, persistent_resource_lifecycle, cpu_vulkan_numerical_parity SKIP_ENVIRONMENT with reason; all other required categories PASS"
+    },
+    "ci": {
+      "description": "GitHub Actions ubuntu/windows runners (no GPU, no GGUF)",
+      "expected": "vulkan_* (3) + llm_model_discovery_and_inference SKIP_ENVIRONMENT; remainder PASS; 0 FAIL"
+    },
+    "huggingface": {
+      "description": "Hugging Face Space runtime (CPU)",
+      "expected": "same SKIPs as cpu-only plus llm_model_discovery_and_inference SKIP_ENVIRONMENT; health/version/doctor endpoints PASS; UI serves live backend state"
+    },
+    "release": {
+      "description": "Gate for tagging a stable release",
+      "expected": "0 FAIL across all evaluated categories; every SKIP_ENVIRONMENT justified by missing capability; docs verification PASS; provenance verification PASS; replay PASS; checkpoint continuation PASS; UI real-endpoint PASS; Hugging Face verification PASS or documented external blocker"
+    }
+  },
+  "environment_skippable": [
+    "vulkan_discovery_and_selection",
+    "persistent_resource_lifecycle",
+    "cpu_vulkan_numerical_parity",
+    "llm_model_discovery_and_inference",
+    "portable_package"
+  ],
+  "categories": [
+    "repository_cleanliness",
+    "provenance_manifest_integrity",
+    "connectome_contract_separation",
+    "biological_vs_synthetic_separation",
+    "spatial_surrogate_behavior",
+    "lif_dynamics_correctness",
+    "refractory_period_invariance",
+    "reset_potential_invariance",
+    "vulkan_discovery_and_selection",
+    "persistent_resource_lifecycle",
+    "cpu_vulkan_numerical_parity",
+    "single_loop_telemetry_isolation",
+    "thread_lock_concurrency",
+    "deterministic_experiment_replication",
+    "local_model_degradation_honesty",
+    "continuous_learning_weight_change",
+    "ui_no_blocking_alerts",
+    "full_pipeline_e2e_runnable",
+    "documentation_claim_consistency",
+    "alife_branch_replay_determinism",
+    "developmental_structural_integrity",
+    "genome_mutation_crossover_provenance",
+    "overlapping_reproduction",
+    "cultural_transmission_gain",
+    "real_mode_zero_surrogate_edges",
+    "csr_directionality",
+    "biological_edge_semantics",
+    "real_annotation_integrity",
+    "plasticity_causal_effect",
+    "checkpoint_continuation",
+    "llm_model_discovery_and_inference",
+    "llm_failure_mode_and_tool_safety",
+    "living_brain_identity",
+    "structural_growth_resource_constrained",
+    "eligibility_neuromodulation",
+    "autonomy_self_generated_goals",
+    "grounded_language_and_social",
+    "genome_v2_architecture_genes",
+    "speciation_evidence",
+    "llm_control_plane_safety",
+    "research_memory_chain",
+    "deeptime_escalation_replay",
+    "milestone_evidence",
+    "benchmark_fairness",
+    "version_metadata",
+    "immutable_bio_baseline",
+    "synapse_identity_provenance",
+    "brain_identity_layers",
+    "heredity_separation",
+    "evolution_parent_identity",
+    "ablation_enforcement",
+    "deterministic_research_ids",
+    "research_ledger_chain",
+    "deeptime_exact_mode",
+    "doctor_functional",
+    "ui_v4_endpoints",
+    "portable_package"
+  ]
+}

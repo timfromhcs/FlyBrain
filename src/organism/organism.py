@@ -319,13 +319,45 @@ class Organism:
         self.stage = stage_for_age(self.age)
         if self.health <= 0.0 or self.age > 400:
             self.die("health" if self.health <= 0.0 else "age")
+        # v4.1 causal-path telemetry: every behaviorally relevant action is
+        # traceable to sensory input -> neural response -> motor output ->
+        # body actuation -> environment outcome -> reward. policy_source names
+        # which (explicitly hand-written) motor policy mapped neural output to
+        # movement; it is NOT neural activity itself.
+        neural_spikes = int(np.sum(self.brain.state.spikes > 0.5))
         return {"organism_id": self.id, "alive": self.alive, "action": act,
                 "reward": round(reward, 4), "energy": round(self.energy, 4),
                 "stage": self.stage.value,
                 "action_kind": act,
                 "goal": (self.autonomy.active_goal().kind
                          if (self.autonomy_mode and self.autonomy is not None
-                             and self.autonomy.active_goal() is not None) else None)}
+                             and self.autonomy.active_goal() is not None) else None),
+                "causal_path": {
+                    "sensory_input": {
+                        "food_gradient": round(float(sense.get("food_gradient", 0.0)), 4),
+                        "hazard_gradient": round(float(sense.get("hazard_gradient", 0.0)), 4),
+                        "nearby_organisms": int(sense.get("nearby_organisms", 0)),
+                    },
+                    "neural_response": {
+                        "spikes": neural_spikes,
+                        "mean_activation": round(float(np.mean(
+                            self.brain.state.activations)) if len(
+                            self.brain.state.activations) else 0.0, 4),
+                        "selected_neural_action": out.get("selected_action", "explore"),
+                        "prediction_error": round(float(out.get("prediction_error", 0.0)), 4),
+                    },
+                    "motor_output": {"dx": int(dx), "dy": int(dy)},
+                    "body_actuation": {
+                        "policy_source": ("neural+autonomy" if self.autonomy_mode
+                                          else "neural+reflex"),
+                        "mobile": bool(self.body.is_mobile()) if self.body is not None else True,
+                    },
+                    "environment_outcome": {
+                        "consumed": round(float(consumed), 4),
+                        "hazard": bool(world.hazard_at(self.id)),
+                    },
+                    "reward": round(reward, 4),
+                }}
 
     def _sync_brain_to_graph(self):
         """Resize brain state arrays after structural growth (new neurons start silent)."""

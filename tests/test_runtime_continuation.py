@@ -12,6 +12,9 @@ from src.brain.runtime import BrainRuntime
 
 
 def full_state_hash(rt: BrainRuntime) -> str:
+    # v4.1: sync the lazy GPU weight mirror so the hash covers true state.
+    if hasattr(rt, "sync_gpu_weights"):
+        rt.sync_gpu_weights()
     h = hashlib.sha256()
     s = rt.state
     for arr in (s.membrane_potentials, s.spikes, s.refractory_steps,
@@ -107,6 +110,7 @@ class TestRuntimeContinuation(unittest.TestCase):
         self.assertEqual(rt_cpu.state.total_spikes, rt_gpu.state.total_spikes)
         self.assertLess(float(np.max(np.abs(rt_cpu.state.membrane_potentials -
                                             rt_gpu.state.membrane_potentials))), 1e-4)
+        rt_gpu.sync_gpu_weights()
         self.assertLess(float(np.max(np.abs(rt_cpu.graph.weights -
                                             rt_gpu.graph.weights))), 1e-4)
         rt_cpu.cleanup()

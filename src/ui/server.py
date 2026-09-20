@@ -41,11 +41,21 @@ def get_colony() -> Population:
 def get_engine() -> SimulationEngine:
     global SIMULATION_ENGINE
     if SIMULATION_ENGINE is None:
+        # Environment-safe defaults (Hugging Face Spaces are CPU-only):
+        # FLYBRAIN_CIRCUIT_SIZE, FLYBRAIN_GRAPH_MODE, FLYBRAIN_USE_GPU.
+        _size = int(os.environ.get("FLYBRAIN_CIRCUIT_SIZE", "512"))
+        _mode_raw = os.environ.get("FLYBRAIN_GRAPH_MODE", "REAL")
+        try:
+            from src.connectome.types import coerce_graph_mode as _coerce
+            _mode = _coerce(_mode_raw)
+        except ValueError:
+            _mode = GraphMode.REAL
+        _use_gpu = os.environ.get("FLYBRAIN_USE_GPU", "1") not in ("0", "false", "no")
         SIMULATION_ENGINE = SimulationEngine(
-            circuit_size=512,
-            graph_mode=GraphMode.REAL,
-            use_gpu=True,
-            seed=42
+            circuit_size=_size,
+            graph_mode=_mode,
+            use_gpu=_use_gpu,
+            seed=int(os.environ.get("FLYBRAIN_SEED", "42"))
         )
     return SIMULATION_ENGINE
 
@@ -53,6 +63,18 @@ def get_engine() -> SimulationEngine:
 async def startup_event():
     engine = get_engine()
     engine.set_event_loop(asyncio.get_event_loop())
+
+
+def _server_event_loop():
+    """Best-effort event loop handle (uvicorn provides one; TestClient threads
+    may not — fall back to a fresh loop instead of raising)."""
+    try:
+        return asyncio.get_running_loop()
+    except RuntimeError:
+        try:
+            return asyncio.get_event_loop()
+        except RuntimeError:
+            return asyncio.new_event_loop()
 
 @app.on_event("shutdown")
 def shutdown_event():
@@ -64,6 +86,7 @@ STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
 os.makedirs(STATIC_DIR, exist_ok=True)
 os.makedirs("visual_evidence", exist_ok=True)
 app.mount("/visual_evidence", StaticFiles(directory="visual_evidence"), name="visual_evidence")
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 @app.get("/")
 def get_index():
@@ -148,15 +171,64 @@ def post_reset(req: ResetRequest):
     global SIMULATION_ENGINE
     if SIMULATION_ENGINE:
         SIMULATION_ENGINE.close()
-    mode = GraphMode(req.graph_mode)
+    from src.connectome.types import coerce_graph_mode
+    mode = coerce_graph_mode(req.graph_mode)
     SIMULATION_ENGINE = SimulationEngine(
         circuit_size=req.circuit_size,
         graph_mode=mode,
         use_gpu=True,
         seed=req.seed
     )
-    SIMULATION_ENGINE.set_event_loop(asyncio.get_event_loop())
-    return {"status": "RESET_COMPLETE", "graph_mode": mode.value, "neurons": req.circuit_size}
+    SIMULATION_ENGINE.set_event_loop(_server_event_loop())
+    return {"status": "RESET_COMPLETE", "graph_mode": mode.value,
+            "graph_identity": GraphMode.canonical(mode),
+            "neurons": req.circuit_size}
+
+@app.get("/api/provenance")
+def get_provenance():
+    """Scientific status contract: graph identity, sampling, annotation levels,
+    weight semantics, dataset hashes. All values live from the loaded circuit."""
+    from src.connectome.types import GRAPH_IDENTITIES
+    engine = get_engine()
+    g = engine.circuit
+    pm = dict(getattr(g, "provenance_metadata", None) or {})
+    pops = g.populations.to_dict() if g.populations else {}
+    return {
+        "graph_identity": pm.get("graph_identity", GraphMode.canonical(g.mode)),
+        "graph_mode": g.mode.value,
+        "provenance_status": g.provenance_status.value,
+        "graph_identities": GRAPH_IDENTITIES,
+        "sampling": {
+            "strategy": pm.get("selection_strategy", "unknown"),
+            "detail": pm.get("selection_detail", ""),
+            "seed": pm.get("selection_seed"),
+            "bias": pm.get("sampling_bias", ""),
+            "sampled_neurons": pm.get("sampled_neuron_count", g.num_neurons),
+            "source_neurons": pm.get("source_neuron_total", pm.get("source_neuron_count")),
+            "source_edges": pm.get("source_edge_total"),
+            "sampled_edges": pm.get("circuit_synapses", g.num_synapses),
+            "full_graph_available_locally": pm.get("full_graph_available_locally", False),
+        },
+        "weight_semantics": {
+            "source": pm.get("weight_source", ""),
+            "transform": pm.get("weight_transform", ""),
+            "simulation_semantics": pm.get("simulation_semantics", ""),
+            "note": "Derived simulation transform. NOT a measured conductance.",
+        },
+        "populations": {
+            name: {"heuristic": p.get("heuristic", True),
+                   "classification_method": p.get("classification_method", ""),
+                   "annotation_status": p.get("annotation_status", ""),
+                   "annotation_level": p.get("annotation_level", "HEURISTIC"),
+                   "count": p.get("count", 0)}
+            for name, p in pops.items()
+        },
+        "dataset": {"name": pm.get("dataset_name", "Janelia MaleCNS"),
+                    "version": pm.get("version", "male-cns:v1.0"),
+                    "soma_sha256": pm.get("soma_sha256", ""),
+                    "connections_sha256": pm.get("connections_sha256", "")},
+        "graph_hash": g.graph_hash,
+    }
 
 @app.get("/api/memory")
 def get_memory(query: Optional[str] = None, limit: int = 10):

@@ -1,0 +1,15 @@
+# FlyBrain Hugging Face Space dependencies (pinned, CPU-only).
+# Pinned from the verified v4.1.0 workstation environment (2026-09-20).
+# No torch/transformers/vulkan/accelerate: the Space runs the CPU reference
+# backend and reports it honestly via /api/health (backend=cpu_reference).
+fastapi==0.136.3
+uvicorn==0.51.0
+numpy==2.4.6
+scipy==1.18.0
+pydantic==2.13.5
+psutil==7.2.2
+websockets==11.0.3
+pillow==12.3.0
+httpx==0.28.1
+python-multipart==0.0.32
+starlette==1.3.1

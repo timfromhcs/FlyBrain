@@ -56,6 +56,12 @@ class BrainRuntime:
                 neuromod=neuromod if neuromod is not None else NeuromodulationConfig())
         
         self.gpu_engine: Optional[VulkanComputeEngine] = None
+        # Lazy GPU weight sync (v4.1, measured: weight readback dominates
+        # rewarded-step cost at scale, e.g. ~0.85ms of ~1.0ms at N=1024).
+        # GPU weights are authoritative; the CPU mirror (self.graph.weights)
+        # is refreshed only at explicit sync points. Telemetry reports
+        # weights_synced so staleness is never silent.
+        self._gpu_weights_dirty = False
         if self.use_gpu:
             try:
                 self.gpu_engine = VulkanComputeEngine()
@@ -104,6 +110,31 @@ class BrainRuntime:
         else:
             self.motor_image_indices = np.arange(max(0, N - 96), max(0, N - 64), dtype=np.int32)
             self.motor_remember_indices = self.motor_image_indices
+
+    def sync_gpu_weights(self) -> bool:
+        """Refresh the CPU weight mirror from authoritative GPU weights.
+
+        Returns True if a sync was performed, False if the mirror was current
+        (CPU path, GPU unavailable, or nothing changed). Called automatically
+        by save_snapshot(); call explicitly before reading graph.weights /
+        graph_hash after rewarded GPU steps (experiment manifests, validation,
+        curriculum measurements).
+        """
+        if not self._gpu_weights_dirty:
+            return False
+        if self.gpu_engine is None or not self.use_gpu:
+            self._gpu_weights_dirty = False
+            return False
+        downloaded = self.gpu_engine.download_weights()
+        if downloaded is not None:
+            self.graph.weights = downloaded
+            self.graph.graph_hash = self.graph.compute_graph_hash()
+        self._gpu_weights_dirty = False
+        return downloaded is not None
+
+    @property
+    def gpu_weights_dirty(self) -> bool:
+        return self._gpu_weights_dirty
 
     def step(
         self,
@@ -227,16 +258,16 @@ class BrainRuntime:
                 # prev_spikes buffer with S(t); restore true S(t-1) so the
                 # three-factor rule sees identical pre/post on CPU and GPU,
                 # then re-upload S(t) to leave next-step state intact.
+                # v4.1: weights stay GPU-resident (no per-step readback);
+                # the CPU mirror syncs lazily via sync_gpu_weights().
                 self.gpu_engine.upload_buffer_data("prev_spikes", prev_spikes)
-                updated_weights = self.gpu_engine.run_plasticity_persistent(
+                self.gpu_engine.run_plasticity_persistent(
                     learning_rate=0.05,
                     reward=reward,
-                    readback=True
+                    readback=False
                 )
                 self.gpu_engine.upload_buffer_data("prev_spikes", new_spk)
-                if updated_weights is not None:
-                    self.graph.weights = updated_weights
-                    self.graph.graph_hash = self.graph.compute_graph_hash()
+                self._gpu_weights_dirty = True
                 synapses_updated = len(self.graph.weights)
             else:
                 synapses_updated = self.plasticity.apply_hebbian_update(
@@ -278,6 +309,7 @@ class BrainRuntime:
             },
             "selected_action": selected_action,
             "synapses_updated": synapses_updated,
+            "weights_synced": not self._gpu_weights_dirty,
             "plasticity_mode": self.plasticity_mode,
             "neuromod_signal": round(neuromod_signal, 6),
             "backend": "vulkan_gpu" if (self.use_gpu and self.gpu_engine) else "cpu_reference"
@@ -285,6 +317,7 @@ class BrainRuntime:
 
     def save_snapshot(self, filepath: str):
         """Saves full deterministic state snapshot for perfect resumption."""
+        self.sync_gpu_weights()
         os.makedirs(os.path.dirname(filepath), exist_ok=True)
         np.savez_compressed(
             filepath,

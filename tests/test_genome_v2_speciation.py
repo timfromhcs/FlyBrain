@@ -157,11 +157,14 @@ class TestPopulationV2(unittest.TestCase):
 
     def test_v2_evolution_changes_architecture_genes(self):
         pop = self._pop(74, size=4)
-        pop.step(40)
+        # Adults (age>=60, energy/health>0.4) are the eligible parents;
+        # at 40 ticks all founders are still juvenile, so run to 70.
+        pop.step(70)
+        self.assertGreaterEqual(len(pop.eligible_parents()), 2,
+                                "simulation must yield eligible adult parents")
         pop.reproduce(3)
         children = [o for o in pop.organisms if o.generation > 0]
-        if not children:
-            self.skipTest("no reproduction occurred")
+        self.assertTrue(children, "reproduction must produce children")
         founder_params = {k for k in pop.organisms[0].genome.params}
         for c in children:
             c.genome.validate()

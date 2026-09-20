@@ -1,5 +1,12 @@
 # FlyBrain: Final Technical & Behavioral Verification Report
 
+> **v4.1.0 note (2026-09-20):** this narrative report is frozen at v4.0.0 and
+> kept for history. The canonical machine-readable evidence for v4.1.0 is
+> `diagnostics/final_verification.json` (with the 8-report proof package);
+> acceptance totals in README/RESEARCH_STATUS are generated from
+> `diagnostics/acceptance_matrix.json` via `verification/acceptance_schema.json`.
+> Where this document says 44/44, read the canonical report (57-category schema).
+
 **Framework**: FlyBrain — biologically grounded artificial-life research framework
 **Target Biological Dataset**: Janelia MaleCNS v1.0 (`male-cns:v1.0`)
 **Host Environment**: Windows 11, AMD Ryzen 7 7735HS, AMD Radeon(TM) Graphics, Vulkan SDK 1.4.357

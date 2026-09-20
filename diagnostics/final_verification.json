@@ -1,0 +1,140 @@
+{
+  "repository": "timfromhcs/FlyBrain",
+  "branch": "main",
+  "commit": "185370ee79b69c8e4f0c866fd7409d4089283c9f",
+  "version": "4.1.0",
+  "release_tag": "v4.1.0",
+  "generated_at": "2026-09-20T22:01:07Z",
+  "dataset_identities": {
+    "soma_sides_csv": "",
+    "connections_csv": "",
+    "source_neurons": 125506,
+    "source_edges": 99301
+  },
+  "shader_identities": {
+    "brain_step.spv": "85427c36a5de1f638280fcffcd7295c864d8f78fee01fd5990fe26afaa9a3b65",
+    "plasticity.spv": "5321dd5fc6985d93d302f4cc6fc0e80a4b04f5ca022cbb7a7b18ef3b448ef17c"
+  },
+  "environment": {
+    "os": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.13",
+    "numpy": "2.5.3"
+  },
+  "hardware": {
+    "device": "AMD Radeon(TM) Graphics",
+    "note": "AMD Radeon 680M integrated GPU, Windows 11"
+  },
+  "acceptance": {
+    "overall": "PASSED",
+    "total": 57,
+    "passed": 56,
+    "failed": 0,
+    "skipped": 1,
+    "schema": "verification/acceptance_schema.json",
+    "schema_drift": []
+  },
+  "skipped_checks_and_reasons": {
+    "portable_package": "No built portable bundle on this host; set FLYBRAIN_PORTABLE_DIR to a built dist for artifact self-test."
+  },
+  "test_suite": {
+    "result": "249 passed, 0 failed (1 dynamics skip converted to hard assertion in v4.1; see tests/)",
+    "evidence": "diagnostics/test_results.xml (local run artifact)"
+  },
+  "benchmark": {
+    "methodology": "20 measured steps after 5 warmup steps; external input constant; REAL graphs for Vulkan, SYNTHETIC_TEST for CPU (matches prior harness); seed 42; wall-clock via perf_counter.",
+    "commit": "185370ee79b69c8e4f0c866fd7409d4089283c9f",
+    "seed": 42,
+    "summary": [
+      {
+        "n": 64,
+        "syn": 100,
+        "step_rb_ms": 0.2025,
+        "step_norb_ms": 0.1615,
+        "plas_rb_ms": 0.1562,
+        "plas_norb_ms": 0.2057
+      },
+      {
+        "n": 128,
+        "syn": 395,
+        "step_rb_ms": 0.2058,
+        "step_norb_ms": 0.1692,
+        "plas_rb_ms": 0.157,
+        "plas_norb_ms": 0.1324
+      },
+      {
+        "n": 256,
+        "syn": 1449,
+        "step_rb_ms": 0.2164,
+        "step_norb_ms": 0.1526,
+        "plas_rb_ms": 0.1737,
+        "plas_norb_ms": 0.1291
+      },
+      {
+        "n": 512,
+        "syn": 6557,
+        "step_rb_ms": 0.2298,
+        "step_norb_ms": 0.1691,
+        "plas_rb_ms": 0.388,
+        "plas_norb_ms": 0.138
+      },
+      {
+        "n": 1024,
+        "syn": 25749,
+        "step_rb_ms": 0.3822,
+        "step_norb_ms": 0.177,
+        "plas_rb_ms": 1.029,
+        "plas_norb_ms": 0.1739
+      }
+    ],
+    "design_conclusions": [
+      "Per-step host readback overhead (median): [0.041, 0.0366, 0.0638, 0.0607, 0.2052] ms across sizes; state readback stays because CPU owns telemetry/motor/decoding state.",
+      "Plasticity readback vs no-readback medians: [(0.1562, 0.2057), (0.157, 0.1324), (0.1737, 0.1291), (0.388, 0.138), (1.029, 0.1739)] ms; weight readback is the dominant GPU->CPU cost on rewarded steps, motivating lazy weight sync (v4.1).",
+      "Host-visible upload bandwidth: [31.7, 183.1, 689.2, 2486.1, 4243.8] MB/s on unified-memory AMD iGPU; device-local+staging would add copies without benefit here, so the host-visible/coherent design is retained (measured, AMD-compatible).",
+      "Command buffer is re-recorded per step (reset + begin/dispatch/end); dispatch geometry is fixed per circuit so pre-recording is possible in principle, but re-record cost is inside the measured submit path and no material gain was demonstrated \u2014 retained as-is (no unmeasured optimization)."
+    ]
+  },
+  "cpu_gpu_validation": {
+    "report": "diagnostics/cpu_gpu_validation_report.json",
+    "status": "SUCCESS"
+  },
+  "ui_verification": {
+    "endpoints": {
+      "/api/health": 200,
+      "/api/version": 200,
+      "/api/doctor": 200,
+      "/api/provenance": 200,
+      "/api/state": 200,
+      "/api/telemetry": 200
+    },
+    "provenance_identity": "REAL_SUBGRAPH",
+    "frontend": "index.html + css/lab.css + js/lab.js, vendored three.js r128, zero CDN deps"
+  },
+  "hugging_face": {
+    "local_smoke": "PASS",
+    "report": "diagnostics/huggingface_verification.json",
+    "remote": "not yet pushed (external step; see deployment/HUGGINGFACE.md)"
+  },
+  "known_limitations": [
+    "REAL_FULL (all 125,506 neurons in one live circuit) not instantiated",
+    "Population simulation runs on CPU; no batched multi-organism GPU stepping",
+    "CPU/Vulkan parity is trajectory-level, not bit-exact",
+    "Local LLM is 2B-class quantization; hypotheses only",
+    "Deep-time ACCELERATED is a documented coarse approximation"
+  ],
+  "unresolved_external_dependencies": [
+    "Hugging Face Hub remote Space publication (requires push; blocked until release commit exists)",
+    "GitHub release/tag publication (gh release; performed after this report)"
+  ],
+  "evidence": {
+    "pre_release_audit": "diagnostics/pre_release_audit.json",
+    "acceptance_matrix": "diagnostics/acceptance_matrix.json",
+    "reproducibility_manifest": "diagnostics/reproducibility_manifest.json",
+    "cpu_gpu_validation_report": "diagnostics/cpu_gpu_validation_report.json",
+    "connectome_validation_report": "diagnostics/connectome_validation_report.json",
+    "benchmark_report": "diagnostics/benchmark_report.json",
+    "huggingface_verification": "diagnostics/huggingface_verification.json",
+    "final_verification": "diagnostics/final_verification.json"
+  },
+  "overall": "PASS",
+  "errors": []
+}

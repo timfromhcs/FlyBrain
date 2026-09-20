@@ -8,6 +8,7 @@ provenance; every rejection states the exact reason.
 """
 import hashlib
 import json
+import re
 import time
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
@@ -70,9 +71,25 @@ COMMAND_SPECS: Dict[str, Dict[str, Any]] = {
     },
 }
 
-FORBIDDEN_SUBSTRINGS = ("os.system", "subprocess", "eval(", "exec(", "__import__",
-                        "rm -rf", "drop table", "delete from", "powershell",
-                        "open(", "write(", "import os", "shutil")
+# Capability allowlist: role -> commands the role may invoke. Typed dispatch is
+# the security boundary (text params are data, never executed). Identifier
+# params (checkpoint names, experiment ids, ...) must additionally match
+# _IDENTIFIER_RE; free-text fields (hypothesis text, descriptions, curriculum
+# stages) are never scanned and never executed.
+CAPABILITY_ROLES: Dict[str, frozenset] = {
+    "llm-scientist": frozenset(COMMAND_SPECS.keys()),
+    "viewer": frozenset({"REQUEST_COMPARISON", "REQUEST_REPLAY", "PROPOSE_HYPOTHESIS"}),
+}
+
+# Identifier-shaped params: strict allowlist, no shell metachars possible.
+_IDENTIFIER_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,199}")
+IDENTIFIER_PARAMS = {"name", "checkpoint_name", "experiment_a", "experiment_b",
+                     "config_name", "reproduction_mode", "experiment_type"}
+
+# Deprecated: whole-blob substring blacklists were fragile (false positives on
+# legitimate scientific text, false negatives via obfuscation). Kept as an
+# empty tuple for backward-compatible imports; enforcement is capability-based.
+FORBIDDEN_SUBSTRINGS: tuple = ()
 
 
 @dataclass
@@ -90,8 +107,8 @@ class CommandEnvelope:
                 "timestamp": self.timestamp or time.time()}
 
 
-def validate_envelope(envelope: Any) -> tuple:
-    """Returns (ok, error). Structural + schema validation, no execution."""
+def validate_envelope(envelope: Any, role: str = "llm-scientist") -> tuple:
+    """Returns (ok, error). Structural + schema + capability validation, no execution."""
     if not isinstance(envelope, CommandEnvelope):
         return False, "payload is not a CommandEnvelope"
     if envelope.schema_version != COMMAND_SCHEMA_VERSION:
@@ -99,13 +116,12 @@ def validate_envelope(envelope: Any) -> tuple:
     spec = COMMAND_SPECS.get(envelope.command)
     if spec is None:
         return False, f"unknown command {envelope.command!r}"
+    allowed_cmds = CAPABILITY_ROLES.get(role, frozenset())
+    if envelope.command not in allowed_cmds:
+        return False, f"command {envelope.command!r} not permitted for role {role!r}"
     params = envelope.params
     if not isinstance(params, dict):
         return False, "params must be a dict"
-    blob = json.dumps(envelope.to_dict()).lower()
-    for bad in FORBIDDEN_SUBSTRINGS:
-        if bad in blob:
-            return False, f"forbidden content in command payload: {bad!r}"
     for name, typ in spec["required"].items():
         if name not in params:
             return False, f"missing required param {name!r}"
@@ -135,6 +151,14 @@ def validate_envelope(envelope: Any) -> tuple:
     for name, allowed_vals in spec.get("enum", {}).items():
         if name in params and params[name] not in allowed_vals:
             return False, f"param {name!r} must be one of {allowed_vals}"
+    # Capability-based identifier guard: identifier params must match the
+    # strict allowlist (no shell metachars can pass). Free-text params
+    # (text/description/success_criterion/stages) are data, never executed,
+    # and are intentionally NOT scanned.
+    for name in IDENTIFIER_PARAMS:
+        if name in params and isinstance(params[name], str):
+            if _IDENTIFIER_RE.fullmatch(params[name]) is None:
+                return False, f"param {name!r} is not a valid identifier"
     return True, ""
 
 
@@ -292,11 +316,13 @@ class ResearchRuntime:
 class ControlPlane:
     """Validates and executes LLM command envelopes against a ResearchRuntime."""
 
-    def __init__(self, runtime: Optional[ResearchRuntime] = None):
+    def __init__(self, runtime: Optional[ResearchRuntime] = None,
+                 role: str = "llm-scientist"):
         self.runtime = runtime if runtime is not None else ResearchRuntime()
+        self.role = role
 
     def execute(self, envelope: Any) -> Dict[str, Any]:
-        ok, err = validate_envelope(envelope)
+        ok, err = validate_envelope(envelope, role=self.role)
         if not ok:
             result = {"status": "REJECTED", "reason": err,
                       "command": getattr(envelope, "command", str(envelope)[:80])}

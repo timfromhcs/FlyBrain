@@ -130,7 +130,9 @@ class ExperimentManager:
             spike_trajectory.append(step_res["spikes"])
             reward_history.append(rew)
 
-        # 4. Record final state hash
+        # 4. Record final state hash (sync GPU weight mirror first so the
+        # hash covers learned weights, not a stale CPU copy)
+        brain.sync_gpu_weights()
         fin_h = hashlib.sha256()
         fin_h.update(brain.state.membrane_potentials.tobytes())
         fin_h.update(brain.state.spikes.tobytes())

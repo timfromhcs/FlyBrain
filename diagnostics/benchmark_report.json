@@ -1,0 +1,327 @@
+{
+  "methodology": "20 measured steps after 5 warmup steps; external input constant; REAL graphs for Vulkan, SYNTHETIC_TEST for CPU (matches prior harness); seed 42; wall-clock via perf_counter.",
+  "timestamp": 1789939836.2015827,
+  "commit": "185370ee79b69c8e4f0c866fd7409d4089283c9f",
+  "seed": 42,
+  "environment": {
+    "os": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.13",
+    "numpy": "2.5.3"
+  },
+  "shaders": {
+    "brain_step.spv": "85427c36a5de1f638280fcffcd7295c864d8f78fee01fd5990fe26afaa9a3b65",
+    "plasticity.spv": "5321dd5fc6985d93d302f4cc6fc0e80a4b04f5ca022cbb7a7b18ef3b448ef17c"
+  },
+  "cpu_step": [
+    {
+      "n": 20,
+      "median_ms": 0.286,
+      "p05_ms": 0.2575,
+      "p95_ms": 0.3183,
+      "min_ms": 0.2564,
+      "max_ms": 0.3227,
+      "mean_ms": 0.2885,
+      "steps_per_sec": 3495.9,
+      "neurons": 64,
+      "synapses": 570,
+      "init_ms": 0.52,
+      "synapses_per_sec": 1993007
+    },
+    {
+      "n": 20,
+      "median_ms": 0.4791,
+      "p05_ms": 0.4518,
+      "p95_ms": 0.5077,
+      "min_ms": 0.4426,
+      "max_ms": 0.5455,
+      "mean_ms": 0.4798,
+      "steps_per_sec": 2087.0,
+      "neurons": 128,
+      "synapses": 1143,
+      "init_ms": 0.65,
+      "synapses_per_sec": 2385723
+    },
+    {
+      "n": 20,
+      "median_ms": 0.978,
+      "p05_ms": 0.9451,
+      "p95_ms": 1.0074,
+      "min_ms": 0.9449,
+      "max_ms": 1.0616,
+      "mean_ms": 0.9782,
+      "steps_per_sec": 1022.5,
+      "neurons": 256,
+      "synapses": 2296,
+      "init_ms": 0.53,
+      "synapses_per_sec": 2347648
+    },
+    {
+      "n": 20,
+      "median_ms": 1.8915,
+      "p05_ms": 1.8513,
+      "p95_ms": 2.0507,
+      "min_ms": 1.8354,
+      "max_ms": 2.1201,
+      "mean_ms": 1.907,
+      "steps_per_sec": 528.7,
+      "neurons": 512,
+      "synapses": 4597,
+      "init_ms": 0.57,
+      "synapses_per_sec": 2430346
+    }
+  ],
+  "vulkan_step": {
+    "device": "AMD Radeon(TM) Graphics",
+    "device_type": "Integrated GPU",
+    "driver_version": 8388961,
+    "status": "MEASURED",
+    "cases": [
+      {
+        "neurons": 64,
+        "synapses": 100,
+        "init_ms": 5.89,
+        "step_readback": {
+          "n": 20,
+          "median_ms": 0.2025,
+          "p05_ms": 0.1975,
+          "p95_ms": 0.237,
+          "min_ms": 0.1967,
+          "max_ms": 0.2531,
+          "mean_ms": 0.2107,
+          "steps_per_sec": 4939.5
+        },
+        "step_no_readback": {
+          "n": 20,
+          "median_ms": 0.1615,
+          "p05_ms": 0.1585,
+          "p95_ms": 0.1848,
+          "min_ms": 0.1534,
+          "max_ms": 0.1931,
+          "mean_ms": 0.1665,
+          "steps_per_sec": 6192.0
+        },
+        "readback_overhead_ms": 0.041,
+        "plasticity_readback_ms": {
+          "n": 10,
+          "median_ms": 0.1562,
+          "p05_ms": 0.1538,
+          "p95_ms": 0.1882,
+          "min_ms": 0.1534,
+          "max_ms": 0.1959,
+          "mean_ms": 0.1635,
+          "steps_per_sec": 6404.1
+        },
+        "plasticity_no_readback_ms": {
+          "n": 10,
+          "median_ms": 0.2057,
+          "p05_ms": 0.1567,
+          "p95_ms": 0.315,
+          "min_ms": 0.1427,
+          "max_ms": 0.3501,
+          "mean_ms": 0.224,
+          "steps_per_sec": 4860.3
+        },
+        "upload_MB_per_s": 31.7,
+        "synapses_per_sec": 493827
+      },
+      {
+        "neurons": 128,
+        "synapses": 395,
+        "init_ms": 6.79,
+        "step_readback": {
+          "n": 20,
+          "median_ms": 0.2058,
+          "p05_ms": 0.1894,
+          "p95_ms": 0.2745,
+          "min_ms": 0.1875,
+          "max_ms": 0.3404,
+          "mean_ms": 0.2161,
+          "steps_per_sec": 4860.3
+        },
+        "step_no_readback": {
+          "n": 20,
+          "median_ms": 0.1692,
+          "p05_ms": 0.161,
+          "p95_ms": 0.1784,
+          "min_ms": 0.1572,
+          "max_ms": 0.192,
+          "mean_ms": 0.1707,
+          "steps_per_sec": 5911.9
+        },
+        "readback_overhead_ms": 0.0366,
+        "plasticity_readback_ms": {
+          "n": 10,
+          "median_ms": 0.157,
+          "p05_ms": 0.1527,
+          "p95_ms": 0.1894,
+          "min_ms": 0.1523,
+          "max_ms": 0.1963,
+          "mean_ms": 0.1641,
+          "steps_per_sec": 6367.4
+        },
+        "plasticity_no_readback_ms": {
+          "n": 10,
+          "median_ms": 0.1324,
+          "p05_ms": 0.1277,
+          "p95_ms": 0.1469,
+          "min_ms": 0.1273,
+          "max_ms": 0.1494,
+          "mean_ms": 0.1363,
+          "steps_per_sec": 7550.0
+        },
+        "upload_MB_per_s": 183.1,
+        "synapses_per_sec": 1919339
+      },
+      {
+        "neurons": 256,
+        "synapses": 1449,
+        "init_ms": 10.9,
+        "step_readback": {
+          "n": 20,
+          "median_ms": 0.2164,
+          "p05_ms": 0.2002,
+          "p95_ms": 0.3632,
+          "min_ms": 0.1998,
+          "max_ms": 0.4277,
+          "mean_ms": 0.2395,
+          "steps_per_sec": 4621.1
+        },
+        "step_no_readback": {
+          "n": 20,
+          "median_ms": 0.1526,
+          "p05_ms": 0.146,
+          "p95_ms": 0.2254,
+          "min_ms": 0.1458,
+          "max_ms": 0.2542,
+          "mean_ms": 0.1662,
+          "steps_per_sec": 6553.1
+        },
+        "readback_overhead_ms": 0.0638,
+        "plasticity_readback_ms": {
+          "n": 10,
+          "median_ms": 0.1737,
+          "p05_ms": 0.1676,
+          "p95_ms": 0.1999,
+          "min_ms": 0.1673,
+          "max_ms": 0.2125,
+          "mean_ms": 0.1781,
+          "steps_per_sec": 5755.4
+        },
+        "plasticity_no_readback_ms": {
+          "n": 10,
+          "median_ms": 0.1291,
+          "p05_ms": 0.1252,
+          "p95_ms": 0.1578,
+          "min_ms": 0.1248,
+          "max_ms": 0.1712,
+          "mean_ms": 0.1354,
+          "steps_per_sec": 7745.9
+        },
+        "upload_MB_per_s": 689.2,
+        "synapses_per_sec": 6695933
+      },
+      {
+        "neurons": 512,
+        "synapses": 6557,
+        "init_ms": 8.5,
+        "step_readback": {
+          "n": 20,
+          "median_ms": 0.2298,
+          "p05_ms": 0.221,
+          "p95_ms": 0.2498,
+          "min_ms": 0.2202,
+          "max_ms": 0.2538,
+          "mean_ms": 0.234,
+          "steps_per_sec": 4351.6
+        },
+        "step_no_readback": {
+          "n": 20,
+          "median_ms": 0.1691,
+          "p05_ms": 0.1601,
+          "p95_ms": 0.1923,
+          "min_ms": 0.1561,
+          "max_ms": 0.2549,
+          "mean_ms": 0.175,
+          "steps_per_sec": 5913.7
+        },
+        "readback_overhead_ms": 0.0607,
+        "plasticity_readback_ms": {
+          "n": 10,
+          "median_ms": 0.388,
+          "p05_ms": 0.3679,
+          "p95_ms": 0.4009,
+          "min_ms": 0.3621,
+          "max_ms": 0.4019,
+          "mean_ms": 0.3866,
+          "steps_per_sec": 2577.3
+        },
+        "plasticity_no_readback_ms": {
+          "n": 10,
+          "median_ms": 0.138,
+          "p05_ms": 0.1321,
+          "p95_ms": 0.1646,
+          "min_ms": 0.132,
+          "max_ms": 0.1736,
+          "mean_ms": 0.1425,
+          "steps_per_sec": 7246.4
+        },
+        "upload_MB_per_s": 2486.1,
+        "synapses_per_sec": 28533507
+      },
+      {
+        "neurons": 1024,
+        "synapses": 25749,
+        "init_ms": 7.79,
+        "step_readback": {
+          "n": 20,
+          "median_ms": 0.3822,
+          "p05_ms": 0.3422,
+          "p95_ms": 0.5253,
+          "min_ms": 0.2912,
+          "max_ms": 0.5803,
+          "mean_ms": 0.3982,
+          "steps_per_sec": 2616.4
+        },
+        "step_no_readback": {
+          "n": 20,
+          "median_ms": 0.177,
+          "p05_ms": 0.1654,
+          "p95_ms": 0.2058,
+          "min_ms": 0.1599,
+          "max_ms": 0.219,
+          "mean_ms": 0.1813,
+          "steps_per_sec": 5649.7
+        },
+        "readback_overhead_ms": 0.2052,
+        "plasticity_readback_ms": {
+          "n": 10,
+          "median_ms": 1.029,
+          "p05_ms": 1.0038,
+          "p95_ms": 1.0707,
+          "min_ms": 0.9939,
+          "max_ms": 1.0839,
+          "mean_ms": 1.0329,
+          "steps_per_sec": 971.8
+        },
+        "plasticity_no_readback_ms": {
+          "n": 10,
+          "median_ms": 0.1739,
+          "p05_ms": 0.1384,
+          "p95_ms": 0.2376,
+          "min_ms": 0.1357,
+          "max_ms": 0.2522,
+          "mean_ms": 0.1822,
+          "steps_per_sec": 5750.4
+        },
+        "upload_MB_per_s": 4243.8,
+        "synapses_per_sec": 67370487
+      }
+    ]
+  },
+  "design_conclusions": [
+    "Per-step host readback overhead (median): [0.041, 0.0366, 0.0638, 0.0607, 0.2052] ms across sizes; state readback stays because CPU owns telemetry/motor/decoding state.",
+    "Plasticity readback vs no-readback medians: [(0.1562, 0.2057), (0.157, 0.1324), (0.1737, 0.1291), (0.388, 0.138), (1.029, 0.1739)] ms; weight readback is the dominant GPU->CPU cost on rewarded steps, motivating lazy weight sync (v4.1).",
+    "Host-visible upload bandwidth: [31.7, 183.1, 689.2, 2486.1, 4243.8] MB/s on unified-memory AMD iGPU; device-local+staging would add copies without benefit here, so the host-visible/coherent design is retained (measured, AMD-compatible).",
+    "Command buffer is re-recorded per step (reset + begin/dispatch/end); dispatch geometry is fixed per circuit so pre-recording is possible in principle, but re-record cost is inside the measured submit path and no material gain was demonstrated \u2014 retained as-is (no unmeasured optimization)."
+  ]
+}

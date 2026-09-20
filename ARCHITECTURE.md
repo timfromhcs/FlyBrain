@@ -1,7 +1,7 @@
 # FlyBrain Architectural Specification & Technical Manual
 
-**Authoritative Architecture Document**  
-**Version:** 1.0.0-PROVENANCE  
+**Authoritative Architecture Document**
+**Version:** 4.1.0
 **Target Platform:** Microsoft Windows 11 Pro 64-bit | Vulkan 1.2+ Compute  
 **Biological Basis:** Janelia FlyEM *Drosophila* Male Central Nervous System (`male-cns:v1.0`)
 
@@ -45,7 +45,7 @@ flowchart TD
     end
 
     subgraph Presentation["7. FlyBrain Lab (Dark Scientific Workstation)"]
-        WEB["Three.js 3D Connectome Raycasting Viewer<br/>REST APIs & WebSocket Telemetry Queue"]
+        WEB["Modular frontend: index.html + css/lab.css + js/lab.js<br/>Vendored three.js r128, /api/provenance contract<br/>REST APIs & WebSocket Telemetry Queue"]
     end
 
     SOMA --> SURR
@@ -63,8 +63,8 @@ flowchart TD
 
 To guarantee technical rigor and scientific honesty, connectome networks in FlyBrain are strictly separated into three isolated modes governed by `src/connectome/types.py`:
 
-### `GraphMode.REAL` (Status: `VERIFIED`)
-- **Biological Source:** Authentic Janelia MaleCNS v1.0 biological synaptic connection table (`malecns/data-raw/malecns_v1_0_connections.csv`): 99,301 rows across 2,045 unique bodies.
+### `GraphMode.REAL` (Status: `VERIFIED`, canonical identity `REAL_SUBGRAPH`)
+- **Biological Source:** Bounded sampled subgraph of the authentic Janelia MaleCNS v1.0 biological synaptic connection table (`malecns/data-raw/malecns_v1_0_connections.csv`): 99,301 rows across 2,045 unique bodies in the source; each live circuit samples N neurons / M edges (hub-biased `REAL_HUB_SUBGRAPH`, exact counts in `provenance_metadata` and `/api/provenance`). `REAL_FULL` is explicitly unavailable and raises rather than silently substituting.
 - **Characteristics:** Contains only empirical EM-reconstructed edges among the sampled circuit. A sampled neuron with no in-sample biological edge stays disconnected: REAL mode never receives invented fallback edges (regression-tested in `tests/test_provenance.py`).
 - **Topology:** Sparse, non-symmetric, heavy-tailed degree distribution with natural biological recurrent loops and modular clustering.
 - **Invariants:** Every edge represents an empirical electron microscopy reconstructed synapse.
@@ -156,12 +156,16 @@ Unlike naive implementations that reallocate buffers and rebuild pipelines on ev
    - Ping-pong synchronization is achieved via single-submit persistent command buffers and memory pipeline barriers (`VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT`).
 
 3. **Synaptic Plasticity Pipeline (`shaders/plasticity.comp`):**
-    - Implements the documented three-factor reward-modulated Hebbian rule identically on CPU and GPU:
-      $$\Delta W_{ij} = \eta \cdot r \cdot \left(A_{\text{pre}, j} \cdot A_{\text{post}, i} - \beta \cdot W_{ij}\right)$$
-      with $\eta=0.05$, $\beta=0.01$, clamp $[0.01, 1.0]$. The shader resolves the postsynaptic
-      (CSR row-owner) neuron per synapse via binary search; the runtime feeds identical
-      pre/post spikes to both paths (12-step trajectory parity: spikes exact, weights $< 2 \times 10^{-8}$).
-    - Operates in-place on the GPU-resident `Weights` buffer.
+     - Implements the documented three-factor reward-modulated Hebbian rule identically on CPU and GPU:
+       $$\Delta W_{ij} = \eta \cdot r \cdot \left(A_{\text{pre}, j} \cdot A_{\text{post}, i} - \beta \cdot W_{ij}\right)$$
+       with $\eta=0.05$, $\beta=0.01$, clamp $[0.01, 1.0]$. The shader resolves the postsynaptic
+       (CSR row-owner) neuron per synapse via binary search; the runtime feeds identical
+       pre/post spikes to both paths (12-step trajectory parity: spikes exact, weights $< 2 \times 10^{-8}$).
+     - Operates in-place on the GPU-resident `Weights` buffer. Since v4.1 the
+       CPU weight mirror syncs lazily (`BrainRuntime.sync_gpu_weights()`,
+       auto-called by `save_snapshot()` and the experiment manager before
+       final hashing); per-step weight readback was removed by measurement
+       (see `diagnostics/benchmark_report.json`).
 
 ---
 
@@ -197,18 +201,20 @@ Experiments in FlyBrain are completely reproducible and tracked cryptographicall
 
 ## 7. Automated Acceptance Matrix & Verification
 
-Release readiness is enforced by an automated 25-category acceptance matrix (`scripts/run_acceptance_matrix.py`):
+Release readiness is enforced by the canonical acceptance schema
+(`verification/acceptance_schema.json`, profiles: workstation, cpu-only,
+vulkan, ci, huggingface, release) evaluated by
+`scripts/run_acceptance_matrix.py`:
 
 ```bash
 flybrain acceptance-matrix
 ```
 
-All 25 categories evaluate behavioral assertions to `PASS`: the 19 core gates (repository cleanliness,
-provenance integrity, contract separation, LIF dynamics, refractory/reset invariance, Vulkan persistence,
-CPU-Vulkan parity, thread safety, deterministic replication, model honesty, plasticity, UI, end-to-end,
-documentation consistency) plus 6 artificial-life gates (population branch-replay determinism, developmental
-structural integrity, genome mutation/crossover provenance, overlapping reproduction with parents alive at
-every birth, cultural transmission gain, zero surrogate edges in REAL mode).
+Every category evaluates behavioral assertions to `PASS`/`SKIP_ENVIRONMENT`
+(`SKIP` only for genuinely missing capabilities, with explicit reason; 0
+`FAIL` required for release). Totals in README, RESEARCH_STATUS, and release
+notes are generated from `diagnostics/acceptance_matrix.json` by
+`scripts/render_status_tables.py` — never hand-copied.
 
 ---
 

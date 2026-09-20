@@ -6,8 +6,8 @@
     "processor": "AMD64 Family 25 Model 68 Stepping 1, AuthenticAMD"
   },
   "git": {
-    "main_repo_head": "11748583b66b103f7c5b75e09e7176a2ec114ed2",
-    "malecns_head": "daf8e2a9849cc77695b14bb6b9d4c02456cd3b3c"
+    "main_repo_head": "185370ee79b69c8e4f0c866fd7409d4089283c9f",
+    "malecns_head": "185370ee79b69c8e4f0c866fd7409d4089283c9f"
   },
   "data_hashes": {
     "malecns_soma": "6c1c415ab748ab1cc65c9a274885cfadc880a88eabb17915afe643c105bac84d"

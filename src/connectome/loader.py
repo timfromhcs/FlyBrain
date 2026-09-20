@@ -15,7 +15,8 @@ from src.connectome.types import (
     GraphMode,
     ProvenanceStatus,
     PopulationMetadata,
-    PopulationRegistry
+    PopulationRegistry,
+    coerce_graph_mode,
 )
 
 from src.paths import resource
@@ -367,6 +368,9 @@ def build_real_connectome(
     connected_sources = sum(1 for i in range(N) if adjacency[i])
     prov_meta = {
         "mode": GraphMode.REAL.value,
+        "graph_identity": "REAL_SUBGRAPH",
+        "graph_identity_legacy_name": "REAL",
+        "full_graph_available_locally": False,
         "provenance_status": ProvenanceStatus.VERIFIED.value,
         "csr_convention": "row_is_incoming",
         "dataset_name": "Janelia MaleCNS",
@@ -375,6 +379,8 @@ def build_real_connectome(
         "selection_detail": "top presynaptic T-bar hubs, balanced left/right halves, sorted by body_id",
         "selection_seed": int(seed),
         "source_neuron_count": len(neurons),
+        "source_neuron_total": 125506,
+        "source_edge_total": 99301,
         "sampled_neuron_count": N,
         "sampled_edge_count": "see circuit_synapses",
         "sampling_bias": "hub-biased (high T-bar neurons overrepresented); NOT a random representative sample",
@@ -575,8 +581,11 @@ def get_or_create_circuit(
 ) -> ConnectomeGraph:
     """
     Factory creating a biological or surrogate connectome circuit.
-    Supports GraphMode.REAL, GraphMode.SPATIAL_SURROGATE, and GraphMode.SYNTHETIC_TEST.
+    Supports GraphMode.REAL (= REAL_SUBGRAPH, bounded sampled subgraph),
+    GraphMode.SPATIAL_SURROGATE, and GraphMode.SYNTHETIC_TEST.
+    The string 'REAL_SUBGRAPH' is accepted and coerced to GraphMode.REAL.
     """
+    mode = coerce_graph_mode(mode)
     os.makedirs(CACHE_DIR, exist_ok=True)
     if cache_name is None:
         cache_name = f"circuit_{mode.value.lower()}_{max_neurons}_s{seed}.npz"

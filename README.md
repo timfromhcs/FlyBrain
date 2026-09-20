@@ -7,11 +7,13 @@
 
 <p align="center">
   <a href="https://github.com/timfromhcs/FlyBrain/actions"><img src="https://github.com/timfromhcs/FlyBrain/actions/workflows/ci.yml/badge.svg" alt="CI/CD Status"></a>
+  <a href="https://github.com/timfromhcs/FlyBrain/releases"><img src="https://img.shields.io/github/v/release/timfromhcs/FlyBrain" alt="Latest Release"></a>
+  <a href="https://huggingface.co/spaces/timfromhcs/FlyBrain-Lab"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Space-yellow" alt="Hugging Face Space"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License: Apache 2.0"></a>
   <img src="https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white" alt="Python 3.12">
   <img src="https://img.shields.io/badge/Vulkan-1.2%2B%20Compute-red?logo=vulkan&logoColor=white" alt="Vulkan Compute">
   <img src="https://img.shields.io/badge/Biological%20Data-Janelia%20MaleCNS-059669" alt="Janelia MaleCNS">
-  <img src="https://img.shields.io/badge/Acceptance%20Matrix-44%2F44%20PASSED-brightgreen" alt="Acceptance Matrix">
+  <img src="https://img.shields.io/badge/Acceptance%20Matrix-canonical%20schema-brightgreen" alt="Acceptance Matrix">
   <img src="https://img.shields.io/badge/Platform-Windows%2011%20%7C%20Linux-0284c7" alt="Platform">
 </p>
 
@@ -24,12 +26,14 @@
 4. [Persistent Vulkan Compute Engine](#persistent-vulkan-compute-engine)
 5. [FlyBrain Lab: Scientific Workstation UI](#flybrain-lab-scientific-workstation-ui)
 6. [Deterministic Experimentation CLI](#deterministic-experimentation-cli)
-7. [Automated Release Acceptance Matrix (44/44 Passed)](#automated-release-acceptance-matrix-3232-passed)
+7. [Automated Release Acceptance Matrix (canonical, generated)](#automated-release-acceptance-matrix-canonical-generated)
 8. [Multi-Store Persistent Memory](#multi-store-persistent-memory)
 9. [Installation & Quick Start](#installation--quick-start)
 10. [Hardware Benchmark Results](#hardware-benchmark-results)
-11. [Artificial-Life Layer — Honest Status](#artificial-life-layer--honest-status)
-12. [Citation & Third-Party Notices](#citation--third-party-notices)
+11. [What's New in v4.1](#whats-new-in-v41)
+12. [Hugging Face Space](#hugging-face-space)
+13. [Artificial-Life Layer — Honest Status](#artificial-life-layer--honest-status)
+14. [Citation & Third-Party Notices](#citation--third-party-notices)
 
 ---
 
@@ -67,7 +71,13 @@ Every connectome circuit in FlyBrain is explicitly categorized by its provenance
 └──────────────────┘          └──────────────────┘          └──────────────────┘
 ```
 
-1. **`GraphMode.REAL` (`VERIFIED`)**: Directly loaded from Janelia MaleCNS v1.0 biological synaptic tables. Every directed edge corresponds to an empirically reconstructed biological synapse.
+1. **`GraphMode.REAL` (`VERIFIED`, canonical identity `REAL_SUBGRAPH`)**: A bounded
+   sampled subgraph of the Janelia MaleCNS v1.0 synaptic table (hub-biased
+   `REAL_HUB_SUBGRAPH` strategy; sampled N of 125,506 somas, sampled M of 99,301
+   pairs — exact counts in `provenance_metadata` and `/api/provenance`). Every
+   included edge corresponds to an empirically reconstructed biological synapse;
+   `REAL_FULL` (all neurons in one live circuit) is explicitly unavailable and
+   raises instead of silently substituting.
 2. **`GraphMode.SPATIAL_SURROGATE` (`SURROGATE`)**: Connects empirical somas via 3D Euclidean k-d tree proximity weighted by presynaptic T-bar capacities. Honestly marked as a surrogate in all telemetry and manifests.
 3. **`GraphMode.SYNTHETIC_TEST` (`EXPERIMENTAL`)**: Deterministic synthetic circuit for fast regression testing and CI verification.
 
@@ -113,6 +123,17 @@ The `VulkanComputeEngine` (`src/compute/vulkan_backend.py`) is engineered for pe
 - **Persistent GPU Buffers:** All CSR arrays, membrane potentials, spikes, and refractory counters stay resident in GPU VRAM across steps. Zero per-step memory allocations.
 - **11 Descriptor Bindings:** Binds row offsets, column indices, weights, previous spikes, external currents, input/output potentials, input/output spikes, input/output refractory counters, and simulation parameters.
 - **Plasticity Compute Pipeline:** Dedicated compute shader (`shaders/plasticity.comp`) executes three-factor reward-modulated Hebbian learning directly on GPU weights.
+- **Lazy weight sync (v4.1, measured):** GPU weights are authoritative; the CPU
+  mirror refreshes only at explicit sync points (snapshots, experiment
+  manifests, validation). Measured weight-readback cost removed from rewarded
+  steps (~0.85 ms saved per rewarded step at N=1024 on AMD Radeon 680M; see
+  `diagnostics/benchmark_report.json`). Telemetry exposes `weights_synced` so
+  staleness is never silent.
+- **Retained host-visible/coherent memory (measured):** on the unified-memory
+  AMD iGPU, device-local+staging would add copies without benefit (measured
+  upload bandwidth up to ~4.2 GB/s host-visible); the design is kept for
+  correctness and AMD compatibility, with the measurement in
+  `diagnostics/benchmark_report.json`.
 
 ---
 
@@ -120,7 +141,9 @@ The `VulkanComputeEngine` (`src/compute/vulkan_backend.py`) is engineered for pe
 
 The user interface has been completely transformed into **FlyBrain Lab**, a dark scientific research workstation:
 
-- **Interactive 3D Connectome Viewer:** Built with Three.js (r128), featuring 3D orbit controls, anatomical axes, and raycasting neuron inspection.
+- **Interactive 3D Connectome Viewer:** Pinned vendored Three.js r128 (zero CDN
+  runtime dependencies), featuring 3D orbit controls, anatomical axes, and
+  raycasting neuron inspection with live membrane/spike state.
 - **Biophysical Telemetry:** Real-time sparklines for spike rates, mean membrane potential, prediction error, and homeostatic drives (*energy*, *curiosity*, *social*, *integrity*).
 - **Experiment Control Hub:** Run deterministic experiments directly from the dashboard and inspect reproduction hashes.
 - **Evolutionary Lineage Tree:** Visualize generational mutations, benchmark scores, and candidate rollbacks.
@@ -160,62 +183,84 @@ flybrain docs-verify
 
 ---
 
-## Automated Release Acceptance Matrix (44/44 Passed)
+## Automated Release Acceptance Matrix (canonical, generated)
 
-Release readiness is verified by `scripts/run_acceptance_matrix.py`, producing `diagnostics/acceptance_matrix.json`.
-Every PASS corresponds to an executable behavioral assertion (no source-text-only checks):
+Release readiness is verified by `scripts/run_acceptance_matrix.py` against the
+single canonical schema `verification/acceptance_schema.json`, producing
+`diagnostics/acceptance_matrix.json`. Every PASS corresponds to an executable
+behavioral assertion (no source-text-only checks). The table below is
+**generated** by `scripts/render_status_tables.py` — never hand-edited:
+
+<!-- ACCEPTANCE-TABLE-START -->
+> Canonical source: `verification/acceptance_schema.json` → `diagnostics/acceptance_matrix.json` (overall **PASSED**: **56/57 PASS**, 0 FAIL, 1 SKIP). Do not copy totals elsewhere — regenerate with `scripts/render_status_tables.py`.
 
 | Index | Category | Status | Details |
 | :---: | :--- | :---: | :--- |
 | 1 | `repository_cleanliness` | **PASS** | All core repository directories intact and organized. |
-| 2 | `provenance_manifest_integrity` | **PASS** | MaleCNS soma and connection SHA-256 hashes match manifest. |
-| 3 | `connectome_contract_separation` | **PASS** | Explicit separation of `REAL`, `SPATIAL_SURROGATE`, `SYNTHETIC_TEST`. |
-| 4 | `biological_vs_synthetic_separation` | **PASS** | `REAL` verified from MaleCNS; `SYNTHETIC_TEST` marked `EXPERIMENTAL`. |
+| 2 | `provenance_manifest_integrity` | **PASS** | Janelia MaleCNS soma and connection SHA-256 hashes match provenance manifest exactly. |
+| 3 | `connectome_contract_separation` | **PASS** | Explicit separation of GraphMode contracts: ['REAL', 'SPATIAL_SURROGATE', 'SYNTHETIC_TEST']; REAL canonicalizes to REAL_SUBGRAPH; REAL_FULL honestly raises. |
+| 4 | `biological_vs_synthetic_separation` | **PASS** | REAL graph verified from MaleCNS; SYNTHETIC_TEST marked EXPERIMENTAL with distinct topology. |
 | 5 | `spatial_surrogate_behavior` | **PASS** | Spatial surrogate generated 546 synapses via 3D k-d tree proximity. |
-| 6 | `lif_dynamics_correctness` | **PASS** | LIF integration correctly decays potential, fires spike, clamps to reset. |
-| 7 | `refractory_period_invariance` | **PASS** | Refractory period strictly prevents firing during active refraction. |
-| 8 | `reset_potential_invariance` | **PASS** | Membrane potential clamped to $V_{reset}$ (-70 mV) upon spike generation. |
-| 9 | `vulkan_discovery_and_selection` | **PASS** | Vulkan 1.3 physical device discovered: AMD Radeon(TM) Graphics. |
-| 10 | `persistent_resource_lifecycle` | **PASS** | GPU buffers and command buffers remain resident across simulation steps. |
-| 11 | `cpu_vulkan_numerical_parity` | **PASS** | Trajectory parity (max abs diff < 1e-4) with exact spike trains across 9 test cases (NOT bit-exact; documented). |
-| 12 | `single_loop_telemetry_isolation` | **PASS** | Authoritative simulation loop runs in background without blocking telemetry. |
-| 13 | `thread_lock_concurrency` | **PASS** | Thread-safe RLock prevents data races during concurrent queries. |
-| 14 | `deterministic_experiment_replication` | **PASS** | Exact 256-bit SHA-256 state match across independent runs. |
-| 15 | `local_model_degradation_honesty` | **PASS** | Honestly declared cognitive status: `MODEL_UNAVAILABLE` when weights absent. |
-| 16 | `continuous_learning_weight_change` | **PASS** | Synaptic plasticity modified weights under reward. |
-| 17 | `ui_no_blocking_alerts` | **PASS** | Zero blocking `alert()` or `prompt()` calls in FlyBrain Lab workstation. |
-| 18 | `full_pipeline_e2e_runnable` | **PASS** | End-to-end pipeline (real connectome -> step -> snapshot) runs cleanly. |
-| 19 | `documentation_claim_consistency` | **PASS** | All documentation claims match datasets, shader descriptors, and API routes. |
-| 20 | `alife_branch_replay_determinism` | **PASS** | Population snapshot branch replay yields identical state hash. |
-| 21 | `developmental_structural_integrity` | **PASS** | Full developmental pipeline preserves graph invariants; dead neurons edgeless. |
-| 22 | `genome_mutation_crossover_provenance` | **PASS** | Deterministic mutation/crossover with complete parent provenance. |
-| 23 | `overlapping_reproduction` | **PASS** | Multiple reproductions; parents alive at every birth; >1 generation coexists. |
-| 24 | `cultural_transmission_gain` | **PASS** | Measured teacher→student learning gain with provenance chain. |
-| 25 | `real_mode_zero_surrogate_edges` | **PASS** | REAL graph edges are 100% empirical; metadata confirms zero surrogate. |
-| 26 | `csr_directionality` | **PASS** | Incoming-CSR: A→B drives B; reverse-direction input to A has no effect. |
-| 27 | `biological_edge_semantics` | **PASS** | REAL weights provenance: `synapse_count` transform, no conductance claim. |
+| 6 | `lif_dynamics_correctness` | **PASS** | LIF integration correctly decays membrane potential, fires spike, and clamps to reset. |
+| 7 | `refractory_period_invariance` | **PASS** | Refractory period strictly prevents firing and decrements counter during active refraction. |
+| 8 | `reset_potential_invariance` | **PASS** | Membrane potential instantly clamped to V_reset (-70.0 mV) upon spike generation. |
+| 9 | `vulkan_discovery_and_selection` | **PASS** | Vulkan 1.3 physical device discovered and selected: 'AMD Radeon(TM) Graphics' |
+| 10 | `persistent_resource_lifecycle` | **PASS** | Vulkan buffers, descriptor sets, and command buffers remain resident across simulation steps. |
+| 11 | `cpu_vulkan_numerical_parity` | **PASS** | Tolerance-based parity verified (9/9 cases): max abs diff < 1e-4 with exact spike trains (NOT bit-exact). |
+| 12 | `single_loop_telemetry_isolation` | **PASS** | SimulationEngine executed 3 steps in background thread without blocking telemetry. |
+| 13 | `thread_lock_concurrency` | **PASS** | Thread-safe RLock prevented data races during concurrent telemetry and state reads. |
+| 14 | `deterministic_experiment_replication` | **PASS** | Exact 256-bit SHA-256 match (9ff3e4faca75180f...) across independent runs. |
+| 15 | `local_model_degradation_honesty` | **PASS** | System honestly declared cognitive status: OPERATIONAL |
+| 16 | `continuous_learning_weight_change` | **PASS** | Synaptic plasticity modified weights. Max delta_w: 1.490564e-01. |
+| 17 | `ui_no_blocking_alerts` | **PASS** | FlyBrain Lab workstation contains zero blocking alert()/prompt() calls (non-intrusive toasts) and zero CDN runtime dependencies (vendored three.js). |
+| 18 | `full_pipeline_e2e_runnable` | **PASS** | End-to-end pipeline (real connectome load -> runtime step -> snapshot save) executed flawlessly. |
+| 19 | `documentation_claim_consistency` | **PASS** | All documentation claims match datasets, shader descriptors, and API routes exactly. |
+| 20 | `alife_branch_replay_determinism` | **PASS** | Population snapshot branch replay produced identical hash (52f731d079a83912). |
+| 21 | `developmental_structural_integrity` | **PASS** | Full developmental pipeline: 1 born, 6 synapses grown, 4 died; invariants hold, dead neurons edgeless. |
+| 22 | `genome_mutation_crossover_provenance` | **PASS** | Mutation/crossover deterministic with complete parent provenance. |
+| 23 | `overlapping_reproduction` | **PASS** | 4 reproductions across generations [0, 1]; parents alive at every birth: True. |
+| 24 | `cultural_transmission_gain` | **PASS** | Measured learning gain 0.3766 with teacher chain ['mx-teacher']. |
+| 25 | `real_mode_zero_surrogate_edges` | **PASS** | REAL-64 graph: 100 edges, 0 non-empirical; metadata confirms zero surrogate. |
+| 26 | `csr_directionality` | **PASS** | A->B drives B, never A; reverse direction has no effect. |
+| 27 | `biological_edge_semantics` | **PASS** | REAL weight transform declared: w = min(0.8, 0.05 + 0.02 * synapse_count) [simulation transform, NOT a measured conductance] |
 | 28 | `real_annotation_integrity` | **PASS** | Unavailable annotations flagged UNKNOWN; available ones EMPIRICAL/DERIVED. |
-| 29 | `plasticity_causal_effect` | **PASS** | Reward 0 no change; reward >0 potentiation; reward <0 depression. |
+| 29 | `plasticity_causal_effect` | **PASS** | reward=0 no change; reward>0 potentiation; reward<0 depression. |
 | 30 | `checkpoint_continuation` | **PASS** | Checkpoint/resume final population hash equals uninterrupted run. |
-| 31 | `llm_model_discovery_and_inference` | **PASS** | Local GGUF discovered, loaded, and generated tokens. |
-| 32 | `llm_failure_mode_and_tool_safety` | **PASS** | Unavailable model returns structured error; shell/unknown tools rejected. |
-| 33 | `living_brain_identity` | **PASS** | Persistent neuron/synapse identities; EMERGENT provenance for lifetime growth. |
+| 31 | `llm_model_discovery_and_inference` | **PASS** | Discovered 1 GGUF; inference=SUCCESS; model=MiniCPM5-2B-Q8_0.gguf. |
+| 32 | `llm_failure_mode_and_tool_safety` | **PASS** | Unavailable model returns structured error (no fake text); shell/unknown tools rejected. |
+| 33 | `living_brain_identity` | **PASS** | Persistent identities + EMERGENT provenance; growth 32->33. |
 | 34 | `structural_growth_resource_constrained` | **PASS** | Zero growth budget blocks neurogenesis (energy is the constraint). |
-| 35 | `eligibility_neuromodulation` | **PASS** | v2 traces + novelty-driven neuromodulation move weights with reward=0. |
+| 35 | `eligibility_neuromodulation` | **PASS** | v2 traces + novelty-driven neuromodulation change weights (reward=0). |
 | 36 | `autonomy_self_generated_goals` | **PASS** | All living organisms self-generate goals; no human task commands. |
-| 37 | `grounded_language_and_social` | **PASS** | Symbols bind to grounded concepts; trust emerges from interaction outcomes. |
-| 38 | `genome_v2_architecture_genes` | **PASS** | v2 encodes learning architecture; v1 legacy remains exactly valid. |
+| 37 | `grounded_language_and_social` | **PASS** | Symbols bind to grounded concepts; trust emerges from outcomes. |
+| 38 | `genome_v2_architecture_genes` | **PASS** | v2 encodes learning architecture; v1 legacy remains valid. |
 | 39 | `speciation_evidence` | **PASS** | Divergence recorded only with measured genome distance. |
 | 40 | `llm_control_plane_safety` | **PASS** | Invalid/shell commands rejected; valid typed commands execute. |
 | 41 | `research_memory_chain` | **PASS** | Hash-chained append-only research memory; tamper-evident. |
 | 42 | `deeptime_escalation_replay` | **PASS** | Coarse deep-time escalates to full-res checkpoint; replay hash-verified. |
-| 43 | `milestone_evidence` | **PASS** | Milestones detected with evidence + machine-readable certificates. |
+| 43 | `milestone_evidence` | **PASS** | Detected ['STRUCTURAL_EXPANSION', 'OVERLAPPING_GENERATIONS'] with evidence + certificate. |
 | 44 | `benchmark_fairness` | **PASS** | Per-arm budgets documented; LLM arms SKIP with reason when unmet. |
+| 45 | `version_metadata` | **PASS** | FlyBrain version metadata = 4.1.0 (v4.1.0). |
+| 46 | `immutable_bio_baseline` | **PASS** | Biological baseline fingerprint unchanged after lifetime development. |
+| 47 | `synapse_identity_provenance` | **PASS** | Stable synapse IDs; seed records cite source dataset; new synapses are EMERGENT, never BIOLOGICAL. |
+| 48 | `brain_identity_layers` | **PASS** | 12-layer identity: same state -> same identity; weight change -> different identity. |
+| 49 | `heredity_separation` | **PASS** | Parent learned; child starts from deterministic development, not inherited learned weights. |
+| 50 | `evolution_parent_identity` | **PASS** | Accepted child never becomes its own parent in history. |
+| 51 | `ablation_enforcement` | **PASS** | no_growth grew=False; no_plasticity weights unchanged (enforced, verified by measurement). |
+| 52 | `deterministic_research_ids` | **PASS** | Research IDs derive from content+sequence; no wall-clock identity. |
+| 53 | `research_ledger_chain` | **PASS** | Hash-chained ledger with code/dataset/shader provenance. |
+| 54 | `deeptime_exact_mode` | **PASS** | EXACT mode is tick-by-tick with no approximation claim; ACCELERATED labels its approximation model. |
+| 55 | `doctor_functional` | **PASS** | Doctor reports READY with 12 OK checks (real values). |
+| 56 | `ui_v4_endpoints` | **PASS** | /api/version + /api/doctor serve real system state. |
+| 57 | `portable_package` | *SKIP_ENVIRONMENT* | No built portable bundle on this host; set FLYBRAIN_PORTABLE_DIR to a built dist for artifact self-test. |
+<!-- ACCEPTANCE-TABLE-END -->
 
-> **Environment-dependent gates are `SKIP`, never fake-PASS:** on GPU-less CI
-> runners, gates 9–11 (Vulkan discovery/lifecycle/parity) skip; on hosts without
-> local GGUF weights, gate 31 (LLM discovery/inference) skips. Cloud CI profile:
-> **40 PASS / 4 SKIP / 0 FAIL → PASSED**. Workstation profile: **44/44 PASS**.
+> **Environment-dependent gates are `SKIP`, never fake-PASS:** on GPU-less
+> runners the Vulkan gates skip; on hosts without local GGUF weights the LLM
+> inference gate skips; without a built portable bundle `portable_package`
+> skips. Profiles are defined in `verification/acceptance_schema.json`
+> (`workstation`, `cpu-only`, `vulkan`, `ci`, `huggingface`, `release`).
+> The release gate requires **0 FAIL**.
 
 ---
 
@@ -269,6 +314,60 @@ Windows 11) against the current empirical REAL topology (20 persistent steps eac
 | 256 | 1,449 | 0.374 ms | 2,676.3 | 3.88 M/s |
 | 512 | 6,557 | 0.237 ms | 4,221.5 | 27.68 M/s |
 | 1,024 | 25,749 | 0.260 ms | 3,839.2 | 98.86 M/s |
+
+v4.1 re-measurement (`diagnostics/benchmark_report.json`, 2026-09-20, same
+hardware, 20 measured steps after 5 warmup, seed 42) adds readback/plasticity
+splits and percentile statistics: per-step host-readback overhead 0.04–0.21 ms
+(state readback retained — CPU owns telemetry/motor state); plasticity weight
+readback dominates rewarded steps at scale (N=1024: 1.03 ms with readback vs
+0.17 ms GPU-resident — hence lazy weight sync); host-visible upload bandwidth
+up to ~4.2 GB/s (device-local/staging retained-out by measurement on the
+unified-memory iGPU). Methodology and design conclusions live in the report;
+no optimization is kept without a measurement behind it.
+
+---
+
+## What's New in v4.1
+
+- **Explicit graph identities:** `REAL_SUBGRAPH` (canonical sampled subgraph,
+  legacy name `REAL`), `REAL_FULL` (honestly unavailable — raises),
+  `SPATIAL_SURROGATE`, `SYNTHETIC_TEST` (`src/connectome/types.py`,
+  `/api/provenance`).
+- **Twelve separated identity layers** (`src/provenance/identity_layers.py`):
+  source, neuron/synapse topology, parameters, dynamic state, plasticity,
+  structural, genome, organism, population, experiment, research — never one
+  ambiguous hash.
+- **Versioned checkpoint envelope** (`src/population/checkpoint.py`,
+  `population_checkpoint_v1`): state/research/combined hashes, RNG bundle,
+  graph + experiment identity, preserved event history; save → restore →
+  continue provably equals uninterrupted execution (`tests/test_checkpoint_v41.py`).
+- **Measured GPU optimization:** lazy weight sync + retained host-visible
+  memory, both benchmark-backed (`scripts/benchmark_v41.py`).
+- **Capability-based LLM control:** typed allowlists + role capabilities +
+  strict identifier grammar; fragile whole-blob substring blacklists removed
+  (`src/llm/control.py`).
+- **Embodied causal telemetry:** every organism step returns its
+  sensory → neural → motor → body → world → reward causal path with an
+  explicit `policy_source` label.
+- **Canonical acceptance schema** (`verification/acceptance_schema.json`) with
+  workstation/cpu-only/vulkan/ci/huggingface/release profiles; docs render
+  totals from the machine-readable report.
+- **FlyBrain Lab frontend:** split `index.html` + `css/lab.css` + `js/lab.js`,
+  vendored pinned three.js r128 (zero CDN runtime dependencies), live
+  Provenance tab backed by `/api/provenance`, reconnect-resilient telemetry.
+- **Real Hugging Face Space** (`huggingface/`, Docker SDK, CPU-only, honest
+  backend reporting) with boot-verified smoke test
+  (`diagnostics/huggingface_verification.json`). Deploy: `deployment/HUGGINGFACE.md`.
+
+---
+
+## Hugging Face Space
+
+A reproducible CPU-only Space serves the full FlyBrain Lab UI with live
+backend state: see `deployment/HUGGINGFACE.md` and `huggingface/README.md`.
+The Space reports `backend: cpu_reference` honestly (no fake Vulkan), labels
+the sampled `REAL_SUBGRAPH`, heuristic populations, and derived weights in
+the Provenance tab.
 
 ---
 

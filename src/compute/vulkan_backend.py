@@ -649,6 +649,23 @@ class VulkanComputeEngine:
 
         return None
 
+    def download_weights(self) -> Optional[np.ndarray]:
+        """Pure GPU->CPU weight readback with no dispatch (sync primitive).
+
+        Used for lazy weight synchronization: GPU weights stay authoritative
+        across steps; the CPU mirror is refreshed only at explicit sync points
+        (snapshots, experiment manifests, validation), never per step.
+        """
+        if not self.persistent_buffers:
+            return None
+        import numpy as _np
+        M = self.num_synapses
+        w_mem = self.persistent_buffers["weights"]["mem"]
+        ptr = vk.vkMapMemory(self.device, w_mem, 0, M * 4, 0)
+        out = _np.frombuffer(bytes(ptr[0:M * 4]), dtype=_np.float32).copy()
+        vk.vkUnmapMemory(self.device, w_mem)
+        return out
+
     def upload_buffer_data(self, name: str, arr: np.ndarray):
         """Uploads contiguous numpy array data to an existing persistent GPU buffer."""
         if name in self.persistent_buffers:

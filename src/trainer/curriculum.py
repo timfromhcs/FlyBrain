@@ -95,6 +95,8 @@ class CurriculumTrainer:
                 "reward": reward
             })
 
+        if hasattr(self.brain, "sync_gpu_weights"):
+            self.brain.sync_gpu_weights()
         final_weights = self.brain.graph.weights.copy()
         delta_w = float(np.mean(np.abs(final_weights - initial_weights)))
         max_delta_w = float(np.max(np.abs(final_weights - initial_weights)))

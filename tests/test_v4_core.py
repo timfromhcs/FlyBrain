@@ -160,9 +160,10 @@ class TestDeepTimeExact(unittest.TestCase):
 class TestDoctor(unittest.TestCase):
     def test_doctor_reports_real_checks(self):
         from src.diagnostics.doctor import run_doctor
+        from src.version import VERSION
         rep = run_doctor()
         self.assertIn(rep["overall"], ("READY", "READY_DEGRADED", "DEGRADED"))
-        self.assertEqual(rep["flybrain_version"], "4.0.0")
+        self.assertEqual(rep["flybrain_version"], VERSION)
         names = [c["name"] for c in rep["checks"]]
         for required in ("os", "python", "dataset", "gpu", "storage", "core_runtime"):
             self.assertIn(required, names)
@@ -182,15 +183,16 @@ class TestUIV4Endpoints(unittest.TestCase):
     def test_version_and_doctor_endpoints(self):
         from fastapi.testclient import TestClient
         from src.ui.server import app
+        from src.version import VERSION
         client = TestClient(app)
         r = client.get("/api/version")
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.json()["version"], "4.0.0")
+        self.assertEqual(r.json()["version"], VERSION)
         r2 = client.get("/api/doctor")
         self.assertEqual(r2.status_code, 200)
         self.assertIn(r2.json()["overall"], ("READY", "READY_DEGRADED", "DEGRADED"))
         r3 = client.get("/api/health")
-        self.assertEqual(r3.json()["version"], "4.0.0")
+        self.assertEqual(r3.json()["version"], VERSION)
 
 
 if __name__ == "__main__":

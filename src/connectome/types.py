@@ -6,8 +6,88 @@ import numpy as np
 
 class GraphMode(str, Enum):
     REAL = "REAL"
+    # Canonical explicit name for the bounded sampled subgraph served via REAL.
+    # Enum alias: REAL_SUBGRAPH is REAL (same value, no cache invalidation).
+    # REAL_FULL (all 125,506 somas / 99,301 pairs at once) is documented but
+    # not instantiated locally; see GRAPH_IDENTITIES below.
+    REAL_SUBGRAPH = "REAL"
     SPATIAL_SURROGATE = "SPATIAL_SURROGATE"
     SYNTHETIC_TEST = "SYNTHETIC_TEST"
+
+    @classmethod
+    def canonical(cls, mode: "GraphMode | str") -> str:
+        """Canonical graph-identity string for a mode.
+
+        REAL and REAL_SUBGRAPH both canonicalize to 'REAL_SUBGRAPH'.
+        """
+        v = mode.value if isinstance(mode, GraphMode) else str(mode)
+        if v == "REAL":
+            return "REAL_SUBGRAPH"
+        return v
+
+
+# Explicit graph-identity contract (Phase 1 connectome contract).
+# REAL_FULL is honest-but-unavailable locally: no host instantiates the full
+# 125,506-neuron / 99,301-edge graph in a single live circuit.
+GRAPH_IDENTITIES: Dict[str, Dict[str, Any]] = {
+    "REAL_FULL": {
+        "available_locally": False,
+        "source_neurons": 125506,
+        "source_edges": 99301,
+        "note": "Full MaleCNS v1.0 graph; not instantiated as a live circuit. "
+                "Requesting it raises instead of silently substituting a sample.",
+    },
+    "REAL_SUBGRAPH": {
+        "available_locally": True,
+        "legacy_enum_name": "REAL",
+        "sampling_strategy": "REAL_HUB_SUBGRAPH",
+        "sampling_bias": "hub-biased (high T-bar neurons overrepresented); NOT a random representative sample",
+        "weight_transform": "w = min(0.8, 0.05 + 0.02 * synapse_count) [simulation transform, NOT a measured conductance]",
+    },
+    "SPATIAL_SURROGATE": {
+        "available_locally": True,
+        "sampling_strategy": "spatial k-d tree proximity",
+    },
+    "SYNTHETIC_TEST": {
+        "available_locally": True,
+        "sampling_strategy": "deterministic synthetic (no biological source)",
+    },
+}
+
+
+def resolve_graph_identity(requested: str) -> str:
+    """Resolve a user-requested graph identity to its canonical form.
+
+    Raises for REAL_FULL with an explicit unavailable reason instead of
+    silently falling back to a subgraph (which would change scientific meaning).
+    """
+    r = str(requested).upper()
+    if r == "REAL_FULL":
+        raise ValueError(
+            "REAL_FULL (all 125,506 MaleCNS neurons in one live circuit) is not "
+            "instantiated by this build. Use REAL_SUBGRAPH (legacy name REAL) with "
+            "an explicit neuron budget, or SPATIAL_SURROGATE / SYNTHETIC_TEST."
+        )
+    if r in ("REAL", "REAL_SUBGRAPH"):
+        return "REAL_SUBGRAPH"
+    if r in GRAPH_IDENTITIES:
+        return r
+    raise ValueError(f"Unknown graph identity: {requested!r}")
+
+
+def coerce_graph_mode(requested: "GraphMode | str") -> GraphMode:
+    """Coerce user input (incl. 'REAL_SUBGRAPH' / 'REAL_FULL') to a GraphMode.
+
+    REAL_FULL raises (honest unavailability); REAL_SUBGRAPH maps to GraphMode.REAL.
+    """
+    if isinstance(requested, GraphMode):
+        return requested
+    r = str(requested).upper()
+    if r == "REAL_FULL":
+        resolve_graph_identity(r)  # raises with the honest reason
+    if r == "REAL_SUBGRAPH":
+        return GraphMode.REAL
+    return GraphMode(r)
 
 class ProvenanceStatus(str, Enum):
     VERIFIED = "VERIFIED"

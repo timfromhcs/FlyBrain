@@ -1,10 +1,12 @@
 {
-  "timestamp": 1789433377.8961692,
+  "timestamp": 1789940841.000345,
   "overall_status": "PASSED",
   "total_categories": 57,
   "passed": 56,
   "failed": 0,
   "skipped": 1,
+  "acceptance_schema": "verification/acceptance_schema.json",
+  "schema_drift": [],
   "categories": {
     "repository_cleanliness": {
       "status": "PASS",
@@ -16,7 +18,7 @@
     },
     "connectome_contract_separation": {
       "status": "PASS",
-      "reason": "Explicit separation of GraphMode contracts: ['REAL', 'SPATIAL_SURROGATE', 'SYNTHETIC_TEST']"
+      "reason": "Explicit separation of GraphMode contracts: ['REAL', 'SPATIAL_SURROGATE', 'SYNTHETIC_TEST']; REAL canonicalizes to REAL_SUBGRAPH; REAL_FULL honestly raises."
     },
     "biological_vs_synthetic_separation": {
       "status": "PASS",
@@ -72,7 +74,7 @@
     },
     "ui_no_blocking_alerts": {
       "status": "PASS",
-      "reason": "FlyBrain Lab workstation contains zero blocking alert() or prompt() calls (uses non-intrusive toast notifications)."
+      "reason": "FlyBrain Lab workstation contains zero blocking alert()/prompt() calls (non-intrusive toasts) and zero CDN runtime dependencies (vendored three.js)."
     },
     "full_pipeline_e2e_runnable": {
       "status": "PASS",
@@ -184,7 +186,7 @@
     },
     "version_metadata": {
       "status": "PASS",
-      "reason": "FlyBrain version metadata = 4.0.0."
+      "reason": "FlyBrain version metadata = 4.1.0 (v4.1.0)."
     },
     "immutable_bio_baseline": {
       "status": "PASS",
