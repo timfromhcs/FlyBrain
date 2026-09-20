@@ -1,6 +1,9 @@
 import os
 import subprocess
-import soundfile as sf
+try:
+    import soundfile as sf
+except ImportError:  # minimal hosts (e.g. HF Space): TTS/file synthesis disabled
+    sf = None
 import numpy as np
 from typing import Dict, Any
 from src.tools.base import ToolConnector
@@ -64,6 +67,9 @@ $synth.Dispose()
                 pass
 
         if not os.path.exists(wav_path):
+            if sf is None:
+                raise RuntimeError("soundfile unavailable on this host: "
+                                   "speech synthesis disabled (no fake audio generated)")
             # Pure Python acoustic audio synthesis fallback for Linux / headless CI
             sr = 22050
             duration = max(0.6, len(text) * 0.05)

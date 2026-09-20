@@ -1,9 +1,13 @@
 import os
-import torch
+try:
+    import torch
+    from diffusers import AutoencoderTiny
+except ImportError:  # CPU-only / minimal hosts (e.g. HF Space): VAE path disabled
+    torch = None
+    AutoencoderTiny = None
 import numpy as np
 from PIL import Image
 from typing import Dict, Any, Optional
-from diffusers import AutoencoderTiny
 from src.tools.base import ToolConnector
 
 # R9: resolution order env > project-local models/ dir > remote cache > procedural.
@@ -27,6 +31,11 @@ class GenerateImageConnector(ToolConnector):
         self._load_vae()
 
     def _load_vae(self):
+        if torch is None or AutoencoderTiny is None:
+            print("[GenerateImage] torch/diffusers unavailable: procedural rendering only.")
+            self.vae = None
+            self.renderer = "procedural"
+            return
         for candidate, tag in ((LOCAL_VAE_PATH, "vae_local"), (REMOTE_VAE_ID, "vae_remote")):
             try:
                 self.vae = AutoencoderTiny.from_pretrained(candidate)
@@ -69,18 +78,20 @@ class GenerateImageConnector(ToolConnector):
         
         # Deterministic PRNG from seed + prompt hash
         prompt_hash = sum(ord(c) for c in prompt)
-        torch.manual_seed(seed + prompt_hash)
-        
-        # 4-channel latent for AutoencoderTiny: [1, 4, 32, 32]
-        latent = torch.randn(1, 4, 32, 32, dtype=torch.float32)
-        
-        # Modulate if brain latent provided
-        if "latent_mod" in params and params["latent_mod"]:
-            mod_arr = np.asarray(params["latent_mod"], dtype=np.float32).flatten()
-            mod_len = min(len(mod_arr), 4 * 32 * 32)
-            latent_flat = latent.view(-1)
-            latent_flat[:mod_len] += torch.from_numpy(mod_arr[:mod_len])
-            latent = latent_flat.view(1, 4, 32, 32)
+        latent = None
+        if torch is not None:
+            torch.manual_seed(seed + prompt_hash)
+
+            # 4-channel latent for AutoencoderTiny: [1, 4, 32, 32]
+            latent = torch.randn(1, 4, 32, 32, dtype=torch.float32)
+
+            # Modulate if brain latent provided
+            if "latent_mod" in params and params["latent_mod"]:
+                mod_arr = np.asarray(params["latent_mod"], dtype=np.float32).flatten()
+                mod_len = min(len(mod_arr), 4 * 32 * 32)
+                latent_flat = latent.view(-1)
+                latent_flat[:mod_len] += torch.from_numpy(mod_arr[:mod_len])
+                latent = latent_flat.view(1, 4, 32, 32)
 
         if self.vae is not None:
             with torch.no_grad():

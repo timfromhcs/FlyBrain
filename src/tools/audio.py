@@ -1,6 +1,9 @@
 import os
 import numpy as np
-import soundfile as sf
+try:
+    import soundfile as sf
+except ImportError:  # minimal hosts (e.g. HF Space): audio input disabled
+    sf = None
 from typing import Dict, Any, Optional
 from src.tools.base import ToolConnector
 
@@ -39,6 +42,9 @@ class ListenAudioConnector(ToolConnector):
         audio_path = params.get("audio_path")
         
         if audio_path and os.path.exists(audio_path):
+            if sf is None:
+                raise RuntimeError("soundfile unavailable on this host: "
+                                   "audio file input disabled")
             data, sr = sf.read(audio_path)
             if data.ndim > 1:
                 data = data.mean(axis=1)
