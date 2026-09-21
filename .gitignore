@@ -23,6 +23,7 @@ diagnostics/e2e_test_snap*
 diagnostics/runtime_cont_*
 diagnostics/alife_experiments_reverify_tmp/
 visual_evidence/images/gen_*.png
+visual_evidence/imagined/
 visual_evidence/audio/speech_*.wav
 
 # Research memory is runtime state (regenerated, hash-chained)
