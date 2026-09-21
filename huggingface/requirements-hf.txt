@@ -16,3 +16,6 @@ starlette==1.3.1
 # Pure binding package (no GPU needed for import): enables the Vulkan probing
 # path, which degrades gracefully to cpu_reference on GPU-less hosts.
 vulkan==1.3.275.1
+# Authoritative 3D physics (MuJoCo engine, CPU, no GPU/torch needed):
+# world endpoints run for real on the Space.
+mujoco==3.13.0
