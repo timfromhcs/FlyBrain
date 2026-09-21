@@ -1,0 +1,121 @@
+{
+  "timestamp": 1789957606.9673114,
+  "version": "5.0.0",
+  "commit": "a4990b814369f70650c1110a5ff1c8955314b66c",
+  "ram_start": {
+    "percent": 47.9,
+    "avail_gb": 10.3
+  },
+  "ram_after_world": {
+    "percent": 48.4,
+    "avail_gb": 10.22
+  },
+  "ram_after_llm": {
+    "percent": 48.3,
+    "avail_gb": 10.22
+  },
+  "ram_after_image": {
+    "percent": 72.1,
+    "avail_gb": 5.52
+  },
+  "ram_end": {
+    "percent": 59.1,
+    "avail_gb": 8.08
+  },
+  "results": {
+    "world_tick_2agents_s": {
+      "median_s": 0.016,
+      "min_s": 0.0112,
+      "max_s": 0.0281,
+      "rounds": 5
+    },
+    "physics_substep_s": {
+      "median_s": 0.0001,
+      "min_s": 0.0001,
+      "max_s": 0.0001,
+      "rounds": 50
+    },
+    "perception_observe_s": {
+      "median_s": 0.0002,
+      "min_s": 0.0001,
+      "max_s": 0.0002,
+      "rounds": 5
+    },
+    "nav_plan_s": {
+      "median_s": 0.0045,
+      "min_s": 0.0043,
+      "max_s": 0.005,
+      "rounds": 5
+    },
+    "memory_place_search_s": {
+      "median_s": 0.0001,
+      "min_s": 0.0001,
+      "max_s": 0.0005,
+      "rounds": 5
+    },
+    "world_save_s": {
+      "median_s": 0.0013,
+      "min_s": 0.001,
+      "max_s": 0.0015,
+      "rounds": 3
+    },
+    "world_restore_s": {
+      "median_s": 0.0165,
+      "min_s": 0.0161,
+      "max_s": 0.0177,
+      "rounds": 3
+    },
+    "llm_load_s": {
+      "median_s": 0.4,
+      "rounds": 1
+    },
+    "llm_goal_gen_s": {
+      "median_s": 1.5437,
+      "min_s": 1.4369,
+      "max_s": 1.5437,
+      "rounds": 2
+    },
+    "image_load_s": {
+      "median_s": 10.3,
+      "rounds": 1
+    },
+    "image_FAST_s": {
+      "median_s": 22.4878,
+      "min_s": 22.4878,
+      "max_s": 22.4878,
+      "rounds": 1
+    },
+    "image_BALANCED_s": {
+      "median_s": 37.9831,
+      "min_s": 37.9831,
+      "max_s": 37.9831,
+      "rounds": 1
+    },
+    "image_QUALITY_s": {
+      "median_s": 180.2203,
+      "min_s": 180.2203,
+      "max_s": 180.2203,
+      "rounds": 1
+    },
+    "stt_load_s": {
+      "median_s": 13.5,
+      "rounds": 1
+    },
+    "tts_load_s": {
+      "median_s": 9.9,
+      "rounds": 1
+    },
+    "tts_synth_s": {
+      "median_s": 4.3302,
+      "min_s": 0.5613,
+      "max_s": 4.3302,
+      "rounds": 2
+    },
+    "stt_transcribe_s": {
+      "median_s": 3.2163,
+      "min_s": 2.9511,
+      "max_s": 3.2163,
+      "rounds": 2
+    }
+  }
+}

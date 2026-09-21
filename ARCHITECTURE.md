@@ -218,8 +218,32 @@ notes are generated from `diagnostics/acceptance_matrix.json` by
 
 ---
 
-## 8. Artificial-Life Layer
+## 8. Embodied 3D World (V6)
 
+Layered on top of, never inside, the biological core:
+
+```text
+World3D (spec/clock/objects) -> PhysicsWorld (MuJoCo, authoritative)
+  -> Body3D (physiology) -> EyeSensor (raycast GEOMETRIC perception)
+  -> BrainRuntime (LIF) -> AutonomyEngine (goals) -> typed actions
+  -> drive servo -> solver -> contacts/outcomes -> reward
+  -> episodic + spatial/visual memory (SQLite + local MiniLM RAG)
+```
+
+- TRUE_WORLD (spec + solver state) vs ORGANISM_KNOWLEDGE (known maps,
+  memories) strictly separated; cognition receives observations only.
+- Character = dynamic capsule + head (single rigid body), planar velocity
+  servo, gravity free, attitude PD + get-up maneuver, fall-impact damage.
+- Friends are full EmbodiedAgents; trust emerges from measured teach()
+  sessions (never initialized).
+- Heavy AI (LLM/VLM/STT/TTS/image) is event-driven via ModelManager
+  (pressure shedding); physics/ticks never wait for models.
+- World backups extend the V5 envelope (world_snapshot.json + spatial.db +
+  model registry metadata; binaries never duplicated).
+- API: `/api/v1/world/*`, `/api/v1/models`; UI: WORLD tab (render-only
+  Three.js, 4 cameras, minimap).
+
+## 9. Artificial-Life Layer
 On top of the connectome core sits a small-scale, CPU-run artificial-life stack (details + honest
 status split in `docs/alife_architecture.md`):
 

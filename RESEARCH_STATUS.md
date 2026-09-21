@@ -93,7 +93,7 @@ Generated from `diagnostics/acceptance_matrix.json` — never hand-edited:
 | 28 | `real_annotation_integrity` | **PASS** | Unavailable annotations flagged UNKNOWN; available ones EMPIRICAL/DERIVED. |
 | 29 | `plasticity_causal_effect` | **PASS** | reward=0 no change; reward>0 potentiation; reward<0 depression. |
 | 30 | `checkpoint_continuation` | **PASS** | Checkpoint/resume final population hash equals uninterrupted run. |
-| 31 | `llm_model_discovery_and_inference` | **PASS** | Discovered 1 GGUF; inference=SUCCESS; model=MiniCPM5-2B-Q8_0.gguf. |
+| 31 | `llm_model_discovery_and_inference` | **PASS** | Discovered 2 GGUF; inference=SUCCESS; model=MiniCPM5-2B-Q8_0.gguf. |
 | 32 | `llm_failure_mode_and_tool_safety` | **PASS** | Unavailable model returns structured error (no fake text); shell/unknown tools rejected. |
 | 33 | `living_brain_identity` | **PASS** | Persistent identities + EMERGENT provenance; growth 32->33. |
 | 34 | `structural_growth_resource_constrained` | **PASS** | Zero growth budget blocks neurogenesis (energy is the constraint). |
@@ -107,7 +107,7 @@ Generated from `diagnostics/acceptance_matrix.json` — never hand-edited:
 | 42 | `deeptime_escalation_replay` | **PASS** | Coarse deep-time escalates to full-res checkpoint; replay hash-verified. |
 | 43 | `milestone_evidence` | **PASS** | Detected ['STRUCTURAL_EXPANSION', 'OVERLAPPING_GENERATIONS'] with evidence + certificate. |
 | 44 | `benchmark_fairness` | **PASS** | Per-arm budgets documented; LLM arms SKIP with reason when unmet. |
-| 45 | `version_metadata` | **PASS** | FlyBrain version metadata = 5.0.0 (v5.0.0). |
+| 45 | `version_metadata` | **PASS** | FlyBrain version metadata = 6.0.0 (v6.0.0). |
 | 46 | `immutable_bio_baseline` | **PASS** | Biological baseline fingerprint unchanged after lifetime development. |
 | 47 | `synapse_identity_provenance` | **PASS** | Stable synapse IDs; seed records cite source dataset; new synapses are EMERGENT, never BIOLOGICAL. |
 | 48 | `brain_identity_layers` | **PASS** | 12-layer identity: same state -> same identity; weight change -> different identity. |

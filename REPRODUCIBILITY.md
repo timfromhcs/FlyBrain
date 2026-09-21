@@ -30,6 +30,18 @@ FlyBrain guarantees reproducible execution through:
 ```
 Outputs `diagnostics/brain_snapshot_manifest.json` showing identical bitwise continuity.
 
+## 4. Local Models (V6)
+Binaries live under `models/<task>/` (git-ignored, ~15 GB total) and are
+acquired once via `scripts/acquire_models.py <task>` (refuses with
+`FLYBRAIN_OFFLINE=1`). `src/models/registry.py` pins id/revision/license/
+SHA-256/size; `diagnostics/v6/model_registry.json` is the release record.
+Runtime loads local-only (`HF_HUB_OFFLINE=1` enforced when offline).
+
+## 5. Offline Operation (V6)
+`FLYBRAIN_OFFLINE=1`: no downloads, no cloud inference, no CDN (vendored
+frontend), `connect()`-blockade test in `tests/test_v6_offline.py` proves
+world boot/simulate/backup/restore/model-load without network.
+
 ## 4. Clean-Room Reproduction (v4.1)
 From a clean checkout, with no caches or environment leaks:
 ```powershell

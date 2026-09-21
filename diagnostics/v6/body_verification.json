@@ -1,0 +1,48 @@
+{
+  "timestamp": 1789958015.0782075,
+  "commit": "a4990b814369f70650c1110a5ff1c8955314b66c",
+  "version": "5.0.0",
+  "environment": {
+    "os": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.13"
+  },
+  "status": "PASS",
+  "body": {
+    "base": {
+      "energy": 0.9943,
+      "health": 1.0,
+      "damage": 0.0,
+      "position": [
+        0,
+        0
+      ],
+      "heading": 0.0,
+      "age": 0,
+      "rest_ticks": 0,
+      "damage_events": 0,
+      "last_damage_cause": ""
+    },
+    "hunger": 0.0018,
+    "thirst": 0.0018,
+    "fatigue": 0.0024,
+    "temperature": 37.0,
+    "pos": [
+      0.6239,
+      4.0784,
+      0.6682
+    ],
+    "vel": [
+      0.6349,
+      -0.4985,
+      -0.2647
+    ],
+    "yaw": 2.7,
+    "grounded": true,
+    "upright": 0.819,
+    "action": "move",
+    "goal": "explore",
+    "fall_events": 0,
+    "alive": true
+  },
+  "needs_integrate": true
+}

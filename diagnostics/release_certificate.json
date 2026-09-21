@@ -1,28 +1,28 @@
 {
-  "version": "5.0.0",
-  "version_tag": "v5.0.0",
-  "generated_at": "2026-09-20T23:40:48Z",
+  "version": "6.0.0",
+  "version_tag": "v6.0.0",
+  "generated_at": "2026-09-21T02:38:15Z",
   "overall": "PASS",
   "checks": {
     "pyproject": {
       "pass": true,
-      "detail": "pyproject=5.0.0 src=5.0.0"
+      "detail": "pyproject=6.0.0 src=6.0.0"
     },
     "cli": {
       "pass": true,
-      "detail": "FlyBrain 5.0.0"
+      "detail": "FlyBrain 6.0.0"
     },
     "api": {
       "pass": true,
-      "detail": "{'version': '5.0.0', 'release': 'FlyBrain V5.0.0'}"
+      "detail": "{'version': '6.0.0', 'release': 'FlyBrain V6.0.0'}"
     },
     "api_tag": {
       "pass": true,
-      "detail": "FlyBrain V5.0.0"
+      "detail": "FlyBrain V6.0.0"
     },
     "acceptance_version_gate": {
       "pass": true,
-      "detail": "FlyBrain version metadata = 5.0.0 (v5.0.0)."
+      "detail": "FlyBrain version metadata = 6.0.0 (v6.0.0)."
     },
     "artifact:shaders/brain_step.spv": {
       "pass": true,

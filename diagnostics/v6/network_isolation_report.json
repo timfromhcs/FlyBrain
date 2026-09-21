@@ -1,0 +1,12 @@
+{
+  "timestamp": 1789958031.9190776,
+  "commit": "a4990b814369f70650c1110a5ff1c8955314b66c",
+  "version": "5.0.0",
+  "environment": {
+    "os": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.13"
+  },
+  "status": "PASS",
+  "mechanism": "FLYBRAIN_OFFLINE=1 -> HF_HUB_OFFLINE/TRANSFORMERS_OFFLINE/HF_DATASETS_OFFLINE; acquire_models refuses; runtime loads local-only; connect() blockade test green",
+  "cdn_runtime_deps": "none (vendored three.js r128)"
+}

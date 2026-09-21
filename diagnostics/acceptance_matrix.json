@@ -1,5 +1,5 @@
 {
-  "timestamp": 1789945703.840016,
+  "timestamp": 1789958270.0213983,
   "overall_status": "PASSED",
   "total_categories": 57,
   "passed": 56,
@@ -130,7 +130,7 @@
     },
     "llm_model_discovery_and_inference": {
       "status": "PASS",
-      "reason": "Discovered 1 GGUF; inference=SUCCESS; model=MiniCPM5-2B-Q8_0.gguf."
+      "reason": "Discovered 2 GGUF; inference=SUCCESS; model=MiniCPM5-2B-Q8_0.gguf."
     },
     "llm_failure_mode_and_tool_safety": {
       "status": "PASS",
@@ -186,7 +186,7 @@
     },
     "version_metadata": {
       "status": "PASS",
-      "reason": "FlyBrain version metadata = 5.0.0 (v5.0.0)."
+      "reason": "FlyBrain version metadata = 6.0.0 (v6.0.0)."
     },
     "immutable_bio_baseline": {
       "status": "PASS",

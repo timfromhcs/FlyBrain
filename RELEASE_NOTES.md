@@ -1,3 +1,35 @@
+# FlyBrain Release Notes — v6.0.0 Stable
+
+**Tag:** `v6.0.0` · **Prior line:** `v5.0.0` · V5 fully preserved (265-test
+suite + 57-gate matrix intact); V6 is additive.
+
+## Embodied world (all real, all measured)
+- MuJoCo 3.13 authoritative 3D physics: gravity, floor rest, wall blocking,
+  crate pushing, posture PD + get-up maneuver, save/restore bit-exact
+  (7 physics tests).
+- Closed loop with §27 causal records; save/restore deterministic
+  continuation proven (world hash + brain + body + spatial memory incl.
+  solver warm-start and unrounded state sidecars).
+- Raycast first-person perception (`GEOMETRIC`), A* navigation on
+  known-vs-true maps (0.25 m grid keeps the 1.4 m door passable), world
+  clock, doors/food/water with real state transitions.
+- Local models, every one loaded and measured: Qwen3-0.6B-GGUF, SmolVLM-256M,
+  Whisper-small, Kokoro-82M, DreamShaper-8-LCM, sd-controlnet-canny,
+  MiniLM-L6-v2. Manager with pressure shedding; offline enforced.
+- Dreams/imagination/speech loop end-to-end on real models; versioned prompt
+  templates; social trust emerges from measured teaching.
+- World UI tab (4 cameras, minimap, dream/speak/imagine), 0 console errors.
+- V6 matrix 42/42 PASS; evidence `diagnostics/v6/`; bench FAST 22s /
+  BALANCED 38s / QUALITY 180s (CPU), physics 0.1ms, nav 4.5ms.
+
+## Honest limitations
+- torch-directml reverted (breaks transformers ≥2.5): CPU inference.
+- Depth/openpose ControlNets pinned but not downloaded (canny verified).
+- Endurance soak: UNVERIFIED. Google Drive: BLOCKED_AUTHENTICATION.
+- Population sim stays CPU; REAL_FULL not instantiated (unchanged).
+
+---
+
 # FlyBrain Release Notes — v5.0.0 Stable
 
 **Tag:** `v5.0.0` · **Prior line:** `v4.1.0` · **Semver:** major (new API

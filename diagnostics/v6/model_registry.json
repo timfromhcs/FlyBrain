@@ -1,0 +1,83 @@
+{
+  "timestamp": 1789958031.8560307,
+  "commit": "a4990b814369f70650c1110a5ff1c8955314b66c",
+  "version": "5.0.0",
+  "environment": {
+    "os": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.13"
+  },
+  "status": "PASS",
+  "models": [
+    {
+      "id": "Qwen/Qwen3-0.6B-GGUF",
+      "task": "TEXT_MODEL",
+      "file": "Qwen3-0.6B-Q8_0.gguf",
+      "revision": "main",
+      "license": "Apache-2.0",
+      "backend": "llama_cpp",
+      "precision": "Q8_0",
+      "memory_estimate_mb": 700,
+      "local_path": "models\\text_model\\Qwen3-0.6B-Q8_0.gguf",
+      "file_size": 639446688,
+      "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031",
+      "present": true,
+      "verified": false
+    },
+    {
+      "id": "sentence-transformers/all-MiniLM-L6-v2",
+      "task": "EMBEDDING_MODEL",
+      "revision": "main",
+      "license": "Apache-2.0",
+      "backend": "sentence_transformers",
+      "precision": "fp32",
+      "memory_estimate_mb": 120,
+      "local_path": "models\\embedding_model\\model.safetensors",
+      "file_size": 90868376,
+      "sha256": "53aa51172d142c89d9012cce15ae4d6cc0ca6895895114379cacb4fab128d9db",
+      "present": true,
+      "verified": false
+    },
+    {
+      "id": "openai/whisper-small",
+      "task": "STT_MODEL",
+      "revision": "main",
+      "license": "Apache-2.0",
+      "backend": "transformers",
+      "precision": "fp32",
+      "memory_estimate_mb": 1000,
+      "local_path": "models\\stt_model\\model.safetensors",
+      "file_size": 966995080,
+      "sha256": "1d7734884874f1a1513ed9aa760a4f8e97aaa02fd6d93a3a85d27b2ae9ca596b",
+      "present": true,
+      "verified": false
+    },
+    {
+      "id": "hexgrad/Kokoro-82M",
+      "task": "TTS_MODEL",
+      "revision": "main",
+      "license": "Apache-2.0",
+      "backend": "kokoro",
+      "precision": "fp32",
+      "memory_estimate_mb": 400,
+      "local_path": null,
+      "file_size": null,
+      "sha256": null,
+      "present": false,
+      "verified": false
+    },
+    {
+      "id": "Lykon/dreamshaper-8-lcm",
+      "task": "IMAGE_MODEL",
+      "revision": "main",
+      "license": "CreativeML Open RAIL-M",
+      "backend": "diffusers",
+      "precision": "fp16-cpu-fp32",
+      "memory_estimate_mb": 4500,
+      "local_path": "models\\image_model\\DreamShaper8_LCM.safetensors",
+      "file_size": 2133804992,
+      "sha256": "a4f3e1526c5dc4fcbe342f5c410d83ae202c7a415fcefcbb92e0f93fcd0a87c3",
+      "present": true,
+      "verified": false
+    }
+  ]
+}

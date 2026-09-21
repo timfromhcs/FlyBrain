@@ -1,6 +1,6 @@
 {
   "experiment_id": "matrix_det_test_b",
-  "timestamp": 1789945678.2745366,
+  "timestamp": 1789958244.0688944,
   "seed": 1337,
   "graph_mode": "REAL",
   "neuron_scale": 128,
@@ -10,7 +10,7 @@
   "connections_file_hash": "039e929b4ccc776f13a8d17eb9833d85de9454b8f43a0a0de34fdabb7ca2a668",
   "brain_shader_hash": "85427c36a5de1f638280fcffcd7295c864d8f78fee01fd5990fe26afaa9a3b65",
   "plasticity_shader_hash": "5321dd5fc6985d93d302f4cc6fc0e80a4b04f5ca022cbb7a7b18ef3b448ef17c",
-  "git_commit": "2f747cc317a774cc082c9ffd65096cd252d5161f",
+  "git_commit": "a4990b814369f70650c1110a5ff1c8955314b66c",
   "hardware_device": "AMD Radeon(TM) Graphics",
   "backend": "vulkan_gpu",
   "graph_hash": "cc3db9f1492600bf75d99d397712fe18e81f832006f8f8b9e12d531fde13ab42",
@@ -23,11 +23,11 @@
     "final_energy": 0.9795,
     "final_curiosity": 0.7391,
     "final_prediction_error": 0.1073,
-    "mean_step_latency_ms": 0.654,
-    "median_step_latency_ms": 0.584,
-    "min_step_latency_ms": 0.529,
-    "max_step_latency_ms": 1.884,
-    "throughput_steps_per_sec": 1530.0
+    "mean_step_latency_ms": 0.584,
+    "median_step_latency_ms": 0.515,
+    "min_step_latency_ms": 0.487,
+    "max_step_latency_ms": 1.589,
+    "throughput_steps_per_sec": 1711.4
   },
   "snapshot_path": "diagnostics\\snapshots\\matrix_det_test_b_final.npz",
   "graph_provenance": {

@@ -1,0 +1,13 @@
+{
+  "timestamp": 1789958015.1263075,
+  "commit": "a4990b814369f70650c1110a5ff1c8955314b66c",
+  "version": "5.0.0",
+  "environment": {
+    "os": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.13"
+  },
+  "status": "PASS",
+  "kind": "GEOMETRIC",
+  "rays": 21,
+  "frame_hash": "08e33a3ac1f7585414429318d6f80e3c00a9a34304d2cfd1c4093c52278038a5"
+}

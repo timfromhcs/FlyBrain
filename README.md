@@ -30,10 +30,11 @@
 8. [Multi-Store Persistent Memory](#multi-store-persistent-memory)
 9. [Installation & Quick Start](#installation--quick-start)
 10. [Hardware Benchmark Results](#hardware-benchmark-results)
-11. [What's New in v5.0](#whats-new-in-v50)
-12. [What's New in v4.1](#whats-new-in-v41)
-12. [Hugging Face Space](#hugging-face-space)
-13. [Artificial-Life Layer — Honest Status](#artificial-life-layer--honest-status)
+11. [What's New in v6.0](#whats-new-in-v60)
+12. [What's New in v5.0](#whats-new-in-v50)
+13. [What's New in v4.1](#whats-new-in-v41)
+14. [Hugging Face Space](#hugging-face-space)
+15. [Artificial-Life Layer — Honest Status](#artificial-life-layer--honest-status)
 14. [Citation & Third-Party Notices](#citation--third-party-notices)
 
 ---
@@ -227,7 +228,7 @@ behavioral assertion (no source-text-only checks). The table below is
 | 28 | `real_annotation_integrity` | **PASS** | Unavailable annotations flagged UNKNOWN; available ones EMPIRICAL/DERIVED. |
 | 29 | `plasticity_causal_effect` | **PASS** | reward=0 no change; reward>0 potentiation; reward<0 depression. |
 | 30 | `checkpoint_continuation` | **PASS** | Checkpoint/resume final population hash equals uninterrupted run. |
-| 31 | `llm_model_discovery_and_inference` | **PASS** | Discovered 1 GGUF; inference=SUCCESS; model=MiniCPM5-2B-Q8_0.gguf. |
+| 31 | `llm_model_discovery_and_inference` | **PASS** | Discovered 2 GGUF; inference=SUCCESS; model=MiniCPM5-2B-Q8_0.gguf. |
 | 32 | `llm_failure_mode_and_tool_safety` | **PASS** | Unavailable model returns structured error (no fake text); shell/unknown tools rejected. |
 | 33 | `living_brain_identity` | **PASS** | Persistent identities + EMERGENT provenance; growth 32->33. |
 | 34 | `structural_growth_resource_constrained` | **PASS** | Zero growth budget blocks neurogenesis (energy is the constraint). |
@@ -241,7 +242,7 @@ behavioral assertion (no source-text-only checks). The table below is
 | 42 | `deeptime_escalation_replay` | **PASS** | Coarse deep-time escalates to full-res checkpoint; replay hash-verified. |
 | 43 | `milestone_evidence` | **PASS** | Detected ['STRUCTURAL_EXPANSION', 'OVERLAPPING_GENERATIONS'] with evidence + certificate. |
 | 44 | `benchmark_fairness` | **PASS** | Per-arm budgets documented; LLM arms SKIP with reason when unmet. |
-| 45 | `version_metadata` | **PASS** | FlyBrain version metadata = 5.0.0 (v5.0.0). |
+| 45 | `version_metadata` | **PASS** | FlyBrain version metadata = 6.0.0 (v6.0.0). |
 | 46 | `immutable_bio_baseline` | **PASS** | Biological baseline fingerprint unchanged after lifetime development. |
 | 47 | `synapse_identity_provenance` | **PASS** | Stable synapse IDs; seed records cite source dataset; new synapses are EMERGENT, never BIOLOGICAL. |
 | 48 | `brain_identity_layers` | **PASS** | 12-layer identity: same state -> same identity; weight change -> different identity. |
@@ -327,6 +328,33 @@ unified-memory iGPU). Methodology and design conclusions live in the report;
 no optimization is kept without a measurement behind it.
 
 ---
+
+## What's New in v6.0
+
+Embodied artificial life (local-first, offline-capable):
+
+- **Persistent 3D world** (MuJoCo rigid-body physics, server-authoritative):
+  terrain, home with pushable door, furniture, trees, rocks, food, lake zone.
+- **Closed loop**: WORLD → BODY → SENSORS → PERCEPTION → BRAIN → GOALS →
+  ACTION → PHYSICS → WORLD → REWARD → MEMORY (per-tick causal records).
+- **First-person geometric perception** (raycast fan, occlusion-aware),
+  honest `GEOMETRIC` label; VLM slot filled by local SmolVLM when present.
+- **Local models, all verified**: Qwen3-0.6B-GGUF (structured goals),
+  SmolVLM-256M (grounded captions), Whisper-small (file STT),
+  Kokoro-82M (TTS), DreamShaper-8-LCM + ControlNet-canny (IoU 0.63
+  continuity), MiniLM (semantic RAG). Model manager with pressure shedding;
+  `models/` binaries git-ignored, registry pins SHA/license.
+- **Dreams + imagination** with `DREAM/COUNTERFACTUAL/GENERATED_*`
+  provenance; Dream Studio gallery; narrative-only path when no GPU model.
+- **Speech loop**: file/mic → STT → memory → LLM → TTS (all local).
+- **Friends**: full agents with genomes, needs, trust emerging from real
+  teaching; `/api/v1/world/friends`.
+- **World UI tab**: server-rendered 3D, 4 cameras, minimap, dream/speak/
+  imagine controls, zero console errors.
+- **Offline hard gate**: `FLYBRAIN_OFFLINE=1` + connect() blockade tests
+  green; acquisition refuses; vendored frontend.
+- **V6 matrix 42/42** (`scripts/run_v6_matrix.py`), evidence in
+  `diagnostics/v6/`, benchmarks in `performance_report.json`.
 
 ## What's New in v5.0
 
