@@ -76,10 +76,10 @@ def main():
         t0 = time.time()
         llm = load_text()
         R["llm_load_s"] = {"median_s": round(time.time() - t0, 1), "rounds": 1}
-        timed("llm_goal_gen_s", lambda: llm.create_chat_completion(
+        timed("llm_goal_gen_s", lambda _llm=llm: _llm.create_chat_completion(
             messages=[{"role": "user", "content": 'Reply ONLY: {"goal": "explore"}'}],
             max_tokens=64, temperature=0.0, seed=1), rounds=2)
-        del llm
+        llm = None
     except Exception as e:
         R["llm"] = {"status": f"UNAVAILABLE:{type(e).__name__}"}
     import gc
@@ -122,9 +122,9 @@ def main():
             sr = 16000
         feats = stt["processor"](data, sampling_rate=sr, return_tensors="pt").input_features
         import torch
-        timed("stt_transcribe_s", lambda: stt["model"].generate(feats, max_new_tokens=32),
+        timed("stt_transcribe_s", lambda _stt=stt: _stt["model"].generate(feats, max_new_tokens=32),
               rounds=2)
-        del stt
+        stt = None
     except Exception as e:
         R["stt"] = {"status": f"UNAVAILABLE:{type(e).__name__}"}
     gc.collect()
@@ -134,8 +134,8 @@ def main():
         tts = load_tts()
         R["tts_load_s"] = {"median_s": round(time.time() - t0, 1), "rounds": 1}
         import torch as _t
-        timed("tts_synth_s", lambda: list(tts("Hello world.", voice="af_heart")), rounds=2)
-        del tts
+        timed("tts_synth_s", lambda _tts=tts: list(_tts("Hello world.", voice="af_heart")), rounds=2)
+        tts = None
     except Exception as e:
         R["tts"] = {"status": f"UNAVAILABLE:{type(e).__name__}"}
     gc.collect()
