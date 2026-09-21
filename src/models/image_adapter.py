@@ -16,6 +16,48 @@ MODES = {
     "QUALITY": {"size": 768, "steps": 12},
 }
 
+CONTROLNETS = {
+    "canny": {"repo": "lllyasviel/sd-controlnet-canny", "revision": "7f2f69197050",
+              "dir": os.path.join("models", "controlnet", "canny")},
+    "depth": {"repo": "lllyasviel/sd-controlnet-depth", "revision": "35e42a3ea498",
+              "dir": os.path.join("models", "controlnet", "depth")},
+    "openpose": {"repo": "lllyasviel/sd-controlnet-openpose", "revision": "df796456519d",
+                 "dir": os.path.join("models", "controlnet", "openpose")},
+}
+
+
+def controlnet_status() -> Dict[str, Any]:
+    out = {}
+    for name, spec in CONTROLNETS.items():
+        p = os.path.join(spec["dir"], "diffusion_pytorch_model.safetensors")
+        out[name] = {"present": os.path.exists(p),
+                     "repo": spec["repo"], "revision": spec["revision"],
+                     "size": os.path.getsize(p) if os.path.exists(p) else None}
+    return out
+
+
+def edge_map(image_path: str, low_pct: float = 80.0, high_pct: float = 92.0):
+    """Local Sobel-hysteresis edge map (no cv2 dependency).
+
+    Returns a 3-channel uint8 edge image + the applied thresholds.
+    Honestly labelled EDGE_MAP (Sobel), not Canny-OpenCV.
+    """
+    import numpy as _np
+    from PIL import Image as _Image
+    from scipy.ndimage import sobel as _sobel, binary_dilation as _dil
+    img = _Image.open(image_path).convert("L")
+    gray = _np.asarray(img, dtype=_np.float32) / 255.0
+    gx, gy = _sobel(gray, axis=1), _sobel(gray, axis=0)
+    mag = _np.hypot(gx, gy)
+    lo, hi = _np.percentile(mag, [low_pct, high_pct])
+    strong = mag >= hi
+    weak = (mag >= lo) & _dil(strong)
+    edges = ((strong | weak) * 255).astype(_np.uint8)
+    rgb = _np.stack([edges] * 3, axis=-1)
+    return _Image.fromarray(rgb), {"low": round(float(lo), 4),
+                                   "high": round(float(hi), 4),
+                                   "method": "sobel_hysteresis"}
+
 
 def find_checkpoint(explicit: Optional[str] = None) -> str:
     if explicit and os.path.exists(explicit):
@@ -42,6 +84,7 @@ class LocalImageModel:
                 h.update(c)
         self.sha256 = h.hexdigest()
         self._pipe = None
+        self._cn_pipe = None
 
     def load(self):
         if self._pipe is not None:
@@ -62,8 +105,69 @@ class LocalImageModel:
 
     def unload(self):
         self._pipe = None
+        self._cn_pipe = None
         import gc
         gc.collect()
+
+    def generate_controlled(self, prompt: str, control_image, controlnet: str = "canny",
+                            mode: str = "FAST", seed: int = 42,
+                            out_path: Optional[str] = None,
+                            control_scale: float = 1.0) -> Dict[str, Any]:
+        """ControlNet render: structure from control_image, style from prompt.
+
+        SD1.5 ControlNet + DreamShaper weights + LCM scheduler, CPU.
+        Raises FileNotFoundError when the ControlNet is absent (UNAVAILABLE).
+        """
+        import torch
+        if mode not in MODES:
+            raise ValueError(f"unknown mode {mode!r}")
+        spec = CONTROLNETS.get(controlnet)
+        if spec is None:
+            raise ValueError(f"unknown controlnet {controlnet!r}")
+        ckpt = os.path.join(spec["dir"], "diffusion_pytorch_model.safetensors")
+        if not os.path.exists(ckpt):
+            raise FileNotFoundError(f"controlnet {controlnet} absent "
+                                    f"(pinned {spec['repo']}@{spec['revision']})")
+        from diffusers import (StableDiffusionControlNetPipeline, ControlNetModel,
+                               LCMScheduler)
+        cfg = MODES[mode]
+        t0 = time.time()
+        cnet = ControlNetModel.from_single_file(ckpt, torch_dtype=torch.float32)
+        pipe = StableDiffusionControlNetPipeline.from_single_file(
+            self.checkpoint, controlnet=cnet, torch_dtype=torch.float32)
+        pipe.scheduler = LCMScheduler.from_config(pipe.scheduler.config)
+        pipe = pipe.to("cpu")
+        pipe.enable_attention_slicing()
+        load_s = round(time.time() - t0, 1)
+        size = cfg["size"]
+        ctrl = control_image.resize((size, size)).convert("RGB")
+        gen = torch.Generator("cpu").manual_seed(int(seed))
+        t0 = time.time()
+        image = pipe(prompt, image=ctrl, height=size, width=size,
+                     num_inference_steps=cfg["steps"], guidance_scale=1.0,
+                     controlnet_conditioning_scale=float(control_scale),
+                     generator=gen).images[0]
+        dt = time.time() - t0
+        if out_path is None:
+            os.makedirs(os.path.join("visual_evidence", "imagined"), exist_ok=True)
+            out_path = os.path.join("visual_evidence", "imagined",
+                                    f"cn_{controlnet}_{int(time.time())}_{seed}.png")
+        image.save(out_path)
+        assert os.path.exists(out_path) and os.path.getsize(out_path) > 10000
+        assert image.size == (size, size)
+        del pipe, cnet
+        import gc
+        gc.collect()
+        return {"status": "GENERATED", "path": out_path,
+                "bytes": os.path.getsize(out_path), "mode": mode,
+                "controlnet": controlnet, "control_repo": spec["repo"],
+                "control_revision": spec["revision"],
+                "controlnet_load_s": load_s,
+                "size": size, "steps": cfg["steps"], "seed": seed,
+                "seconds": round(dt, 1),
+                "checkpoint": os.path.basename(self.checkpoint),
+                "checkpoint_sha256": self.sha256,
+                "provenance": "GENERATED_IMAGE_CONTROLLED"}
 
     def generate(self, prompt: str, mode: str = "FAST", seed: int = 42,
                  out_path: Optional[str] = None) -> Dict[str, Any]:

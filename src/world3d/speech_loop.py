@@ -44,34 +44,22 @@ def synthesize_reply(tts_pipe, voice: str, text: str, out_path: str) -> Dict[str
 
 
 def llm_reply(text_model, heard: str, memories: list) -> Dict[str, Any]:
-    prompt = ("A person said to a simulated organism: " + heard[:200]
-              + ". Relevant memories: " + json.dumps(memories)[:400]
-              + '. Reply ONLY JSON: {"reply": "...", "action": "SPEAK"}')
+    from src.prompts.render import load_templates, render, extract_json, check_output
+    templates = load_templates()
     last_err = ""
     for attempt in range(2):
+        t = render("conversation_reply", templates, heard=heard[:200],
+                   memories=json.dumps(memories)[:400])
         out = text_model.create_chat_completion(
-            messages=[{"role": "system", "content": "Terse organism. JSON only."},
-                      {"role": "user", "content": prompt}],
-            max_tokens=384, temperature=0.0, seed=21 + attempt)
+            messages=[{"role": "system", "content": t["system"]},
+                      {"role": "user", "content": t["user"]}],
+            max_tokens=t["max_tokens"], temperature=t["temperature"], seed=21 + attempt)
         text = out["choices"][0]["message"]["content"]
-        start = text.rfind('{"reply"')
-        depth, end = 0, -1
-        for i in range(max(start, 0), len(text)):
-            if text[i] == "{":
-                depth += 1
-            elif text[i] == "}":
-                depth -= 1
-                if depth == 0:
-                    end = i + 1
-                    break
         try:
-            if start < 0 or end <= start:
-                raise ValueError("LLM produced no reply JSON")
-            data = json.loads(text[start:end])
-            assert isinstance(data.get("reply"), str) and data["reply"]
+            data = check_output(extract_json(text, "reply"), t["schema"])
             data.setdefault("action", "SPEAK")
             return data
-        except (ValueError, AssertionError) as e:
+        except ValueError as e:
             last_err = str(e)
     raise ValueError(f"LLM produced no reply JSON ({last_err})")
 

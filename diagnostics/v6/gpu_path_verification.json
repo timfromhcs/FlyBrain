@@ -1,0 +1,14 @@
+{
+  "timestamp": 1789957577.794517,
+  "commit": "75f692e79ce12156f10b8abcbb5270c4d1fd8a68",
+  "torch": "2.14.0+cpu",
+  "device": "AMD Radeon 680M (iGPU, no CUDA)",
+  "attempt": "torch-directml 0.2.5: install OK, device visible, matmul OK",
+  "conflict": "dml pins torch==2.4.1+cpu; transformers>=2.5 disables torch -> Whisper/SmolVLM dead. Reverted to torch 2.14.0+cpu; verified whisper import + MiniLM encode after revert.",
+  "decision": "CPU for torch inference; Vulkan for LIF compute; DirectML BLOCKED_BY_DEPENDENCY (revisit if dml supports torch>=2.5)",
+  "status": "DOCUMENTED_BLOCKED",
+  "vulkan_lif": {
+    "available": false,
+    "reason": "No module named 'src'"
+  }
+}

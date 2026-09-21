@@ -21,47 +21,23 @@ def _salient_episodes(agent, k: int = 6) -> List[Dict[str, Any]]:
     return eps[:k]
 
 
-def _extract_json(text: str, key: str) -> Dict[str, Any]:
-    start = text.rfind('{"' + key + '"')
-    if start < 0:
-        # fallback: first balanced object containing the key
-        start = text.find("{")
-    depth, end = 0, -1
-    for i in range(max(start, 0), len(text)):
-        if text[i] == "{":
-            depth += 1
-        elif text[i] == "}":
-            depth -= 1
-            if depth == 0:
-                end = i + 1
-                break
-    if start < 0 or end <= start:
-        raise ValueError("LLM produced no dream JSON")
-    data = json.loads(text[start:end])
-    if key not in data:
-        raise ValueError(f"LLM JSON missing {key!r}")
-    return data
-
-
 def dream_scenario_llm(text_model, agent, memories: List[Dict[str, Any]]) -> Dict[str, Any]:
+    from src.prompts.render import load_templates, render, extract_json, check_output
+    templates = load_templates()
     internal = {"hunger": round(agent.body3d.hunger, 2),
                 "fatigue": round(agent.body3d.fatigue, 2),
                 "goal": agent.body3d.goal}
-    prompt = ("Dream for a simulated organism. Memories: "
-              + json.dumps(memories)[:1200]
-              + f". Internal state: {json.dumps(internal)}. "
-                'Reply ONLY JSON: {"narrative": "...", "entities": ["..."], '
-                '"mood": "...", "seed": 7}')
     last_err = ""
-    for attempt, (temp, ntok) in enumerate(((0.0, 384), (0.0, 384))):
+    for attempt in range(2):
+        t = render("dream_scenario", templates, memories=json.dumps(memories)[:1200],
+                   internal=json.dumps(internal), seed=7)
         out = text_model.create_chat_completion(
-            messages=[{"role": "system",
-                       "content": "Terse dreamer. JSON only. Never explain."},
-                      {"role": "user", "content": prompt}],
-            max_tokens=ntok, temperature=temp, seed=11 + attempt)
+            messages=[{"role": "system", "content": t["system"]},
+                      {"role": "user", "content": t["user"]}],
+            max_tokens=t["max_tokens"], temperature=t["temperature"], seed=11 + attempt)
         text = out["choices"][0]["message"]["content"]
         try:
-            data = _extract_json(text, "narrative")
+            data = check_output(extract_json(text, "narrative"), t["schema"])
             break
         except ValueError as e:
             last_err = str(e)
@@ -124,22 +100,20 @@ def replay_dream(agent, dream_id: str) -> Dict[str, Any]:
 
 def imagine(agent, theme: str, text_model, image_model) -> Dict[str, Any]:
     """LLM visual concept from memories+goal+theme -> SD render -> memory."""
+    from src.prompts.render import load_templates, render, extract_json, check_output
+    templates = load_templates()
     mems = _salient_episodes(agent, k=4)
-    prompt = ("Visual concept for an imagined scene. Theme: " + theme[:200]
-              + ". Memories: " + json.dumps(mems)[:900]
-              + f". Goal: {agent.body3d.goal}. "
-                'Reply ONLY JSON: {"concept": "...", "seed": 3}')
-    out = None
-    text = ""
     last_err = ""
     for attempt in range(2):
+        t = render("visual_concept", templates, theme=theme[:200],
+                   memories=json.dumps(mems)[:900], goal=agent.body3d.goal, seed=3)
         out = text_model.create_chat_completion(
-            messages=[{"role": "system", "content": "Terse artist. JSON only."},
-                      {"role": "user", "content": prompt}],
-            max_tokens=512, temperature=0.0, seed=13 + attempt)
+            messages=[{"role": "system", "content": t["system"]},
+                      {"role": "user", "content": t["user"]}],
+            max_tokens=t["max_tokens"], temperature=t["temperature"], seed=13 + attempt)
         text = out["choices"][0]["message"]["content"]
         try:
-            concept = _extract_json(text, "concept")
+            concept = check_output(extract_json(text, "concept"), t["schema"])
             break
         except ValueError as e:
             last_err = str(e)

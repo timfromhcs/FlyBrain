@@ -1,0 +1,43 @@
+{
+  "timestamp": 1789957308.3091705,
+  "version": "5.0.0",
+  "commit": "75f692e79ce12156f10b8abcbb5270c4d1fd8a68",
+  "controlnets": {
+    "canny": {
+      "present": true,
+      "repo": "lllyasviel/sd-controlnet-canny",
+      "revision": "7f2f69197050",
+      "size": 1445157124
+    },
+    "depth": {
+      "present": false,
+      "repo": "lllyasviel/sd-controlnet-depth",
+      "revision": "35e42a3ea498",
+      "size": null
+    },
+    "openpose": {
+      "present": false,
+      "repo": "lllyasviel/sd-controlnet-openpose",
+      "revision": "df796456519d",
+      "size": null
+    }
+  },
+  "edge_extraction_s": 0.48,
+  "edge_info": {
+    "low": 0.1221,
+    "high": 0.343,
+    "method": "sobel_hysteresis"
+  },
+  "status": "GENERATED",
+  "mode": "FAST",
+  "controlnet": "canny",
+  "control_repo": "lllyasviel/sd-controlnet-canny",
+  "control_revision": "7f2f69197050",
+  "controlnet_load_s": 3.4,
+  "seconds": 33.1,
+  "provenance": "GENERATED_IMAGE_CONTROLLED",
+  "path": "diagnostics\\v6\\genesis_controlled.png",
+  "edge_iou": 0.6262,
+  "edge_density_control": 0.1233,
+  "edge_density_render": 0.1292
+}

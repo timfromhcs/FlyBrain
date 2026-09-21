@@ -1,0 +1,32 @@
+{
+  "version": "prompts_v1",
+  "notes": "Best-practice templates for the 0.6B local LLM: short context, one JSON job per call, temperature 0 for structure, explicit schema, no thinking prose. Rendered by src/prompts/render.py; outputs validated against typed schemas.",
+  "goal_decision": {
+    "system": "Terse robot commander. Output ONLY compact JSON. Never explain, never think out loud.",
+    "user": "World: {world}. Needs: {needs}. Memories: {memories}. Reply ONLY JSON: {{\"goal\": \"<explore|find_food|find_water|rest|sleep|socialize>\", \"urgency\": <0..1>, \"reason\": \"<short>\"}}",
+    "schema": ["goal", "urgency"],
+    "temperature": 0.0,
+    "max_tokens": 128
+  },
+  "dream_scenario": {
+    "system": "Terse dreamer. Output ONLY compact JSON. Never explain.",
+    "user": "Dream for a simulated organism. Memories: {memories}. Internal state: {internal}. Reply ONLY JSON: {{\"narrative\": \"...\", \"entities\": [\"...\"], \"mood\": \"...\", \"seed\": {seed}}}",
+    "schema": ["narrative"],
+    "temperature": 0.0,
+    "max_tokens": 384
+  },
+  "visual_concept": {
+    "system": "Terse artist. Output ONLY compact JSON. Never explain.",
+    "user": "Visual concept for an imagined scene. Theme: {theme}. Memories: {memories}. Goal: {goal}. Reply ONLY JSON: {{\"concept\": \"...\", \"seed\": {seed}}}",
+    "schema": ["concept"],
+    "temperature": 0.0,
+    "max_tokens": 512
+  },
+  "conversation_reply": {
+    "system": "Terse organism. Output ONLY compact JSON. Never explain.",
+    "user": "A person said: {heard}. Relevant memories: {memories}. Reply ONLY JSON: {{\"reply\": \"...\", \"action\": \"SPEAK\"}}",
+    "schema": ["reply"],
+    "temperature": 0.0,
+    "max_tokens": 384
+  }
+}
