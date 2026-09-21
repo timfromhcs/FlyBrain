@@ -30,6 +30,7 @@
 
     <nav>
         <button class="nav-tab active" onclick="switchTab('overview')">Overview</button>
+        <button class="nav-tab" onclick="switchTab('world')">World</button>
         <button class="nav-tab" onclick="switchTab('stream')">Live Stream</button>
         <button class="nav-tab" onclick="switchTab('connectome')">Connectome 3D</button>
         <button class="nav-tab" onclick="switchTab('colony')">Colony</button>
@@ -43,6 +44,46 @@
     </nav>
 
     <main>
+        <!-- Tab: Embodied 3D World (server-authoritative MuJoCo; browser renders) -->
+        <div id="tab-world" class="tab-content">
+            <div class="viewer-container">
+                <div id="world-canvas-wrapper">
+                    <canvas id="world-canvas"></canvas>
+                    <div class="viewer-controls-overlay">
+                        <label style="font-size: 11px; color: var(--text-dim);">Camera:</label>
+                        <select id="world-cam" onchange="worldCamMode=this.value">
+                            <option value="third">Third-person</option>
+                            <option value="first">First-person</option>
+                            <option value="observer">Observer</option>
+                            <option value="free">Free orbit</option>
+                        </select>
+                        <label style="font-size: 11px; color: var(--text-dim);"><input type="checkbox" id="world-debug" onchange="worldDebug=this.checked"> Debug</label>
+                        <button class="btn" onclick="worldStep(5)">+ Step</button>
+                        <button class="btn" onclick="worldDream(false)">Dream</button>
+                        <button class="btn" onclick="worldDream(true)">Dream+Image</button>
+                    </div>
+                </div>
+                <div class="inspector-panel">
+                    <div style="font-size: 14px; font-weight: 700; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px;">Organism</div>
+                    <div class="inspector-row"><span class="inspector-label">Goal</span><span class="inspector-val" id="w-goal">—</span></div>
+                    <div class="inspector-row"><span class="inspector-label">Energy / Hunger</span><span class="inspector-val" id="w-needs">—</span></div>
+                    <div class="inspector-row"><span class="inspector-label">Location</span><span class="inspector-val" id="w-loc">—</span></div>
+                    <div class="inspector-row"><span class="inspector-label">World time</span><span class="inspector-val" id="w-time">—</span></div>
+                    <div class="inspector-row"><span class="inspector-label">Models</span><span class="inspector-val" id="w-models">—</span></div>
+                    <div style="display: flex; gap: 6px; margin-top: 10px;">
+                        <input type="text" id="w-say-text" placeholder="Say something…" style="flex: 1;">
+                        <button class="btn btn-green" onclick="worldSay()">Speak</button>
+                    </div>
+                    <div style="display: flex; gap: 6px; margin-top: 6px;">
+                        <input type="text" id="w-imagine-text" placeholder="Imagine…" style="flex: 1;">
+                        <button class="btn" onclick="worldImagine()">Imagine</button>
+                    </div>
+                    <div id="w-friends" style="margin-top: 10px; font-size: 12px;"></div>
+                    <canvas id="world-minimap" width="220" height="220" style="margin-top: 10px; border: 1px solid var(--border-subtle); border-radius: 8px;"></canvas>
+                </div>
+            </div>
+        </div>
+
         <!-- Tab 1: Overview -->
         <div id="tab-overview" class="tab-content active">
             <div class="grid-overview">

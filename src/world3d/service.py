@@ -78,7 +78,18 @@ class WorldService:
     def geometry(self) -> Dict[str, Any]:
         """Static render geometry derived from the spec (observer view)."""
         spec = self.world.spec
-        return {"size": spec["size"], "home": spec["home"],
+        h = spec["home"]
+        cx, cy, w, d, t, dw, wh = (h["cx"], h["cy"], h["w"], h["d"], h["wall_t"],
+                                   h["door_w"], h["wall_h"])
+        q = (w - dw) / 2
+        walls = [
+            {"x": cx, "y": cy + d / 2, "sx": w, "sy": t, "h": wh},
+            {"x": cx - w / 2, "y": cy, "sx": t, "sy": d, "h": wh},
+            {"x": cx + w / 2, "y": cy, "sx": t, "sy": d, "h": wh},
+            {"x": cx - (dw / 2 + q / 2), "y": cy - d / 2, "sx": q, "sy": t, "h": wh},
+            {"x": cx + (dw / 2 + q / 2), "y": cy - d / 2, "sx": q, "sy": t, "h": wh},
+        ]
+        return {"size": spec["size"], "home": spec["home"], "walls": walls,
                 "furniture": spec["furniture"], "trees": spec["trees"],
                 "rocks": spec["rocks"],
                 "foods": [f for f in spec["foods"] if f["id"] not in self.world.consumed],

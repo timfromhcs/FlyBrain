@@ -27,6 +27,9 @@
             if (tabId === 'connectome') {
                 if (!threeScene) init3DViewer();
                 fetchConnectome();
+            } else if (tabId === 'world') {
+                if (!worldScene) initWorldViewer();
+                fetchWorld();
             } else if (tabId === 'stream') {
                 fetchStream();
             } else if (tabId === 'colony') {
@@ -582,6 +585,216 @@
 
         function backupDownload(name) {
             window.open(`/api/v1/backup/download?name=${encodeURIComponent(name)}`, '_blank');
+        }
+
+        // ---- Embodied 3D World (render-only; physics is server-side MuJoCo) ----
+        let worldScene = null, worldCamera = null, worldRenderer = null, worldControls = null;
+        let worldCamMode = 'third', worldDebug = false;
+        let worldGeom = null, worldChars = {}, worldState = null;
+
+        function worldScalePos(p) { return [p[0], p[2], -p[1]]; } // MuJoCo (x,y,z) -> three (x,z,-y)
+
+        function initWorldViewer() {
+            const container = document.getElementById('world-canvas-wrapper');
+            const canvas = document.getElementById('world-canvas');
+            worldScene = new THREE.Scene();
+            worldScene.background = new THREE.Color(0x06080e);
+            worldCamera = new THREE.PerspectiveCamera(55, 1, 0.1, 200);
+            worldRenderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+            const resize = () => {
+                const w = container.clientWidth || 800, h = container.clientHeight || 500;
+                worldRenderer.setSize(w, h, false);
+                worldCamera.aspect = w / h; worldCamera.updateProjectionMatrix();
+            };
+            resize(); window.addEventListener('resize', resize);
+            worldControls = new THREE.OrbitControls(worldCamera, worldRenderer.domElement);
+            worldScene.add(new THREE.AmbientLight(0xffffff, 0.55));
+            const sun = new THREE.DirectionalLight(0xfff2dd, 0.9);
+            sun.position.set(10, 18, 6); worldScene.add(sun);
+            const render = () => {
+                requestAnimationFrame(render);
+                if (worldControls && worldCamMode === 'free') worldControls.update();
+                if (worldScene && worldCamera) {
+                    updateWorldCamera();
+                    worldRenderer.render(worldScene, worldCamera);
+                }
+            };
+            render();
+        }
+
+        function buildWorldGeometry(g) {
+            worldGeom = g;
+            const mat = (c) => new THREE.MeshLambertMaterial({ color: c });
+            const addBox = (x, y, sx, sy, h, color, name) => {
+                const m = new THREE.Mesh(new THREE.BoxGeometry(sx, h, sy), mat(color));
+                m.position.set(x, h / 2, -y); m.name = name || '';
+                worldScene.add(m); return m;
+            };
+            const ground = new THREE.Mesh(new THREE.PlaneGeometry(g.size, g.size),
+                new THREE.MeshLambertMaterial({ color: 0x1d2b1f }));
+            ground.rotation.x = -Math.PI / 2; ground.name = 'ground'; worldScene.add(ground);
+            (g.walls || []).forEach((wl, i) => addBox(wl.x, wl.y, wl.sx, wl.sy, wl.h, 0x6b5f7a, 'wall' + i));
+            (g.furniture || []).forEach(f => {
+                if (f.kind === 'static_box') addBox(f.x, f.y, f.sx, f.sy, f.sz, 0x7a6a4a, f.id);
+                else addBox(f.x, f.y, f.sx, f.sy, f.sz, 0x997744, f.id);
+            });
+            (g.trees || []).forEach(t => {
+                const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.25, 2, 8), mat(0x5a4128));
+                trunk.position.set(t.x, 1, -t.y); worldScene.add(trunk);
+                const top = new THREE.Mesh(new THREE.SphereGeometry(1.4, 10, 8), mat(0x2d5a27));
+                top.position.set(t.x, 3, -t.y); worldScene.add(top);
+            });
+            (g.rocks || []).forEach(r => {
+                const m = new THREE.Mesh(new THREE.SphereGeometry(r.r, 10, 8), mat(0x777788));
+                m.position.set(r.x, r.r * 0.7, -r.y); worldScene.add(m);
+            });
+            const water = g.water;
+            const lake = new THREE.Mesh(new THREE.PlaneGeometry(water.sx, water.sy),
+                new THREE.MeshLambertMaterial({ color: 0x1d4e6b, transparent: true, opacity: 0.8 }));
+            lake.rotation.x = -Math.PI / 2; lake.position.set(water.cx, 0.02, -water.cy);
+            worldScene.add(lake);
+            refreshWorldFoods(g);
+        }
+
+        function refreshWorldFoods(g) {
+            Object.keys(worldChars).forEach(k => { if (k.startsWith('food_')) { worldScene.remove(worldChars[k]); delete worldChars[k]; } });
+            (g.foods || []).forEach(f => {
+                const m = new THREE.Mesh(new THREE.SphereGeometry(0.18, 8, 8),
+                    new THREE.MeshLambertMaterial({ color: 0x33cc55 }));
+                m.position.set(f.x, 0.25, -f.y); m.name = f.id;
+                worldScene.add(m); worldChars['food_' + f.id] = m;
+            });
+        }
+
+        function syncWorldChars(chars) {
+            chars.forEach(c => {
+                let m = worldChars[c.name];
+                if (!m) {
+                    const g = new THREE.Group();
+                    // r128 has no CapsuleGeometry: cylinder + 2 spheres = capsule
+                    const bmat = new THREE.MeshLambertMaterial(
+                        { color: c.name === 'hero' ? 0x33aaff : 0xffaa33 });
+                    const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 0.9, 10), bmat);
+                    torso.position.y = 0.75; g.add(torso);
+                    const capB = new THREE.Mesh(new THREE.SphereGeometry(0.3, 10, 8), bmat);
+                    capB.position.y = 0.3; g.add(capB);
+                    const capT = new THREE.Mesh(new THREE.SphereGeometry(0.3, 10, 8), bmat);
+                    capT.position.y = 1.2; g.add(capT);
+                    const head = new THREE.Mesh(new THREE.SphereGeometry(0.22, 10, 8),
+                        new THREE.MeshLambertMaterial({ color: 0xe8c39a }));
+                    head.position.y = 1.6; g.add(head);
+                    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.05, 6, 6),
+                        new THREE.MeshBasicMaterial({ color: 0x00f0ff }));
+                    eye.position.set(0, 1.62, 0.2); g.add(eye);
+                    if (worldDebug) {
+                        const halo = new THREE.Mesh(new THREE.SphereGeometry(0.42, 8, 8),
+                            new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true, transparent: true, opacity: 0.5 }));
+                        halo.position.y = 0.75; g.add(halo);
+                    }
+                    m = g; worldScene.add(m); worldChars[c.name] = m;
+                }
+                const p = worldScalePos(c.pos);
+                m.position.set(p[0], p[1] - 0.75 + 0.0, p[2]);
+                m.position.y = c.pos[2] - 0.75;
+                m.rotation.y = -c.yaw;
+            });
+        }
+
+        function updateWorldCamera() {
+            const hero = (worldState && worldState.characters || []).find(c => c.name === 'hero');
+            if (!hero) return;
+            const p = worldScalePos(hero.pos);
+            if (worldCamMode === 'first') {
+                worldCamera.position.set(p[0], p[1] + 0.7, p[2]);
+                const look = [p[0] + Math.sin(hero.yaw) * 3, p[1] + 0.5, p[2] + Math.cos(hero.yaw) * 3];
+                worldCamera.lookAt(look[0], look[1], look[2]);
+            } else if (worldCamMode === 'third') {
+                worldCamera.position.set(p[0] - Math.sin(hero.yaw) * 4, p[1] + 2.5, p[2] - Math.cos(hero.yaw) * 4);
+                worldCamera.lookAt(p[0], p[1] + 0.8, p[2]);
+            } else if (worldCamMode === 'observer') {
+                worldCamera.position.set(0, 34, -0.01);
+                worldCamera.lookAt(0, 0, 0);
+            }
+        }
+
+        function drawWorldMinimap(chars) {
+            const cv = document.getElementById('world-minimap');
+            if (!cv) return;
+            const ctx = cv.getContext('2d');
+            const S = 220, W = (worldGeom && worldGeom.size) || 40;
+            const px = (x, y) => [(x + W / 2) / W * S, (y + W / 2) / W * S];
+            ctx.fillStyle = '#0a0e16'; ctx.fillRect(0, 0, S, S);
+            if (worldGeom && worldGeom.water) {
+                const [ax, ay] = px(worldGeom.water.cx - worldGeom.water.sx / 2, worldGeom.water.cy - worldGeom.water.sy / 2);
+                ctx.fillStyle = '#1d4e6b';
+                ctx.fillRect(ax, ay, worldGeom.water.sx / W * S, worldGeom.water.sy / W * S);
+            }
+            (chars || []).forEach(c => {
+                const [ax, ay] = px(c.pos[0], c.pos[1]);
+                ctx.fillStyle = c.name === 'hero' ? '#00f0ff' : '#ffaa33';
+                ctx.beginPath(); ctx.arc(ax, ay, 4, 0, 7); ctx.fill();
+            });
+        }
+
+        async function fetchWorld() {
+            try {
+                if (!worldGeom) {
+                    const g = await fetch('/api/v1/world/geometry').then(r => r.json());
+                    buildWorldGeometry(g);
+                } else {
+                    const g = await fetch('/api/v1/world/geometry').then(r => r.json());
+                    refreshWorldFoods(g);
+                }
+                const s = await fetch('/api/v1/world/state').then(r => r.json());
+                worldState = s;
+                syncWorldChars(s.characters);
+                drawWorldMinimap(s.characters);
+                const hero = s.characters.find(c => c.name === 'hero') || {};
+                const ag = await fetch('/api/v1/world/agent?name=hero').then(r => r.json()).catch(() => null);
+                document.getElementById('w-goal').innerText = (ag && ag.body.goal) || hero.goal || '—';
+                document.getElementById('w-needs').innerText =
+                    `E ${(ag && ag.body.base.energy || 0).toFixed(2)} · H ${(ag && ag.body.hunger || 0).toFixed(2)}`;
+                document.getElementById('w-loc').innerText =
+                    hero.pos ? `${hero.pos[0].toFixed(1)}, ${hero.pos[1].toFixed(1)}` : '—';
+                document.getElementById('w-time').innerText =
+                    `t${s.tick} · day ${s.day_fraction.toFixed(2)}${s.is_night ? ' · night' : ''} · ${s.state_hash.slice(0, 10)}…`;
+                const md = await fetch('/api/v1/models').then(r => r.json()).catch(() => null);
+                document.getElementById('w-models').innerText = md
+                    ? Object.entries(md.manager.loaded).map(([k, v]) => k).join(', ') || 'all unloaded'
+                    : '—';
+                const fr = await fetch('/api/v1/world/friends').then(r => r.json()).catch(() => null);
+                document.getElementById('w-friends').innerHTML = fr
+                    ? fr.friends.map(f => `<div>${f.name}: trust ${f.trust_hero === null ? 'n/a' : f.trust_hero.toFixed(2)} · E ${f.energy}</div>`).join('')
+                    : '';
+            } catch (e) { showToast('World unreachable'); }
+        }
+
+        async function worldStep(n) {
+            await fetch(`/api/v1/world/step?ticks=${n}`, { method: 'POST' });
+            fetchWorld();
+        }
+
+        async function worldDream(withImage) {
+            showToast(withImage ? 'Dreaming with image (slow)…' : 'Dreaming…');
+            const res = await fetch(`/api/v1/world/dream?with_image=${withImage}`, { method: 'POST' });
+            const data = await res.json();
+            showToast(data.narrative ? `Dream: ${data.narrative.slice(0, 100)}…` : (data.detail || 'dream failed'));
+        }
+
+        async function worldSay() {
+            const text = document.getElementById('w-say-text').value.trim();
+            if (!text) return;
+            const res = await fetch(`/api/v1/world/speak?text=${encodeURIComponent(text)}`, { method: 'POST' });
+            const data = await res.json();
+            showToast(data.wav ? `Spoke ${data.seconds}s` : (data.detail || 'TTS unavailable'));
+        }
+
+        async function worldImagine() {
+            const theme = document.getElementById('w-imagine-text').value.trim() || 'the forest at night';
+            showToast('Imagining (slow)…');
+            const res = await fetch(`/api/v1/world/imagine?theme=${encodeURIComponent(theme)}`, { method: 'POST' });
+            const data = await res.json();
+            showToast(data.image_path ? `Imagined: ${data.image_path}` : (data.detail || 'imagination unavailable'));
         }
 
         // Diagnostics Tab

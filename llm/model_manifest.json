@@ -22,6 +22,29 @@
         "heads_kv": 2,
         "tensor_count": 381
       }
+    },
+    {
+      "path": "models\\text_model\\Qwen3-0.6B-Q8_0.gguf",
+      "filename": "Qwen3-0.6B-Q8_0.gguf",
+      "size_bytes": 639446688,
+      "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031",
+      "architecture": "qwen3",
+      "model_name": "Qwen3 0.6B Instruct",
+      "size_label": "0.6B",
+      "quantization": "MOSTLY_Q8_0",
+      "context_length": 40960,
+      "embedding_length": 1024,
+      "block_count": 28,
+      "bos_token_id": 151643,
+      "eos_token_id": 151645,
+      "has_chat_template": true,
+      "status": "DISCOVERED",
+      "extra": {
+        "mtime": 1789952485.0238829,
+        "heads": 16,
+        "heads_kv": 8,
+        "tensor_count": 310
+      }
     }
   ]
 }
