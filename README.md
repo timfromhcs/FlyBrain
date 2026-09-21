@@ -242,7 +242,7 @@ behavioral assertion (no source-text-only checks). The table below is
 | 42 | `deeptime_escalation_replay` | **PASS** | Coarse deep-time escalates to full-res checkpoint; replay hash-verified. |
 | 43 | `milestone_evidence` | **PASS** | Detected ['STRUCTURAL_EXPANSION', 'OVERLAPPING_GENERATIONS'] with evidence + certificate. |
 | 44 | `benchmark_fairness` | **PASS** | Per-arm budgets documented; LLM arms SKIP with reason when unmet. |
-| 45 | `version_metadata` | **PASS** | FlyBrain version metadata = 6.0.0 (v6.0.0). |
+| 45 | `version_metadata` | **PASS** | FlyBrain version metadata = 7.0.0 (v7.0.0). |
 | 46 | `immutable_bio_baseline` | **PASS** | Biological baseline fingerprint unchanged after lifetime development. |
 | 47 | `synapse_identity_provenance` | **PASS** | Stable synapse IDs; seed records cite source dataset; new synapses are EMERGENT, never BIOLOGICAL. |
 | 48 | `brain_identity_layers` | **PASS** | 12-layer identity: same state -> same identity; weight change -> different identity. |

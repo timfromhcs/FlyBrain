@@ -17,7 +17,7 @@ def main():
         allow_patterns=["huggingface/**", "src/**", "shaders/*", "manifests/*",
                         "malecns/data-raw/*.csv"],
         ignore_patterns=["**/__pycache__/**", "**/*.pyc"],
-        commit_message="FlyBrain V5.0.0 Space sync (v1 API, backup, watchdog, fixed tabs)",
+        commit_message="FlyBrain V7.0.0 Space sync (v7 release, instantaneous model init, backup collision fix)",
     )
     print("sync uploaded", flush=True)
     # root layout files
@@ -27,7 +27,7 @@ def main():
                           ("huggingface/README.md", "README.md")]:
         api.upload_file(repo_id=SPACE_ID, repo_type="space", token=TOKEN,
                         path_or_fileobj=os.path.join(PROJECT_ROOT, local),
-                        path_in_repo=remote, commit_message=f"V5 Space root: {remote}")
+                        path_in_repo=remote, commit_message=f"V7 Space root: {remote}")
         print(f"root {remote}", flush=True)
     print("stage:", api.get_space_runtime(SPACE_ID, token=TOKEN).stage, flush=True)
 

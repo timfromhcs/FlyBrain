@@ -79,6 +79,10 @@ class BackupService:
         name = f"{stamp}_{safe_label}"
         dest = self._dir_for(name)
         if os.path.exists(dest):
+            ms = int((time.time() % 1) * 1000)
+            name = f"{stamp}_{ms:03d}_{safe_label}"
+            dest = self._dir_for(name)
+        if os.path.exists(dest):
             raise ValueError(f"backup {name!r} already exists (never overwrite)")
         os.makedirs(dest)
 
@@ -268,6 +272,10 @@ class BackupService:
         safe_label = _NAME_RE.fullmatch(label) and label or "world"
         name = f"{stamp}_{safe_label}"
         dest = self._dir_for(name)
+        if os.path.exists(dest):
+            ms = int((time.time() % 1) * 1000)
+            name = f"{stamp}_{ms:03d}_{safe_label}"
+            dest = self._dir_for(name)
         if os.path.exists(dest):
             raise ValueError(f"backup {name!r} already exists (never overwrite)")
         os.makedirs(dest)

@@ -12,7 +12,7 @@ short_description: Drosophila connectome research workstation
 
 # FlyBrain Lab — Hugging Face Space (CPU build)
 
-Production build of [timfromhcs/FlyBrain](https://github.com/timfromhcs/FlyBrain) v6.0.x:
+Production build of [timfromhcs/FlyBrain](https://github.com/timfromhcs/FlyBrain) v7.0.x:
 connectome research backend + embodied 3D world (MuJoCo physics runs for
 real on Space CPUs).
 

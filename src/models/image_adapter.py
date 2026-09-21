@@ -78,11 +78,21 @@ def find_checkpoint(explicit: Optional[str] = None) -> str:
 class LocalImageModel:
     def __init__(self, checkpoint: Optional[str] = None):
         self.checkpoint = find_checkpoint(checkpoint)
-        h = hashlib.sha256()
-        with open(self.checkpoint, "rb") as f:
-            for c in iter(lambda: f.read(65536), b""):
-                h.update(c)
-        self.sha256 = h.hexdigest()
+        sidecar = self.checkpoint + ".sha256"
+        if os.path.exists(sidecar):
+            with open(sidecar, "r", encoding="utf-8") as f:
+                self.sha256 = f.read().strip()
+        else:
+            h = hashlib.sha256()
+            with open(self.checkpoint, "rb") as f:
+                for c in iter(lambda: f.read(65536), b""):
+                    h.update(c)
+            self.sha256 = h.hexdigest()
+            try:
+                with open(sidecar, "w", encoding="utf-8") as f:
+                    f.write(self.sha256)
+            except Exception:
+                pass
         self._pipe = None
         self._cn_pipe = None
 
