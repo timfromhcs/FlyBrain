@@ -1,0 +1,15 @@
+{
+  "timestamp": 1789953930.3977559,
+  "version": "5.0.0",
+  "commit": "fb66932ec4966cfd8a73f6344ba24b816f0d40a0",
+  "model_id": "HuggingFaceTB/SmolVLM-256M-Instruct",
+  "backend": "transformers-cpu",
+  "load_s": 1.6,
+  "caption_s": 19.4,
+  "caption": "In this image we can see a cabin in the middle of the image. There are trees at the top of the image. There is a sky at the top of the image.",
+  "grounded_words": [
+    "cabin",
+    "trees"
+  ],
+  "status": "PASS"
+}

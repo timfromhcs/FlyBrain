@@ -28,6 +28,10 @@ CREATE TABLE IF NOT EXISTS sightings(
   id INTEGER PRIMARY KEY AUTOINCREMENT, entity TEXT, tick INTEGER,
   x REAL, y REAL, dist REAL);
 CREATE VIRTUAL TABLE IF NOT EXISTS places_fts USING fts5(label, note);
+CREATE TABLE IF NOT EXISTS dreams(
+  id TEXT PRIMARY KEY, tick INTEGER, organism TEXT, narrative TEXT,
+  entities TEXT, mood TEXT, seed INTEGER, source_memories TEXT,
+  image_path TEXT, provenance TEXT, replays INTEGER DEFAULT 0);
 """
 
 

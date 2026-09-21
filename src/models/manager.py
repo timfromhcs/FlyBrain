@@ -27,9 +27,11 @@ def _ram() -> Dict[str, float]:
 
 
 class ModelManager:
-    def __init__(self, ram_limit_percent: float = 88.0):
+    def __init__(self, ram_limit_percent: float = 88.0,
+                 ram_reader=_ram):
         self.lock = threading.RLock()
         self.ram_limit = float(ram_limit_percent)
+        self._ram_reader = ram_reader
         self.loaded: Dict[str, Dict[str, Any]] = {}  # task -> {handle, loaded_at, uses}
         self._loaders: Dict[str, Callable[[], Any]] = {}
         self.events = []
@@ -43,13 +45,13 @@ class ModelManager:
 
     def status(self) -> Dict[str, Any]:
         with self.lock:
-            return {"ram": _ram(), "ram_limit_percent": self.ram_limit,
+            return {"ram": self._ram_reader(), "ram_limit_percent": self.ram_limit,
                     "loaded": {t: {"uses": v["uses"], "loaded_at": v["loaded_at"]}
                                for t, v in self.loaded.items()},
                     "events": self.events[-20:]}
 
     def _pressure(self) -> bool:
-        r = _ram()
+        r = self._ram_reader()
         return r["percent"] >= self.ram_limit if r["percent"] >= 0 else False
 
     def _shed(self, keep: str) -> None:
