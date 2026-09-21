@@ -1,0 +1,36 @@
+{
+  "timestamp": 1789952808.947303,
+  "version": "5.0.0",
+  "commit": "4c6c77eb923ccfa5daa82a2299b1f5727286744b",
+  "stt": {
+    "model_id": "openai/whisper-small",
+    "sha256": "1d7734884874f1a1513ed9aa760a4f8e97aaa02fd6d93a3a85d27b2ae9ca596b",
+    "size": 966995080,
+    "backend": "transformers-cpu",
+    "load_s": 1.4,
+    "transcribe_s": 5.0,
+    "transcript": " Hello fly brain, explore the forest.",
+    "expected_words_found": [
+      "hello",
+      "forest",
+      "explore"
+    ],
+    "status": "PASS"
+  },
+  "microphone": {
+    "inputs": 2,
+    "status": "AVAILABLE"
+  },
+  "tts": {
+    "model_id": "hexgrad/Kokoro-82M",
+    "sha256": "496dba118d1a58f5f3db2efc88dbdc216e0483fc89fe6e47ee1f2c53f18ad1e4",
+    "size": 327212226,
+    "voice": "af_heart",
+    "load_s": 3.6,
+    "gen_s": 5.2,
+    "wav": "diagnostics/v6/tts_probe.wav",
+    "duration_s": 2.88,
+    "rms": 0.0475,
+    "status": "PASS"
+  }
+}

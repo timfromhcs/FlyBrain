@@ -4,6 +4,10 @@ __pycache__/
 .pytest_cache/
 *.tmp
 backups/
+# Local model binaries (acquired via scripts/acquire_models.py, never committed)
+models/
+# ...but the model *code* (registry/manager/adapters) is tracked:
+!src/models/
 diagnostics/connectome_cache/
 diagnostics/snapshots/
 *.db

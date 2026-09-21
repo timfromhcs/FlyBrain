@@ -1,0 +1,18 @@
+{
+  "timestamp": 1789952600.288542,
+  "version": "5.0.0",
+  "commit": "4c6c77eb923ccfa5daa82a2299b1f5727286744b",
+  "model_id": "Qwen/Qwen3-0.6B-GGUF",
+  "file": "Qwen3-0.6B-Q8_0.gguf",
+  "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031",
+  "size": 639446688,
+  "backend": "llama_cpp",
+  "load_s": 0.5,
+  "gen_s": 3.3,
+  "raw": "<think>\nOkay, the user wants me to output a JSON with the goal \"explore\" and urgency 0.5. Let me make sure I follow the instructions. The response should be compact and only JSON. I need to avoid any explanation. Let me structure the JSON correctly. The keys are \"goal\" and \"urgency\", with the values",
+  "structured": {
+    "goal": "explore",
+    "urgency": 0.5
+  },
+  "status": "PASS"
+}

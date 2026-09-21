@@ -1,0 +1,27 @@
+{
+  "timestamp": 1789953672.2771146,
+  "version": "5.0.0",
+  "commit": "4c6c77eb923ccfa5daa82a2299b1f5727286744b",
+  "ram_total_gb": 19.8,
+  "checkpoint": "DreamShaper8_LCM.safetensors",
+  "checkpoint_sha256": "a4f3e1526c5dc4fcbe342f5c410d83ae202c7a415fcefcbb92e0f93fcd0a87c3",
+  "model_id": "Lykon/dreamshaper-8-lcm",
+  "load_s": 40.3,
+  "status": "GENERATED",
+  "path": "diagnostics\\v6\\genesis_test.png",
+  "bytes": 364732,
+  "mode": "FAST",
+  "size": 512,
+  "steps": 4,
+  "seed": 7,
+  "seconds": 30.7,
+  "provenance": "GENERATED_IMAGE",
+  "decoded": {
+    "format": "PNG",
+    "size": [
+      512,
+      512
+    ],
+    "mode": "RGB"
+  }
+}
