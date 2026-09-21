@@ -808,6 +808,174 @@ def v1_llm_status():
     return {"api": "v1", **get_llm_status()}
 
 
+# ---------------- V6 embodied world (server-authoritative MuJoCo) ----------------
+
+def get_world():
+    from src.world3d.service import get_service
+    return get_service()
+
+
+_MODEL_MANAGER = None
+
+
+def get_models():
+    global _MODEL_MANAGER
+    if _MODEL_MANAGER is None:
+        from src.models.loaders import default_manager
+        _MODEL_MANAGER = default_manager()
+    return _MODEL_MANAGER
+
+
+@app.get("/api/v1/world/state")
+def v1_world_state():
+    return {"api": "v1", **get_world().state()}
+
+
+@app.get("/api/v1/world/geometry")
+def v1_world_geometry():
+    return {"api": "v1", **get_world().geometry()}
+
+
+@app.post("/api/v1/world/step")
+def v1_world_step(ticks: int = 1):
+    recs = get_world().step(max(1, min(ticks, 50)))
+    last = recs[-1] if recs else {}
+    return {"api": "v1", "advanced": len(recs), "last": last,
+            "state_hash": get_world().world.state_hash()}
+
+
+@app.get("/api/v1/world/agent")
+def v1_world_agent(name: str = "hero"):
+    svc = get_world()
+    ag = svc.agents.get(name)
+    if ag is None:
+        raise HTTPException(status_code=404, detail="unknown agent")
+    return {"api": "v1", "body": ag.body3d.to_dict(),
+            "causal_tail": ag.causal_log[-5:]}
+
+
+@app.get("/api/v1/world/map")
+def v1_world_map():
+    """Observer map (TRUE layout, labelled) + organism known map."""
+    svc = get_world()
+    hero = svc.agents["hero"]
+    return {"api": "v1", "scope": "OBSERVER_TRUE_MAP",
+            "known_scope": "ORGANISM_KNOWN_MAP",
+            "known_free": len(hero.nav.known_free),
+            "known_blocked": len(hero.nav.known_blocked),
+            "remembered_paths": list(hero.nav.remembered_paths),
+            "door_state": dict(svc.world.door_state)}
+
+
+@app.post("/api/v1/world/interact")
+def v1_world_interact(target: str = "food", agent: str = "hero"):
+    svc = get_world()
+    ag = svc.agents.get(agent)
+    if ag is None:
+        raise HTTPException(status_code=404, detail="unknown agent")
+    return {"api": "v1", **ag._interact(target)}
+
+
+@app.get("/api/v1/world/friends")
+def v1_world_friends():
+    svc = get_world()
+    out = []
+    for name, ag in svc.agents.items():
+        if name == "hero":
+            continue
+        trust = None
+        if ag.org.social_mem is not None:
+            trust = ag.org.social_mem.trust_of("hero")
+        out.append({"name": name, "goal": ag.body3d.goal,
+                    "energy": round(ag.body3d.base.energy, 3),
+                    "trust_hero": trust, "alive": ag.body3d.alive,
+                    "pos": ag.body3d.pos})
+    return {"api": "v1", "friends": out}
+
+
+@app.post("/api/v1/world/dream")
+def v1_world_dream(agent: str = "hero", with_image: bool = False):
+    from src.world3d.dreaming import dream_cycle
+    svc = get_world()
+    ag = svc.agents.get(agent)
+    if ag is None:
+        raise HTTPException(status_code=404, detail="unknown agent")
+    mm = get_models()
+    try:
+        text = mm.load("TEXT_MODEL")
+    except Exception as e:  # noqa: BLE001
+        raise HTTPException(status_code=503, detail=f"TEXT_MODEL UNAVAILABLE: {e}")
+    img = None
+    if with_image:
+        try:
+            img = mm.load("IMAGE_MODEL")
+        except Exception as e:  # noqa: BLE001
+            raise HTTPException(status_code=503, detail=f"IMAGE_MODEL UNAVAILABLE: {e}")
+    return {"api": "v1", **dream_cycle(ag, text, image_model=img)}
+
+
+@app.post("/api/v1/world/imagine")
+def v1_world_imagine(theme: str, agent: str = "hero"):
+    from src.world3d.dreaming import imagine
+    svc = get_world()
+    ag = svc.agents.get(agent)
+    if ag is None:
+        raise HTTPException(status_code=404, detail="unknown agent")
+    mm = get_models()
+    try:
+        text = mm.load("TEXT_MODEL")
+        img = mm.load("IMAGE_MODEL")
+    except Exception as e:  # noqa: BLE001
+        raise HTTPException(status_code=503, detail=f"model UNAVAILABLE: {e}")
+    return {"api": "v1", **imagine(ag, theme, text, img)}
+
+
+@app.post("/api/v1/world/speak")
+def v1_world_speak(text: str, voice: str = "af_heart"):
+    import tempfile as _tf
+    from src.world3d.speech_loop import synthesize_reply
+    mm = get_models()
+    try:
+        tts = mm.load("TTS_MODEL")
+    except Exception as e:  # noqa: BLE001
+        raise HTTPException(status_code=503, detail=f"TTS_MODEL UNAVAILABLE: {e}")
+    out = os.path.join(_tf.gettempdir(), f"flybrain_say_{abs(hash(text)) % 999999}.wav")
+    return {"api": "v1", **synthesize_reply(tts, voice, text, out)}
+
+
+@app.get("/api/v1/models")
+def v1_models():
+    from src.models.registry import scan_local
+    return {"api": "v1", "registry": scan_local(), "manager": get_models().status(),
+            "offline": os.environ.get("FLYBRAIN_OFFLINE", "0") == "1"}
+
+
+@app.post("/api/v1/models/load")
+def v1_models_load(task: str):
+    try:
+        get_models().load(task)
+        return {"api": "v1", "status": "LOADED", "task": task}
+    except Exception as e:  # noqa: BLE001
+        raise HTTPException(status_code=503, detail=f"{task} UNAVAILABLE: {e}")
+
+
+@app.post("/api/v1/models/unload")
+def v1_models_unload(task: str):
+    ok = get_models().unload(task)
+    return {"api": "v1", "status": "UNLOADED" if ok else "NOT_LOADED", "task": task}
+
+
+@app.post("/api/v1/world/backup")
+def v1_world_backup(label: str = "world", trigger: str = "manual"):
+    return {"api": "v1", **_backup_service().create_world_backup(
+        get_world(), label=label, trigger=trigger)}
+
+
+@app.post("/api/v1/world/restore")
+def v1_world_restore(name: str):
+    return {"api": "v1", **_backup_service().restore_world_backup(name, get_world())}
+
+
 # ---------------- Local GGUF LLM endpoints (REAL runtime state) ----------------
 
 LLM_RUNTIME = None

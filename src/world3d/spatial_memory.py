@@ -10,10 +10,22 @@ import hashlib
 import json
 import os
 import sqlite3
+import threading
 import time
 from typing import Any, Dict, List, Optional
 
 import numpy as np
+
+
+def _locked(fn):
+    import functools
+
+    @functools.wraps(fn)
+    def wrapper(self, *args, **kwargs):
+        with self._lock:
+            return fn(self, *args, **kwargs)
+
+    return wrapper
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS places(
@@ -39,12 +51,17 @@ class SpatialMemory:
     def __init__(self, path: str = "diagnostics/world_memory.db"):
         os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
         self.path = path
-        self.db = sqlite3.connect(path)
-        self.db.executescript(SCHEMA)
+        # server endpoints run in worker threads: shared connection + lock
+        # (writes are small; lock hold time is microseconds).
+        self._lock = threading.RLock()
+        self.db = sqlite3.connect(path, check_same_thread=False)
+        with self._lock:
+            self.db.executescript(SCHEMA)
         self._embedder = None
         self._embedder_state = "UNCHECKED"
 
     # ---- places ----
+    @_locked
     def record_place(self, label: str, x: float, y: float, tick: int,
                      note: str = "") -> str:
         pid = hashlib.sha256(f"{label}|{round(x,1)}|{round(y,1)}".encode()).hexdigest()[:12]
@@ -59,6 +76,7 @@ class SpatialMemory:
         self.db.commit()
         return pid
 
+    @_locked
     def close(self) -> None:
         try:
             self.db.commit()
@@ -67,6 +85,7 @@ class SpatialMemory:
             pass
 
     # ---- snapshot / restore (save determinism: memory IS agent state) ----
+    @_locked
     def snapshot(self) -> Dict[str, Any]:
         return {
             "places": self.db.execute("SELECT * FROM places").fetchall(),
@@ -75,6 +94,7 @@ class SpatialMemory:
             "sightings": self.db.execute("SELECT * FROM sightings").fetchall(),
         }
 
+    @_locked
     def restore(self, snap: Dict[str, Any]) -> None:
         cur = self.db.cursor()
         cur.execute("DELETE FROM places")
@@ -94,6 +114,7 @@ class SpatialMemory:
             cur.execute("INSERT INTO sightings VALUES(?,?,?,?,?,?)", tuple(r))
         self.db.commit()
 
+    @_locked
     def where_seen(self, entity: str) -> List[Dict[str, Any]]:
         rows = self.db.execute(
             "SELECT entity,tick,x,y,dist FROM sightings WHERE entity=? ORDER BY tick DESC LIMIT 10",
@@ -101,11 +122,13 @@ class SpatialMemory:
         return [{"entity": r[0], "tick": r[1], "x": r[2], "y": r[3], "dist": r[4]}
                 for r in rows]
 
+    @_locked
     def record_sighting(self, entity: str, tick: int, x: float, y: float, dist: float) -> None:
         self.db.execute("INSERT INTO sightings(entity,tick,x,y,dist) VALUES(?,?,?,?,?)",
                         (entity, tick, x, y, dist))
         self.db.commit()
 
+    @_locked
     def record_frame(self, obs: Dict[str, Any], internal: Dict[str, Any],
                      event: str = "") -> None:
         self.db.execute(
@@ -115,12 +138,14 @@ class SpatialMemory:
              json.dumps(internal, sort_keys=True), event))
         self.db.commit()
 
+    @_locked
     def record_path(self, name: str, waypoints: List) -> None:
         self.db.execute("INSERT OR REPLACE INTO paths VALUES(?,?,1)",
                         (name, json.dumps(waypoints)))
         self.db.commit()
 
     # ---- retrieval: lexical (always) ----
+    @_locked
     def search_places(self, query: str, limit: int = 5) -> List[Dict[str, Any]]:
         import re as _re
         words = _re.findall(r"[a-zA-Z0-9]+", query.lower())
@@ -164,6 +189,8 @@ class SpatialMemory:
         return {"tier": "semantic", "state": self._embedder_state,
                 "model": "sentence-transformers/all-MiniLM-L6-v2"}
 
+    @_locked
+    @_locked
     def search_places_semantic(self, query: str, limit: int = 5) -> Dict[str, Any]:
         self._load_embedder()
         if self._embedder is None:

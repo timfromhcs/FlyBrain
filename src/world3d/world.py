@@ -135,6 +135,7 @@ class World3D:
                 "spec_hash": self.spec.get("spec_hash", ""),
                 "physics": self.physics.snapshot(), "clock_sec": self.clock_sec,
                 "tick": self.tick, "consumed": list(self.consumed),
+                "door_state": dict(self.door_state),
                 "events": self.events[-200:]}
 
     def restore(self, snap: Dict[str, Any]) -> None:
@@ -147,6 +148,8 @@ class World3D:
             except KeyError:
                 pass
         self.consumed = list(snap.get("consumed", []))
+        if snap.get("door_state"):
+            self.door_state = dict(snap["door_state"])
         self.physics.restore(snap["physics"])
         self.clock_sec = float(snap.get("clock_sec", 0.0))
         self.tick = int(snap.get("tick", 0))

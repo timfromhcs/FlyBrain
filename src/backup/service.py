@@ -189,12 +189,29 @@ class BackupService:
         state_ok = "SKIPPED"
         try:
             import numpy as _np
-            d = _np.load(os.path.join(dest, "brain_snapshot.npz"), allow_pickle=True)
-            h = hashlib.sha256()
-            for k in ("membrane_potentials", "spikes", "refractory_steps", "weights"):
-                h.update(_np.ascontiguousarray(d[k]).tobytes())
-            state_ok = "OK" if h.hexdigest() == manifest.get("state_hash") else "MISMATCH"
-            ok = ok and state_ok == "OK"
+            if manifest.get("kind") == "world":
+                ws = json.load(open(os.path.join(dest, "world_snapshot.json"),
+                                    encoding="utf-8"))
+                ph = ws["world"]["physics"]
+                h = hashlib.sha256()
+                h.update(_np.ascontiguousarray(ph["qpos"], dtype=_np.float64).tobytes())
+                h.update(_np.ascontiguousarray(ph["qvel"], dtype=_np.float64).tobytes())
+                h.update(json.dumps(
+                    {"tick": ws["world"].get("tick"),
+                     "clock": round(float(ws["world"].get("clock_sec", 0.0)), 4),
+                     "consumed": sorted(ws["world"].get("consumed", [])),
+                     "doors": ws["world"].get("door_state", {})},
+                    sort_keys=True).encode())
+                # world_snapshot stores live door_state under world_state? use manifest
+                state_ok = "OK" if h.hexdigest() == manifest.get("world_hash") else "MISMATCH"
+                ok = ok and state_ok == "OK"
+            else:
+                d = _np.load(os.path.join(dest, "brain_snapshot.npz"), allow_pickle=True)
+                h = hashlib.sha256()
+                for k in ("membrane_potentials", "spikes", "refractory_steps", "weights"):
+                    h.update(_np.ascontiguousarray(d[k]).tobytes())
+                state_ok = "OK" if h.hexdigest() == manifest.get("state_hash") else "MISMATCH"
+                ok = ok and state_ok == "OK"
         except Exception as e:
             state_ok = f"ERROR: {e}"
             ok = False
@@ -241,6 +258,75 @@ class BackupService:
         return {"status": "RESTORED", "backup": name, "state_hash": h.hexdigest(),
                 "pre_restore_backup": pre["backup_name"],
                 "colony_restored": restored is not None}
+
+    # ---- world backup (V6: world + agents + spatial memory) ----
+    def create_world_backup(self, world_service, label: str = "world",
+                            trigger: str = "manual") -> Dict[str, Any]:
+        """Snapshot a WorldService (world+agents+spatial DB file). Model
+        binaries are NEVER duplicated: only metadata (registry snapshot)."""
+        stamp = time.strftime("%Y%m%d_%H%M%S", time.gmtime())
+        safe_label = _NAME_RE.fullmatch(label) and label or "world"
+        name = f"{stamp}_{safe_label}"
+        dest = self._dir_for(name)
+        if os.path.exists(dest):
+            raise ValueError(f"backup {name!r} already exists (never overwrite)")
+        os.makedirs(dest)
+        snap = world_service.snapshot()
+        spath = os.path.join(dest, "world_snapshot.json")
+        with open(spath, "w", encoding="utf-8") as f:
+            json.dump(snap, f)
+        files = {"world_snapshot.json": _sha256_file(spath)}
+        try:
+            world_service.spatial.db.commit()
+            dpath = os.path.join(dest, "spatial.db")
+            shutil.copyfile(world_service.spatial.path, dpath)
+            files["spatial.db"] = _sha256_file(dpath)
+        except Exception as e:  # noqa: BLE001
+            files["spatial.db"] = f"SKIPPED:{e}"
+        try:
+            from src.models.registry import scan_local
+            reg = os.path.join(dest, "model_registry.json")
+            with open(reg, "w", encoding="utf-8") as f:
+                json.dump(scan_local(), f, indent=2)
+            files["model_registry.json"] = _sha256_file(reg)
+        except Exception:
+            pass
+        from src.version import VERSION as _V
+        manifest = {
+            "schema_version": BACKUP_SCHEMA_VERSION,
+            "backup_name": name, "trigger": trigger, "label": safe_label,
+            "created_at": time.time(), "target": "local_disk",
+            "kind": "world",
+            "project_version": _V, "git_commit": _git_commit(),
+            "world_tick": world_service.world.tick,
+            "world_hash": world_service.world.state_hash(),
+            "agents": sorted(world_service.agents),
+            "state_hash": hashlib.sha256(
+                world_service.world.state_hash().encode()).hexdigest(),
+            "files": files,
+        }
+        mpath = os.path.join(dest, "manifest.json")
+        with open(mpath, "w", encoding="utf-8") as f:
+            json.dump(manifest, f, indent=2, sort_keys=True)
+        self._log("created", {"backup": name, "trigger": trigger, "kind": "world",
+                              "world_hash": manifest["world_hash"]})
+        self._prune_generations()
+        return manifest
+
+    def restore_world_backup(self, name: str, world_service) -> Dict[str, Any]:
+        verdict = self.verify_backup(name)
+        if verdict["status"] != "VALID":
+            raise ValueError(f"refusing to restore {name!r}: {verdict['status']}")
+        dest = self._dir_for(name)
+        snap = json.load(open(os.path.join(dest, "world_snapshot.json"), encoding="utf-8"))
+        world_service.restore(snap)
+        h = world_service.world.state_hash()
+        manifest = json.load(open(os.path.join(dest, "manifest.json"), encoding="utf-8"))
+        match = h == manifest.get("world_hash")
+        self._log("restored", {"backup": name, "kind": "world", "hash_match": match})
+        if not match:
+            raise ValueError("post-restore world hash mismatch")
+        return {"status": "RESTORED", "backup": name, "world_hash": h}
 
     # ---- retention ----
     def _prune_generations(self) -> None:
