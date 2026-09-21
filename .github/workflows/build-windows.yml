@@ -42,8 +42,8 @@ jobs:
 
       - name: Package Portable Distribution
         run: |
-          mkdir dist
-          Compress-Archive -Path src, shaders, manifests, malecns, scripts, README.md, LICENSE, pyproject.toml -DestinationPath dist/FlyBrain-Windows-x64-Portable.zip
+          New-Item -ItemType Directory -Path dist -Force
+          Compress-Archive -Path src, shaders, manifests, malecns, scripts, README.md, LICENSE, pyproject.toml -DestinationPath dist/FlyBrain-Windows-x64-Portable.zip -Force
 
       - name: Generate Checksums
         run: |
