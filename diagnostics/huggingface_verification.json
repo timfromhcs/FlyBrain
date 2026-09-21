@@ -67,7 +67,7 @@
   },
   "startup_log_tail": "[flybrain-space] repo=E:\\FlyBain LLM Evolve circuit=128 mode=REAL_SUBGRAPH use_gpu=0\nINFO:     Started server process [11332]\nINFO:     Waiting for application startup.\nE:\\FlyBain LLM Evolve\\.venv\\Lib\\site-packages\\huggingface_hub\\utils\\_validators.py:205: UserWarning: The `local_dir_use_symlinks` argument is deprecated and ignored in `hf_hub_download`. Downloading to a local directory does not use symlinks anymore.\n  warnings.warn(\nINFO:     Application startup complete.\nINFO:     Uvicorn running on http://127.0.0.1:7861 (Press CTRL+C to quit)\n[GenerateImage] VAE source unavailable (E:\\FlyBain LLM Evolve\\src\\models\\dreamlite-vae): We couldn't connect to 'https://huggingface.co' to load this model, couldn't find it in the cached files and it looks like E:\\FlyBain LLM Evolve\\src\\models\\dreamlite-vae is not the path to a directory containing a config.json file.\nCheckout your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/diffusers/installation#offline-mode'.\nINFO:     127.0.0.1:65179 - \"GET /api/health HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:65182 - \"GET /api/version HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:65183 - \"GET /api/doctor HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:65192 - \"GET /api/provenance HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:65193 - \"GET /api/telemetry HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:65194 - \"GET /api/connectome?max_nodes=64&max_edges=64 HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:65195 - \"GET / HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:65196 - \"GET /static/vendor/three.min.js HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:65197 - \"POST /api/simulation/step HTTP/1.1\" 200 OK\n",
   "remote_space_id": "timfromhcs/FlyBrain-Lab",
-  "remote_verified_at": 1789980507.8473303,
+  "remote_verified_at": 1789980995.3837266,
   "remote": {
     "space_url": "https://huggingface.co/spaces/timfromhcs/FlyBrain-Lab",
     "runtime_url": "https://timfromhcs-FlyBrain-Lab.hf.space",
@@ -76,14 +76,14 @@
       "health": {
         "status": 200,
         "backend": "cpu_reference",
-        "version": "6.0.0",
+        "version": "7.0.0",
         "graph_mode": "REAL"
       },
       "version": {
         "status": 200,
         "body": {
-          "version": "6.0.0",
-          "release": "FlyBrain V6.0.0"
+          "version": "7.0.0",
+          "release": "FlyBrain V7.0.0"
         }
       },
       "provenance": {
@@ -103,8 +103,8 @@
       },
       "backup_create": {
         "status": 200,
-        "backup": "20260921_084825_remote-verify",
-        "state_hash": "a491593c17f50bf5"
+        "backup": "20260921_085633_remote-verify",
+        "state_hash": "c381e8d4268e13ee"
       },
       "backup_download": {
         "bytes": 8795,
@@ -114,7 +114,7 @@
           "manifest.json"
         ],
         "hashes_ok": true,
-        "state_hash": "a491593c17f50bf5"
+        "state_hash": "c381e8d4268e13ee"
       },
       "backup_verify": {
         "status": 200,
@@ -123,10 +123,10 @@
       "backup_restore": {
         "status": 200,
         "restored": "RESTORED",
-        "state_hash": "a491593c17f50bf5",
+        "state_hash": "c381e8d4268e13ee",
         "hash_match": true,
-        "step_before": 52,
-        "step_after": 52
+        "step_before": 2,
+        "step_after": 2
       }
     }
   }
