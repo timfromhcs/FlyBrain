@@ -5,6 +5,10 @@ FileNotFoundError -> manager surfaces UNAVAILABLE, never fake handles.
 """
 import os
 
+from src.models.offline import apply_offline_env
+
+apply_offline_env()
+
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
@@ -24,8 +28,16 @@ def load_text():
 
 def load_embedding():
     from sentence_transformers import SentenceTransformer
+    d = _p("EMBEDDING_MODEL")
+    # local directory first (offline-capable); hub ID only as online fallback
+    local_files = os.listdir(d) if os.path.isdir(d) else []
+    if any(f.endswith(".safetensors") or f.endswith(".bin") for f in local_files):
+        try:
+            return SentenceTransformer(d)
+        except Exception:
+            pass
     return SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2",
-                               cache_folder=_p("EMBEDDING_MODEL"))
+                               cache_folder=d)
 
 
 def load_stt():

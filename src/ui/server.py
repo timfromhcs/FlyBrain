@@ -14,6 +14,8 @@ from dataclasses import asdict
 from typing import Dict, Any, Optional, List
 
 from src.connectome.types import GraphMode, ProvenanceStatus
+from src.models.offline import apply_offline_env as _apply_offline_env
+_apply_offline_env()
 from src.brain.simulation_engine import SimulationEngine
 from src.experiment.manager import ExperimentManager, get_file_sha256, get_git_commit
 from src.common.determinism import SeedBundle

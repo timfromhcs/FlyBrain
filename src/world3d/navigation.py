@@ -9,7 +9,8 @@ import heapq
 import math
 from typing import Any, Dict, List, Optional, Set, Tuple
 
-CELL = 0.5
+CELL = 0.25  # 0.25 m cells: the 1.4 m door gap stays passable after
+             # robot-radius inflation (0.5 m cells sealed it by quantization)
 
 
 def _cells_for_rect(cx, cy, sx, sy, inflate, size) -> Set[Tuple[int, int]]:
@@ -36,14 +37,14 @@ def true_blocked_cells(spec: Dict[str, Any]) -> Set[Tuple[int, int]]:
             (cx - (dw / 2 + (w - dw) / 4), cy - d / 2, (w - dw) / 2, t),
             (cx + (dw / 2 + (w - dw) / 4), cy - d / 2, (w - dw) / 2, t)]
     for (x, y, sx, sy) in segs:
-        blocked |= _cells_for_rect(x, y, sx, sy, 0.35, size)
+        blocked |= _cells_for_rect(x, y, sx, sy, 0.3, size)
     for f in spec.get("furniture", []):
         if f["kind"] == "static_box":
-            blocked |= _cells_for_rect(f["x"], f["y"], f["sx"], f["sy"], 0.35, size)
+            blocked |= _cells_for_rect(f["x"], f["y"], f["sx"], f["sy"], 0.3, size)
     for tr in spec.get("trees", []):
-        blocked |= _cells_for_rect(tr["x"], tr["y"], 0.5, 0.5, 0.3, size)
+        blocked |= _cells_for_rect(tr["x"], tr["y"], 0.5, 0.5, 0.25, size)
     for rk in spec.get("rocks", []):
-        blocked |= _cells_for_rect(rk["x"], rk["y"], rk["r"] * 2, rk["r"] * 2, 0.3, size)
+        blocked |= _cells_for_rect(rk["x"], rk["y"], rk["r"] * 2, rk["r"] * 2, 0.25, size)
     return blocked
 
 

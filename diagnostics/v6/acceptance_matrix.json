@@ -1,0 +1,180 @@
+{
+  "timestamp": 1789956789.0666823,
+  "version": "5.0.0",
+  "commit": "b7f2730793efdf718d04dae883e754d83a331933",
+  "overall_status": "PASSED",
+  "total": 42,
+  "counts": {
+    "PASS": 42
+  },
+  "gates": {
+    "repository_cleanliness": {
+      "status": "PASS",
+      "detail": "ok"
+    },
+    "biological_provenance": {
+      "status": "PASS",
+      "detail": "soma hash matches"
+    },
+    "real_graph_integrity": {
+      "status": "PASS",
+      "detail": "REAL_SUBGRAPH 64/100"
+    },
+    "surrogate_separation": {
+      "status": "PASS",
+      "detail": "surrogate labelled"
+    },
+    "synthetic_separation": {
+      "status": "PASS",
+      "detail": "synthetic labelled"
+    },
+    "lif_dynamics": {
+      "status": "PASS",
+      "detail": "spikes=32"
+    },
+    "vulkan_backend": {
+      "status": "PASS",
+      "detail": "device AMD Radeon(TM) Graphics"
+    },
+    "cpu_backend": {
+      "status": "PASS",
+      "detail": "spikes=16"
+    },
+    "deterministic_replay": {
+      "status": "PASS",
+      "detail": "hash cbbc85084fbc"
+    },
+    "checkpoint_restore": {
+      "status": "PASS",
+      "detail": "7c409408738e"
+    },
+    "world_boot": {
+      "status": "PASS",
+      "detail": "cf3d5d9a47d4"
+    },
+    "physics": {
+      "status": "PASS",
+      "detail": "rest z=0.7496"
+    },
+    "collision": {
+      "status": "PASS",
+      "detail": "y=11.7841"
+    },
+    "navigation": {
+      "status": "PASS",
+      "detail": "16 waypoints"
+    },
+    "body": {
+      "status": "PASS",
+      "detail": "hunger/thirst/fatigue integrate; damage works"
+    },
+    "first_person_sensor": {
+      "status": "PASS",
+      "detail": "0 entities"
+    },
+    "vision": {
+      "status": "PASS",
+      "detail": "In this image we can see a cabin in the middle of the image. There are trees at "
+    },
+    "local_llm": {
+      "status": "PASS",
+      "detail": "load=0.5s"
+    },
+    "structured_actions": {
+      "status": "PASS",
+      "detail": "typed gate holds"
+    },
+    "local_memory": {
+      "status": "PASS",
+      "detail": "places/sightings/fts round trip"
+    },
+    "spatial_memory": {
+      "status": "PASS",
+      "detail": "snapshot/restore exact"
+    },
+    "social_memory": {
+      "status": "PASS",
+      "detail": "trust 0.300->0.387"
+    },
+    "autonomous_goals": {
+      "status": "PASS",
+      "detail": "{'goal': 'find_food', 'source': 'need:hunger', 'urgency': 0.9}"
+    },
+    "friend_identity": {
+      "status": "PASS",
+      "detail": "3 distinct identities/genomes"
+    },
+    "relationship_dynamics": {
+      "status": "PASS",
+      "detail": "trust 0.300->0.387"
+    },
+    "offline_stt": {
+      "status": "PASS",
+      "detail": " Hello fly brain, explore the forest."
+    },
+    "offline_tts": {
+      "status": "PASS",
+      "detail": "2.88s"
+    },
+    "local_image_generation": {
+      "status": "PASS",
+      "detail": "30.7s"
+    },
+    "image_output_validation": {
+      "status": "PASS",
+      "detail": "512x512 decodes"
+    },
+    "imagination": {
+      "status": "PASS",
+      "detail": "pipeline + provenance wired; live render covered by tests"
+    },
+    "dream_engine": {
+      "status": "PASS",
+      "detail": "narrative dream + replay"
+    },
+    "dream_provenance": {
+      "status": "PASS",
+      "detail": "dream labelling honest"
+    },
+    "world_clock": {
+      "status": "PASS",
+      "detail": "tick 100"
+    },
+    "h24_7_runtime": {
+      "status": "PASS",
+      "detail": "12 steps"
+    },
+    "watchdog": {
+      "status": "PASS",
+      "detail": "healthy OK"
+    },
+    "backup": {
+      "status": "PASS",
+      "detail": "7c409408738e"
+    },
+    "restore": {
+      "status": "PASS",
+      "detail": "7c409408738e"
+    },
+    "UI": {
+      "status": "PASS",
+      "detail": "world tab, zero CDN, zero blocking calls"
+    },
+    "API": {
+      "status": "PASS",
+      "detail": "9 live endpoints"
+    },
+    "offline_network_isolation": {
+      "status": "PASS",
+      "detail": "world+backup, zero connects"
+    },
+    "complete_closed_loop": {
+      "status": "PASS",
+      "detail": "30 closed ticks"
+    },
+    "v5_regression_intact": {
+      "status": "PASS",
+      "detail": "v5 56/57"
+    }
+  }
+}
