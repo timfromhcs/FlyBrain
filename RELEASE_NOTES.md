@@ -1,3 +1,25 @@
+# FlyBrain Release Notes — v10.0.0 Stable
+
+**Tag:** `v10.0.0` · **Prior lines:** `v9.0.0`, `v8.0.0`, `v7.0.0` · Full production release: Canonical Dataset Registry, Genuine Biological Closed-Loop Autonomy, Persistent World Modifications across Process Restart, Native Binary GLB Exporter, Rigorous 3D Mesh Degeneracy Validation, Model Inference Honesty without Silent Swallows, and Self-Healing Windows Installer.
+
+## V10.0 Highlights (Real, Empirical, Non-Mock)
+- **Canonical Dataset Registry (`src/connectome/dataset_registry.py`):**
+  Strict scientific decoupling between the complete Janelia MaleCNS v1.0 biological connectome (125,506 somas, 99,301 connections, CC-BY-4.0) and lightweight derived subgraphs or synthetic surrogates. Experiment provenance cryptographically binds dataset identity.
+- **Genuine Biological Closed-Loop Autonomy (`src/world/embodied_loop.py`):**
+  Full neural closed-loop: `Sensory Perception -> LIF SNN -> Neural Firing Rates -> Motor Action -> MuJoCo Physics Contact -> Spatial Memory -> Reward`. Direct test drivers are explicitly tagged `policy_source="TEST_DRIVER_ONLY"`.
+- **Persistent World Chunk Modifications (`src/world/chunks/chunk_manager.py`):**
+  Seeded endless world modifications are persisted to atomic disk files with event hashes and timestamps, surviving full process restarts and reload.
+- **Binary glTF (GLB) & 3D Geometry Validation (`src/assets/mesh_generator.py`):**
+  Native glTF 2.0 binary container exporter with 4-byte chunk alignment. Comprehensive geometric validation checks for degenerate zero-area triangles, duplicate indices, and non-manifold edges.
+- **Model Inference Honesty (`src/world/planner.py`):**
+  Zero bare `except Exception: pass` swallows. Every inference call exposes exact provenance (`LOCAL_LLM` vs `RULE_BASED_FALLBACK`), model ID, quantization, backend, and structured error logs.
+- **Self-Healing Installer (`installer/install.ps1`):**
+  Dynamic canonical version synchronization (10.0.0), `-Repair` mode restoring damaged files or directories, and verified clean-room installation testing.
+- **Unified 56-Gate Release Matrix (`scripts/run_v10_acceptance_matrix.py`):**
+  Comprehensive automated gating system validating 56 core gates with fail-closed policy.
+
+---
+
 # FlyBrain Release Notes — v9.0.0 Stable
 
 **Tag:** `v9.0.0` · **Prior lines:** `v8.0.0`, `v7.0.0` · Full production release: Generative Endless World, Closed-Loop AI -> World -> Organism Pipeline, FlyAsset Compiler with Physical Scale Normalization, MuJoCo 3.13 Contact Resolution, and Autonomous Verification System.

@@ -1,0 +1,37 @@
+{
+  "repository": "timfromhcs/FlyBrain",
+  "commit": "98e1c5d41f486a43b4690e54256241a79857aa75",
+  "version": "10.0.0",
+  "timestamp": 1789986508.7394438,
+  "environment": {
+    "os": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.13"
+  },
+  "dataset_identity": "MALECNS_V1_DERIVED_SUBGRAPH",
+  "result": "PASS",
+  "pyproject_synced": true,
+  "requirements_synced": true,
+  "installed_packages": {
+    "numpy": "2.5.3",
+    "scipy": "1.18.1",
+    "pillow": "UNAVAILABLE (ModuleNotFoundError)",
+    "vulkan": "1.3.275.1",
+    "fastapi": "0.141.1",
+    "uvicorn": "0.53.0",
+    "websockets": "17.1",
+    "soundfile": "0.14.0",
+    "sounddevice": "0.5.6",
+    "torch": "2.14.0+cpu",
+    "torchvision": "0.29.0+cpu",
+    "diffusers": "0.40.0",
+    "transformers": "5.17.0",
+    "accelerate": "1.15.0",
+    "pydantic": "2.13.5",
+    "requests": "2.34.2",
+    "psutil": "7.2.2",
+    "mujoco": "3.13.0",
+    "sentence_transformers": "6.1.0",
+    "kokoro": "0.9.4",
+    "llama_cpp": "0.3.35"
+  }
+}

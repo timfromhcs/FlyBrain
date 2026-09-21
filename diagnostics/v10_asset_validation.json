@@ -1,0 +1,59 @@
+{
+  "repository": "timfromhcs/FlyBrain",
+  "commit": "98e1c5d41f486a43b4690e54256241a79857aa75",
+  "version": "10.0.0",
+  "timestamp": 1789986318.3675778,
+  "environment": {
+    "os": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.13"
+  },
+  "dataset_identity": "MALECNS_V1_DERIVED_SUBGRAPH",
+  "result": "PASS",
+  "asset_id": "wooden_bridge_cb57fcf1b5761c24",
+  "manifest_path": "assets/compiled/wooden_bridge_cb57fcf1b5761c24.json",
+  "visual_mesh": "assets/compiled/wooden_bridge_cb57fcf1b5761c24.obj",
+  "visual_glb": "assets/compiled/wooden_bridge_cb57fcf1b5761c24.glb",
+  "mesh_validation": {
+    "is_valid": true,
+    "vertex_count": 56,
+    "face_count": 104,
+    "bounds_min": [
+      -2.0,
+      -0.75,
+      0.0
+    ],
+    "bounds_max": [
+      2.0,
+      0.75,
+      0.95
+    ],
+    "dimensions_m": [
+      4.0,
+      1.5,
+      0.95
+    ],
+    "is_manifold": true,
+    "degenerate_count": 0,
+    "errors": []
+  },
+  "collision": {
+    "type": "BOX",
+    "dimensions_m": [
+      4.0,
+      1.5,
+      0.18
+    ],
+    "offset_m": [
+      0.0,
+      0.0,
+      0.09
+    ],
+    "mass_kg": 1296.0,
+    "friction": [
+      0.8,
+      0.1,
+      0.01
+    ],
+    "restitution": 0.05
+  }
+}

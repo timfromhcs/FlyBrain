@@ -1,7 +1,7 @@
 # FlyBrain: Scientific Research Status & Provenance Verification
 
 **Last Updated:** September 2026
-**System Version:** 6.0.0
+**System Version:** 10.0.0
 **Target Platform:** Windows 11 64-bit | Vulkan 1.2+ Compute
 **Acceptance Status:** derived from `diagnostics/acceptance_matrix.json`
 (canonical schema `verification/acceptance_schema.json`; table in §4 is

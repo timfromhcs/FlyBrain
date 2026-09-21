@@ -1,6 +1,6 @@
 {
   "name": "flybrain",
-  "version": "9.0.0",
+  "version": "10.0.0",
   "description": "Vulkan-First Artificial Organism Research Framework & Web Dashboard",
   "private": true,
   "scripts": {

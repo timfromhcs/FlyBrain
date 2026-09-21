@@ -1,0 +1,101 @@
+{
+  "repository": "timfromhcs/FlyBrain",
+  "commit": "98e1c5d41f486a43b4690e54256241a79857aa75",
+  "version": "10.0.0",
+  "timestamp": 1789985930.387476,
+  "environment": {
+    "os": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.13"
+  },
+  "dataset_identity": "MALECNS_V1_DERIVED_SUBGRAPH",
+  "datasets": [
+    {
+      "dataset_id": "MALECNS_V1_FULL",
+      "category": "BIOLOGICAL",
+      "name": "Janelia MaleCNS Complete Adult Drosophila Brain & VNC",
+      "version": "1.0",
+      "organism": "Drosophila melanogaster (male)",
+      "source_url": "https://github.com/natverse/malecns",
+      "upstream_revision": "v1.0-release",
+      "local_revision": "upstream-reference",
+      "neuron_count": 125506,
+      "edge_count": 99301,
+      "files": {
+        "upstream_source": {
+          "url": "https://github.com/natverse/malecns",
+          "note": "Full Janelia dataset; not instantiated in a single monolithic circuit locally."
+        }
+      },
+      "derivation_relation": null,
+      "dataset_license": "CC-BY-4.0",
+      "software_license": "GPL-3.0",
+      "annotation_provenance": "Janelia Research Campus (HHMI) & University of Cambridge",
+      "is_full_connectome": true
+    },
+    {
+      "dataset_id": "MALECNS_V1_DERIVED_SUBGRAPH",
+      "category": "DERIVED",
+      "name": "Janelia MaleCNS v1.0 Hub-Biased Derived Subgraph",
+      "version": "1.0-subgraph",
+      "organism": "Drosophila melanogaster (male)",
+      "source_url": "malecns/data-raw/malecns_v1_0_connections.csv",
+      "upstream_revision": "v1.0",
+      "local_revision": "v10.0-verified",
+      "neuron_count": 125506,
+      "edge_count": 99301,
+      "files": {
+        "soma_sides": {
+          "path": "malecns/data-raw/2023-27-2 soma_sides.csv",
+          "expected_count": 125506
+        },
+        "connections": {
+          "path": "malecns/data-raw/malecns_v1_0_connections.csv",
+          "expected_count": 99301
+        }
+      },
+      "derivation_relation": "DERIVED_FROM:MALECNS_V1_FULL(HUB_SAMPLING_TRANSFORM)",
+      "dataset_license": "CC-BY-4.0",
+      "software_license": "Apache-2.0",
+      "annotation_provenance": "Derived hub extraction from Janelia MaleCNS v1.0",
+      "is_full_connectome": false
+    },
+    {
+      "dataset_id": "MALECNS_SPATIAL_SURROGATE",
+      "category": "SURROGATE",
+      "name": "MaleCNS Spatial Surrogate Control Network",
+      "version": "1.0-surrogate",
+      "organism": "Synthetic Control (Biological Somas)",
+      "source_url": "procedural:scipy.spatial.cKDTree",
+      "upstream_revision": "N/A",
+      "local_revision": "v10.0",
+      "neuron_count": 125506,
+      "edge_count": 0,
+      "files": {},
+      "derivation_relation": "SURROGATE_CONTROL(SOMA_PRESERVED_DISTANCE_KNN)",
+      "dataset_license": "Apache-2.0",
+      "software_license": "Apache-2.0",
+      "annotation_provenance": "Synthetic control preserving soma coordinates and T-bar capacities",
+      "is_full_connectome": false
+    },
+    {
+      "dataset_id": "SYNTHETIC_TEST_V1",
+      "category": "SYNTHETIC",
+      "name": "Deterministic Synthetic Test Connectome",
+      "version": "1.0",
+      "organism": "Artificial Synthetic Benchmark",
+      "source_url": "procedural:deterministic_ring_lattice",
+      "upstream_revision": "N/A",
+      "local_revision": "v10.0",
+      "neuron_count": 512,
+      "edge_count": 4096,
+      "files": {},
+      "derivation_relation": null,
+      "dataset_license": "Apache-2.0",
+      "software_license": "Apache-2.0",
+      "annotation_provenance": "Deterministic non-biological synthetic graph for CI and regression",
+      "is_full_connectome": false
+    }
+  ],
+  "result": "PASS",
+  "status": "VERIFIED"
+}

@@ -6,6 +6,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [10.0.0] - 2026-09-21
+
+### Added
+- **Canonical Dataset Registry (`src/connectome/dataset_registry.py`)**:
+  - Formal scientific decoupling between full Janelia MaleCNS v1.0 biological data (125,506 somas, 99,301 connections, CC-BY-4.0) and lightweight derived subgraphs or synthetic surrogates.
+  - Strict provenance hashing binding dataset identity into experimental records.
+- **Genuine Biological Closed-Loop Autonomy (`src/world/embodied_loop.py`)**:
+  - Closed-loop causal loop: Perception -> LIF SNN -> Neural Firing Rates -> Motor Propulsion -> MuJoCo Contact -> Spatial Memory -> Reward.
+  - Mandatory labelling: `policy_source="BIOLOGICAL_CLOSED_LOOP"` for organism control and `policy_source="TEST_DRIVER_ONLY"` for diagnostic harnesses.
+  - Full causal trace output (`diagnostics/v10_closed_loop_report.json`).
+- **Persistent World Chunk Modifications (`src/world/chunks/chunk_manager.py`)**:
+  - Deterministic serialization of chunk delta overlays (`data/world_chunks/chunk_{cx}_{cy}_deltas.json`) with event hashes and timestamps.
+  - Full modification persistence surviving process restart and reload.
+- **Binary glTF (GLB) Export & 3D Geometry Validation (`src/assets/mesh_generator.py`)**:
+  - Native binary glTF 2.0 (.glb) exporter with aligned BIN/JSON chunks.
+  - Rigorous mesh validation checking for degenerate zero-area triangles, duplicate vertices, and non-manifold topology.
+  - Portable relative paths normalized across Windows and Linux platforms.
+- **Model Inference Honesty (`src/world/planner.py`)**:
+  - Elimination of bare `except Exception: pass` swallows; structured error capture.
+  - Explicit inference provenance reporting (`LOCAL_LLM` vs `RULE_BASED_FALLBACK`).
+- **Self-Healing Installer (`installer/install.ps1`)**:
+  - Dynamic canonical version injection (10.0.0).
+  - Checksum-verified `-Repair` mode restoring missing or corrupted configuration files and directory structures.
+  - Verified clean-room installation tests (`tests/test_installer_self_healing.py`).
+- **Unified V10 56-Gate Release Matrix (`scripts/run_v10_acceptance_matrix.py`)**:
+  - Machine-readable release gate verification ensuring fail-closed zero-mock integrity.
+
+---
+
 ## [9.0.0] - 2026-09-21
 
 ### Added

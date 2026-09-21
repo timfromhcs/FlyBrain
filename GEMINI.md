@@ -1,7 +1,7 @@
 # FlyBrain — Master Roadmap & Status Plan (GEMINI.md)
 
 **Letzte Aktualisierung:** 21. September 2026  
-**Aktueller Versionsstand:** `v9.0.0` (Stable Production Release)  
+**Aktueller Versionsstand:** `v10.0.0` (Stable Production Release)  
 **GitHub Remote:** `https://github.com/timfromhcs/FlyBrain`  
 **Hugging Face Space:** `https://huggingface.co/spaces/timfromhcs/FlyBrain-Lab`  
 

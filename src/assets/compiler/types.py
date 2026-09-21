@@ -60,8 +60,9 @@ class FlyAsset:
     asset_class: AssetClass = AssetClass.STATIC
     source_hash: str = ""
     generator: str = "flybrain_asset_compiler"
-    model_revision: str = "v8.0"
-    visual_mesh: str = ""  # path to .glb or .obj
+    model_revision: str = "v10.0"
+    visual_mesh: str = ""  # path to .obj
+    visual_glb: Optional[str] = None  # path to .glb
     dimensions_m: List[float] = field(default_factory=lambda: [1.0, 1.0, 1.0])
     origin: Dict[str, float] = field(default_factory=lambda: {"x": 0.0, "y": 0.0, "z": 0.0})
     materials: Dict[str, Any] = field(default_factory=dict)

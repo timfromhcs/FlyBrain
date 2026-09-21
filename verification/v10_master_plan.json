@@ -1,0 +1,283 @@
+{
+  "schema_version": "v10_master_plan_v1",
+  "project": "timfromhcs/FlyBrain",
+  "target_version": "10.0.0",
+  "baseline_commit": "98e1c5d41f486a43b4690e54256241a79857aa75",
+  "created_at": "2026-09-21T12:17:00Z",
+  "agent": "SHWTY-FlyBrain-V10",
+  "principles": {
+    "no_mock": true,
+    "no_hallucination": true,
+    "local_first": true,
+    "fail_closed": true,
+    "autonomy": true,
+    "self_healing": true
+  },
+  "tasks": [
+    {
+      "task_id": "TASK-V10-VER-01",
+      "priority": "P0",
+      "category": "versioning",
+      "problem": "Stale version strings (8.0.0, 9.0.0, v8.0) scattered across src/version.py, pyproject.toml, package.json, installer, and docs.",
+      "root_cause": "Decentralized version bumping without unified single-source verification.",
+      "target_files": [
+        "src/version.py",
+        "pyproject.toml",
+        "package.json",
+        "installer/install.ps1",
+        "installer/doctor.ps1",
+        "src/world/chunks/chunk_manager.py",
+        "README.md",
+        "RESEARCH_STATUS.md",
+        "GEMINI.md"
+      ],
+      "implementation_method": "Set canonical VERSION=10.0.0 in src/version.py, sync pyproject.toml, package.json, installer, and documentation verifier.",
+      "tests_required": ["tests/test_version_consistency.py"],
+      "evidence_required": "diagnostics/v10_documentation_report.json",
+      "completion_condition": "All active components and manifests report version 10.0.0."
+    },
+    {
+      "task_id": "TASK-V10-DATA-02",
+      "priority": "P0",
+      "category": "science",
+      "problem": "Connectome lacks formal dataset registry separating full Janelia MaleCNS v1.0 biological dataset from derived subgraphs and synthetic controls.",
+      "root_cause": "Direct CSV file reading without schema-backed dataset identity or license decoupling.",
+      "target_files": [
+        "src/connectome/dataset_registry.py",
+        "src/connectome/loader.py",
+        "src/connectome/types.py",
+        "manifests/malecns_provenance.json",
+        "tests/test_dataset_registry.py"
+      ],
+      "implementation_method": "Implement DatasetRegistry registering MaleCNS v1.0 biological data (125506 somas, 99301 synapses, CC-BY-4.0), derived subgraphs, surrogate controls, file hashes, and provenance.",
+      "tests_required": ["tests/test_dataset_registry.py"],
+      "evidence_required": "diagnostics/v10_dataset_provenance.json",
+      "completion_condition": "Changing dataset changes provenance hash; full biological vs synthetic separation strictly enforced."
+    },
+    {
+      "task_id": "TASK-V10-LOOP-03",
+      "priority": "P0",
+      "category": "embodiment",
+      "problem": "Generative loop acceptance test used direct physics drive commands bypassing biological brain runtime.",
+      "root_cause": "Test harness shortcut omitting sensory perception and neural firing propagation.",
+      "target_files": [
+        "src/world/embodied_loop.py",
+        "src/world/integration.py",
+        "src/world3d/agent.py",
+        "src/world3d/physics.py",
+        "tests/test_embodied_loop.py"
+      ],
+      "implementation_method": "Implement EmbodiedClosedLoop routing perception -> LIF brain -> motor rates -> physical movement -> contact. Label any direct test bypass as TEST_DRIVER_ONLY.",
+      "tests_required": ["tests/test_embodied_loop.py"],
+      "evidence_required": "diagnostics/v10_closed_loop_report.json",
+      "completion_condition": "Causal trace records full perception-to-contact cycle; no unlabelled direct manipulation."
+    },
+    {
+      "task_id": "TASK-V10-MEM-04",
+      "priority": "P0",
+      "category": "memory",
+      "problem": "Chunk modifications kept in memory only; storage_dir created but never utilized.",
+      "root_cause": "Incomplete persistence implementation in chunk engine.",
+      "target_files": [
+        "src/world/chunks/chunk_manager.py",
+        "src/world3d/spatial_memory.py",
+        "tests/test_v10_memory_persistence.py"
+      ],
+      "implementation_method": "Implement persistent chunk delta storage (JSON/SQLite) surviving process termination. Write restart-replay test.",
+      "tests_required": ["tests/test_v10_memory_persistence.py"],
+      "evidence_required": "diagnostics/v10_world_persistence_test.json",
+      "completion_condition": "Modifications persist across save, terminate, restart, and reload sequence."
+    },
+    {
+      "task_id": "TASK-V10-STREAM-05",
+      "priority": "P1",
+      "category": "world",
+      "problem": "World generator hardcoded to revision v8.0; cache eviction bounds not formally tested.",
+      "root_cause": "Hardcoded parameters in WorldGenerator.",
+      "target_files": [
+        "src/world/chunks/chunk_manager.py",
+        "tests/test_chunk_streaming.py"
+      ],
+      "implementation_method": "Introduce WorldGeneratorRevision.V10_TERRAIN; enforce bounded RAM cache <= 25 chunks; assert seed+coords determinism.",
+      "tests_required": ["tests/test_chunk_streaming.py"],
+      "evidence_required": "diagnostics/v10_acceptance_matrix.json",
+      "completion_condition": "Deterministic chunk hash across coordinate shifts with strictly bounded loaded count."
+    },
+    {
+      "task_id": "TASK-V10-ASSET-06",
+      "priority": "P1",
+      "category": "assets",
+      "problem": "MeshGenerator promised GLB export but only generated OBJ; validation lacked degenerate triangle and non-manifold checks; absolute paths stored in manifests.",
+      "root_cause": "Incomplete initial 3D mesh synthesizer implementation.",
+      "target_files": [
+        "src/assets/mesh_generator.py",
+        "src/assets/compiler/compiler.py",
+        "src/assets/resolver.py",
+        "tests/test_asset_pipeline.py"
+      ],
+      "implementation_method": "Implement binary GLB export; add zero-area and non-manifold edge detection; fix railing indexing bug; store relative portable paths in manifests; apply compiled physics authoritatively.",
+      "tests_required": ["tests/test_asset_pipeline.py"],
+      "evidence_required": "diagnostics/v10_asset_validation.json",
+      "completion_condition": "GLB export succeeds; 0 degenerate triangles; portable manifests; authoritative physics properties applied."
+    },
+    {
+      "task_id": "TASK-V10-HONEST-07",
+      "priority": "P1",
+      "category": "cognition",
+      "problem": "Planner swallowed exceptions with except Exception: pass, masking model failure as silent fallback without structured metadata.",
+      "root_cause": "Uninformative exception swallowing in LLM intent extractor.",
+      "target_files": [
+        "src/world/planner.py",
+        "src/models/registry.py",
+        "src/models/manager.py",
+        "tests/test_model_honesty.py"
+      ],
+      "implementation_method": "Capture structured inference metadata (LOCAL_LLM, RULE_BASED_FALLBACK, etc.), model ID, quantization, backend, and error context without bare swallows.",
+      "tests_required": ["tests/test_model_honesty.py"],
+      "evidence_required": "diagnostics/v10_closed_loop_report.json",
+      "completion_condition": "100% honesty in model execution reporting; zero bare exception swallows."
+    },
+    {
+      "task_id": "TASK-V10-VULKAN-08",
+      "priority": "P1",
+      "category": "compute",
+      "problem": "Vague claims regarding bit-exactness between CPU and Vulkan floating-point execution.",
+      "root_cause": "Conflation of spike timing parity with IEEE 754 float precision across architectures.",
+      "target_files": [
+        "src/compute/cpu_reference.py",
+        "src/compute/vulkan_engine.py",
+        "tests/test_vulkan_parity.py"
+      ],
+      "implementation_method": "Formally delineate numerical parity, spike-exact parity, and bit-exact CPU replay. Assert exact spike matching while allowing bounded epsilon float delta.",
+      "tests_required": ["tests/test_vulkan_parity.py"],
+      "evidence_required": "diagnostics/v10_acceptance_matrix.json",
+      "completion_condition": "Exact spike train parity verified; bit-exact claim limited to deterministic CPU replay."
+    },
+    {
+      "task_id": "TASK-V10-INSTALL-09",
+      "priority": "P1",
+      "category": "installer",
+      "problem": "Installer hardcoded version 8.0.0; lacked self-healing repair and isolated scratch install tests.",
+      "root_cause": "Basic installer script lacking verification automation.",
+      "target_files": [
+        "installer/install.ps1",
+        "installer/doctor.ps1",
+        "scripts/verify_installer_self_healing.py",
+        "tests/test_installer_self_healing.py"
+      ],
+      "implementation_method": "Inject canonical 10.0.0 version; implement checksum-based repair mode; create test validating clean install and corrupted file recovery in temporary directory.",
+      "tests_required": ["tests/test_installer_self_healing.py"],
+      "evidence_required": "diagnostics/v10_install_test.json",
+      "completion_condition": "Clean directory install and self-healing corruption repair pass."
+    },
+    {
+      "task_id": "TASK-V10-DEP-10",
+      "priority": "P1",
+      "category": "packaging",
+      "problem": "Dependency mismatch between pyproject.toml and requirements.txt.",
+      "root_cause": "Uncoordinated dependency updates across manifests.",
+      "target_files": [
+        "pyproject.toml",
+        "requirements.txt",
+        "huggingface/requirements-hf.txt"
+      ],
+      "implementation_method": "Synchronize dependencies in pyproject.toml and requirements.txt; preserve lightweight pinned CPU set for Hugging Face Space.",
+      "tests_required": ["scripts/verify_docs_consistency.py"],
+      "evidence_required": "diagnostics/v10_dependency_report.json",
+      "completion_condition": "Dependency definitions fully synchronized."
+    },
+    {
+      "task_id": "TASK-V10-DOCS-11",
+      "priority": "P0",
+      "category": "quality",
+      "problem": "verify_docs_consistency.py only ran 7 static checks, missing version, dataset, commit, and portability checks.",
+      "root_cause": "Stale script from earlier release.",
+      "target_files": [
+        "scripts/verify_docs_consistency.py",
+        "README.md",
+        "CHANGELOG.md",
+        "RELEASE_NOTES.md",
+        "RESEARCH_STATUS.md",
+        "REPRODUCIBILITY.md"
+      ],
+      "implementation_method": "Expand verify_docs_consistency.py to evaluate 9 comprehensive consistency dimensions.",
+      "tests_required": ["scripts/verify_docs_consistency.py"],
+      "evidence_required": "diagnostics/v10_documentation_report.json",
+      "completion_condition": "Documentation consistency verifier exits 0 with full pass."
+    },
+    {
+      "task_id": "TASK-V10-GATE-12",
+      "priority": "P0",
+      "category": "gating",
+      "problem": "Acceptance tests fragmented across versions; no single master V10 runner evaluating all minimum gates.",
+      "root_cause": "Accumulation of legacy version test runners.",
+      "target_files": [
+        "verification/acceptance_schema.json",
+        "scripts/run_v10_acceptance_matrix.py",
+        "diagnostics/v10_acceptance_matrix.json"
+      ],
+      "implementation_method": "Implement run_v10_acceptance_matrix.py validating all 56 required minimum gates, fail-closed policy, and machine-readable evidence output.",
+      "tests_required": ["scripts/run_v10_acceptance_matrix.py"],
+      "evidence_required": "diagnostics/v10_acceptance_matrix.json",
+      "completion_condition": "56/56 gates evaluated; 0 FAIL; allowed skips explicitly documented."
+    }
+  ],
+  "minimum_gates": [
+    "repository_integrity",
+    "source_tree_integrity",
+    "dependency_lock_consistency",
+    "dataset_provenance_integrity",
+    "dataset_identity_consistency",
+    "graph_mode_separation",
+    "biological_vs_synthetic_separation",
+    "lif_correctness",
+    "refractory_correctness",
+    "reset_correctness",
+    "cpu_gpu_numeric_parity",
+    "persistent_gpu_resource_lifecycle",
+    "deterministic_experiment_replay",
+    "snapshot_restore_replay",
+    "plasticity_causal_effect",
+    "living_brain_identity",
+    "structural_growth_integrity",
+    "genome_provenance",
+    "heredity_separation",
+    "autonomy_goal_generation",
+    "grounded_language",
+    "social_state",
+    "llm_control_safety",
+    "research_memory_chain",
+    "deep_time_exact_mode",
+    "deep_time_approximation_honesty",
+    "world_generation_determinism",
+    "chunk_streaming",
+    "chunk_persistence",
+    "world_restart_replay",
+    "asset_geometry_validation",
+    "asset_physics_consistency",
+    "asset_portability",
+    "embodied_closed_loop_control",
+    "memory_write",
+    "memory_reload",
+    "memory_retrieval",
+    "world_action_from_memory",
+    "planner_source_honesty",
+    "model_registry_integrity",
+    "model_inference_honesty",
+    "ui_live_backend_state",
+    "ui_no_fake_telemetry",
+    "api_contracts",
+    "backup_create",
+    "backup_verify",
+    "backup_restore",
+    "backup_hash_integrity",
+    "watchdog_behavior",
+    "installer_fresh_install",
+    "installer_repair",
+    "portable_artifact_self_test",
+    "docs_consistency",
+    "license_consistency",
+    "reproducibility_manifest",
+    "v10_version_metadata"
+  ]
+}

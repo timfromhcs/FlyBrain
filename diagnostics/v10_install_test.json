@@ -1,0 +1,19 @@
+{
+  "repository": "timfromhcs/FlyBrain",
+  "commit": "98e1c5d41f486a43b4690e54256241a79857aa75",
+  "version": "10.0.0",
+  "timestamp": 1789986493.1631675,
+  "environment": {
+    "os": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.13"
+  },
+  "dataset_identity": "MALECNS_V1_DERIVED_SUBGRAPH",
+  "result": "PASS",
+  "installer_verification": {
+    "fresh_install_status": "PASS",
+    "repair_mode_status": "PASS",
+    "subdirectories_created": 11,
+    "config_version": "10.0.0",
+    "launcher_script_verified": true
+  }
+}

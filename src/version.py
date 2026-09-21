@@ -1,7 +1,8 @@
-"""FlyBrain version metadata (single source of truth for V9)."""
-VERSION = "9.0.0"
-VERSION_TAG = "v9.0.0"
-RELEASE_NAME = "FlyBrain V9.0.0"
+"""FlyBrain version metadata (single source of truth for V10)."""
+VERSION = "10.0.0"
+VERSION_TAG = "v10.0.0"
+RELEASE_NAME = "FlyBrain V10.0.0"
+VERSION_INFO = (10, 0, 0)
 
 
 

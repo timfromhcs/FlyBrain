@@ -1,0 +1,19 @@
+{
+  "repository": "timfromhcs/FlyBrain",
+  "commit": "98e1c5d41f486a43b4690e54256241a79857aa75",
+  "version": "10.0.0",
+  "timestamp": 1789986057.522688,
+  "environment": {
+    "os": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.13"
+  },
+  "dataset_identity": "MALECNS_V1_DERIVED_SUBGRAPH",
+  "generator_revision": "v10.0",
+  "result": "PASS",
+  "persistence_evidence": {
+    "chunk_key": "1_2",
+    "event_hash": "3e3ccb4e34a226f5",
+    "persisted_deltas_count": 1,
+    "disk_file": true
+  }
+}

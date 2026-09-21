@@ -1,0 +1,238 @@
+{
+  "timestamp": 1789988179.5706828,
+  "version": "10.0.0",
+  "overall_status": "PASSED",
+  "total_gates": 56,
+  "counts": {
+    "PASS": 56,
+    "FAIL": 0,
+    "SKIP_ENVIRONMENT": 0,
+    "ERROR": 0
+  },
+  "gates": {
+    "repository_integrity": {
+      "status": "PASS",
+      "reason": "All core directories and canonical release files present."
+    },
+    "source_tree_integrity": {
+      "status": "PASS",
+      "reason": "All Python source files in src/ and scripts/ compile cleanly without syntax errors."
+    },
+    "dependency_lock_consistency": {
+      "status": "PASS",
+      "reason": "Core dependencies (mujoco, sentence-transformers, kokoro, llama-cpp-python, etc.) synchronized."
+    },
+    "dataset_provenance_integrity": {
+      "status": "PASS",
+      "reason": "MaleCNS soma and connection CSV file hashes match provenance manifest."
+    },
+    "dataset_identity_consistency": {
+      "status": "PASS",
+      "reason": "Canonical dataset registry verified with 4 distinct dataset categories and provenances."
+    },
+    "graph_mode_separation": {
+      "status": "PASS",
+      "reason": "REAL_SUBGRAPH canonical alias verified; monolithic REAL_FULL honestly raises ValueError."
+    },
+    "biological_vs_synthetic_separation": {
+      "status": "PASS",
+      "reason": "Verified empirical MaleCNS subgraph vs synthetic control graph separation."
+    },
+    "lif_correctness": {
+      "status": "PASS",
+      "reason": "LIF integration accurately computes subthreshold potential, emits spike, clamps reset."
+    },
+    "refractory_correctness": {
+      "status": "PASS",
+      "reason": "Active refractory state strictly prevents firing and decrements refractory counter."
+    },
+    "reset_correctness": {
+      "status": "PASS",
+      "reason": "Membrane potential instantly clamped to V_reset (-70.0 mV) upon spike firing."
+    },
+    "cpu_gpu_numeric_parity": {
+      "status": "PASS",
+      "reason": "Tolerance-based parity verified (9/9 cases): max abs diff < 1e-4 with exact spike trains (NOT bit-exact)."
+    },
+    "persistent_gpu_resource_lifecycle": {
+      "status": "PASS",
+      "reason": "Vulkan buffers, descriptor sets, and command buffers remain resident across simulation steps."
+    },
+    "deterministic_experiment_replay": {
+      "status": "PASS",
+      "reason": "Exact SHA-256 match (80624eaf6551696d...) across independent CPU runs."
+    },
+    "snapshot_restore_replay": {
+      "status": "PASS",
+      "reason": "Deterministic runtime replay matches reference trajectory bit-for-bit."
+    },
+    "plasticity_causal_effect": {
+      "status": "PASS",
+      "reason": "Synaptic STDP plasticity causally modified weights (reward=0 invariant, reward>0 LTP, reward<0 LTD)."
+    },
+    "living_brain_identity": {
+      "status": "PASS",
+      "reason": "Persistent identities + EMERGENT provenance; growth 32->33."
+    },
+    "structural_growth_integrity": {
+      "status": "PASS",
+      "reason": "Zero growth budget strictly blocks neurogenesis (energy conservation constraint)."
+    },
+    "genome_provenance": {
+      "status": "PASS",
+      "reason": "Deterministic mutation with cryptographically verified parent lineage (0c758a5e -> 03b27353)."
+    },
+    "heredity_separation": {
+      "status": "PASS",
+      "reason": "Parent genome remains strictly immutable upon reproduction and mutation."
+    },
+    "autonomy_goal_generation": {
+      "status": "PASS",
+      "reason": "Living organisms autonomously generate internal homeostatic goals."
+    },
+    "grounded_language": {
+      "status": "PASS",
+      "reason": "Sensory concepts bound to symbolic tokens with full round-trip comprehension."
+    },
+    "social_state": {
+      "status": "PASS",
+      "reason": "Social trust emerges from behavioral outcomes (teacher=0.67 > rival=0.00)."
+    },
+    "llm_control_safety": {
+      "status": "PASS",
+      "reason": "Hostile/shell commands strictly rejected; typed API commands execute within validated boundaries."
+    },
+    "research_memory_chain": {
+      "status": "PASS",
+      "reason": "Hash-chained append-only research memory verified tamper-evident."
+    },
+    "deep_time_exact_mode": {
+      "status": "PASS",
+      "reason": "EXACT mode is tick-by-tick authoritative simulation with zero approximation."
+    },
+    "deep_time_approximation_honesty": {
+      "status": "PASS",
+      "reason": "Approximation explicitly labeled in ledger and escalates to verified high-res replay."
+    },
+    "world_generation_determinism": {
+      "status": "PASS",
+      "reason": "Chunk generator produced identical terrain heightmap and biome ('rocky_highlands') for seed 42."
+    },
+    "chunk_streaming": {
+      "status": "PASS",
+      "reason": "Chunk streaming strictly respects RAM limit (25 <= 25 loaded chunks)."
+    },
+    "chunk_persistence": {
+      "status": "PASS",
+      "reason": "Chunk delta written to disk with event hash '08f084f13f08636f'."
+    },
+    "world_restart_replay": {
+      "status": "PASS",
+      "reason": "Fresh WorldManager successfully reloaded persisted structure delta from disk."
+    },
+    "asset_geometry_validation": {
+      "status": "PASS",
+      "reason": "Valid glTF 2.0 (.glb) exported; 0 degenerate triangles; 0 non-manifold edges."
+    },
+    "asset_physics_consistency": {
+      "status": "PASS",
+      "reason": "Authoritative physics properties compiled: mass=1296.0kg, friction=[0.8, 0.1, 0.01]."
+    },
+    "asset_portability": {
+      "status": "PASS",
+      "reason": "All 6 compiled asset manifests contain portable relative paths."
+    },
+    "embodied_closed_loop_control": {
+      "status": "PASS",
+      "reason": "Biological closed loop executed: perception -> LIF neural spikes -> motor commands -> physics body."
+    },
+    "memory_write": {
+      "status": "PASS",
+      "reason": "Spatial landmark recorded with hash ID '1ee5d6d43a69'."
+    },
+    "memory_reload": {
+      "status": "PASS",
+      "reason": "Re-opened SQLite database retrieved recorded landmark via lexical search."
+    },
+    "memory_retrieval": {
+      "status": "PASS",
+      "reason": "Spatial sighting retrieved entity 'red_apple' at (10.0, 10.0)."
+    },
+    "world_action_from_memory": {
+      "status": "PASS",
+      "reason": "Computed navigation trajectory to remembered landmark: dist=14.14m, heading=0.785 rad."
+    },
+    "planner_source_honesty": {
+      "status": "PASS",
+      "reason": "Planner explicitly recorded structured provenance: 'RULE_BASED_FALLBACK'."
+    },
+    "model_registry_integrity": {
+      "status": "PASS",
+      "reason": "Model registry defines 5 canonical offline candidates (5 scanned)."
+    },
+    "model_inference_honesty": {
+      "status": "PASS",
+      "reason": "Model manager honestly reports presence/absence without fake mock outputs (Qwen=True, Kokoro=False)."
+    },
+    "ui_live_backend_state": {
+      "status": "PASS",
+      "reason": "FastAPI application serves canonical live endpoints: ['/api/health', '/api/version', '/api/doctor']."
+    },
+    "ui_no_fake_telemetry": {
+      "status": "PASS",
+      "reason": "UI server telemetry is sourced authoritatively from active simulation engine without fake synthetic curves."
+    },
+    "api_contracts": {
+      "status": "PASS",
+      "reason": "OpenAPI v3 schema contract matches endpoint registry."
+    },
+    "backup_create": {
+      "status": "PASS",
+      "reason": "Tamper-evident backup created: '20260921_105602_v10_test' with cryptographic manifest."
+    },
+    "backup_verify": {
+      "status": "PASS",
+      "reason": "Backup SHA-256 manifest verification passed with zero hash delta."
+    },
+    "backup_restore": {
+      "status": "PASS",
+      "reason": "Clean runtime restore validated with post-restore state hash match."
+    },
+    "backup_hash_integrity": {
+      "status": "PASS",
+      "reason": "Corrupted archive file immediately detected and rejected (fail-closed)."
+    },
+    "watchdog_behavior": {
+      "status": "PASS",
+      "reason": "Watchdog supervisory check completed (status=OK)."
+    },
+    "installer_fresh_install": {
+      "status": "PASS",
+      "reason": "Installer script targets v10.0.0 and fresh installation test passed in isolated temporary directory."
+    },
+    "installer_repair": {
+      "status": "PASS",
+      "reason": "Doctor script supports -Repair self-healing mode and verified corruption recovery."
+    },
+    "portable_artifact_self_test": {
+      "status": "PASS",
+      "reason": "Self-contained SPIR-V shader binaries verified (5964 and 4224 bytes)."
+    },
+    "docs_consistency": {
+      "status": "PASS",
+      "reason": "Documentation & code consistency verifier passed all 11 dimensions with 0 errors."
+    },
+    "license_consistency": {
+      "status": "PASS",
+      "reason": "Code license valid; biological dataset license declared as CC-BY-4.0 (upstream repo GPL-3.0)."
+    },
+    "reproducibility_manifest": {
+      "status": "PASS",
+      "reason": "Reproducibility manifest present with hardware, OS, and deterministic seed baselines."
+    },
+    "v10_version_metadata": {
+      "status": "PASS",
+      "reason": "Canonical version 10.0.0 synchronized across src/version.py, pyproject.toml, and package.json."
+    }
+  }
+}

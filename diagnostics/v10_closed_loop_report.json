@@ -1,0 +1,297 @@
+{
+  "status": "PASS",
+  "prompt": "Create a small wooden bridge over the nearby stream.",
+  "seed": 42,
+  "duration_s": 0.067,
+  "policy_source": "TEST_DRIVER_ONLY",
+  "world_plan": {
+    "raw_prompt": "Create a small wooden bridge over the nearby stream.",
+    "biome": "temperate_valley",
+    "structures": [
+      {
+        "type": "wooden_bridge",
+        "material": "wood",
+        "span_m": 4.0,
+        "width_m": 1.5,
+        "x": 2.0,
+        "y": 5.0,
+        "z": 0.0
+      }
+    ],
+    "water": {
+      "type": "stream",
+      "x": 2.0,
+      "y": 5.0,
+      "width": 2.5
+    },
+    "resolved_assets": [
+      {
+        "type": "wooden_bridge",
+        "material": "wood",
+        "span_m": 4.0,
+        "width_m": 1.5,
+        "x": 2.0,
+        "y": 5.0,
+        "z": 0.0,
+        "resolution": {
+          "status": "CACHE_HIT",
+          "asset_id": "wooden_bridge_e0983eff6e624932",
+          "manifest_path": "assets/compiled/wooden_bridge_e0983eff6e624932.json",
+          "visual_mesh": "assets/compiled/wooden_bridge_e0983eff6e624932.obj",
+          "visual_glb": "assets/compiled/wooden_bridge_e0983eff6e624932.glb",
+          "dimensions_m": [
+            4.0,
+            1.5,
+            0.18
+          ],
+          "collision": {
+            "type": "BOX",
+            "dimensions_m": [
+              4.0,
+              1.5,
+              0.18
+            ],
+            "offset_m": [
+              0.0,
+              0.0,
+              0.09
+            ],
+            "mass_kg": 1296.0,
+            "friction": [
+              0.8,
+              0.1,
+              0.01
+            ],
+            "restitution": 0.05
+          },
+          "category": "STRUCTURE"
+        }
+      }
+    ],
+    "inference_provenance": {
+      "source": "RULE_BASED_FALLBACK",
+      "model_id": "rule_based_semantic_parser",
+      "runtime_backend": "procedural",
+      "is_deterministic": true,
+      "upstream_error": "ImportError: cannot import name 'get_model_manager' from 'src.models.manager' (E:\\FlyBain LLM Evolve\\src\\models\\manager.py)"
+    }
+  },
+  "asset": {
+    "status": "CACHE_HIT",
+    "asset_id": "wooden_bridge_e0983eff6e624932",
+    "manifest_path": "assets/compiled/wooden_bridge_e0983eff6e624932.json",
+    "visual_mesh": "assets/compiled/wooden_bridge_e0983eff6e624932.obj",
+    "visual_glb": "assets/compiled/wooden_bridge_e0983eff6e624932.glb",
+    "dimensions_m": [
+      4.0,
+      1.5,
+      0.18
+    ],
+    "collision": {
+      "type": "BOX",
+      "dimensions_m": [
+        4.0,
+        1.5,
+        0.18
+      ],
+      "offset_m": [
+        0.0,
+        0.0,
+        0.09
+      ],
+      "mass_kg": 1296.0,
+      "friction": [
+        0.8,
+        0.1,
+        0.01
+      ],
+      "restitution": 0.05
+    },
+    "category": "STRUCTURE"
+  },
+  "physics": {
+    "structure_placed": {
+      "id": "wooden_bridge",
+      "x": 2.0,
+      "y": 5.0,
+      "z": 0.0,
+      "sx": 4.0,
+      "sy": 1.5,
+      "sz": 0.18,
+      "geom_type": "box",
+      "rgba": "0.55 0.35 0.15 1",
+      "dynamic": false,
+      "mass": 1296.0,
+      "friction": [
+        0.8,
+        0.1,
+        0.01
+      ]
+    },
+    "initial_ground_z": 0.75,
+    "peak_deck_z": 0.75,
+    "final_agent_pos": [
+      2.0,
+      5.727,
+      0.48
+    ],
+    "elevation_delta": 0.0,
+    "grounded": false,
+    "deck_contact_verified": true
+  },
+  "spatial_memory": {
+    "timestamp": 1789988187.3412309,
+    "landmark": "wooden_bridge",
+    "pos": [
+      2.0,
+      5.0,
+      0.0
+    ],
+    "dimensions_m": [
+      4.0,
+      1.5,
+      0.18
+    ],
+    "agent_final_pos": [
+      2.0,
+      5.727,
+      0.48
+    ],
+    "deck_elevation_reached": 0.75,
+    "deck_contact_verified": true
+  },
+  "provenance_sha256": "00283e6e8ffce3fef32998ccc147b9c72431b419497a7a69d66ab32922eef565",
+  "causal_trace_samples": [
+    {
+      "step": 0,
+      "policy_source": "TEST_DRIVER_ONLY",
+      "applied_velocity": [
+        0.0,
+        0.8
+      ],
+      "pos": [
+        2.0,
+        3.029,
+        0.749
+      ]
+    },
+    {
+      "step": 1,
+      "policy_source": "TEST_DRIVER_ONLY",
+      "applied_velocity": [
+        0.0,
+        0.8
+      ],
+      "pos": [
+        2.0,
+        3.065,
+        0.748
+      ]
+    },
+    {
+      "step": 2,
+      "policy_source": "TEST_DRIVER_ONLY",
+      "applied_velocity": [
+        0.0,
+        0.8
+      ],
+      "pos": [
+        2.0,
+        3.104,
+        0.746
+      ]
+    },
+    {
+      "step": 3,
+      "policy_source": "TEST_DRIVER_ONLY",
+      "applied_velocity": [
+        0.0,
+        0.8
+      ],
+      "pos": [
+        2.0,
+        3.143,
+        0.742
+      ]
+    },
+    {
+      "step": 4,
+      "policy_source": "TEST_DRIVER_ONLY",
+      "applied_velocity": [
+        0.0,
+        0.8
+      ],
+      "pos": [
+        2.0,
+        3.183,
+        0.737
+      ]
+    },
+    {
+      "step": 115,
+      "policy_source": "TEST_DRIVER_ONLY",
+      "applied_velocity": [
+        0.0,
+        0.8
+      ],
+      "pos": [
+        2.0,
+        5.639,
+        0.481
+      ]
+    },
+    {
+      "step": 116,
+      "policy_source": "TEST_DRIVER_ONLY",
+      "applied_velocity": [
+        0.0,
+        0.8
+      ],
+      "pos": [
+        2.0,
+        5.665,
+        0.485
+      ]
+    },
+    {
+      "step": 117,
+      "policy_source": "TEST_DRIVER_ONLY",
+      "applied_velocity": [
+        0.0,
+        0.8
+      ],
+      "pos": [
+        2.0,
+        5.686,
+        0.483
+      ]
+    },
+    {
+      "step": 118,
+      "policy_source": "TEST_DRIVER_ONLY",
+      "applied_velocity": [
+        0.0,
+        0.8
+      ],
+      "pos": [
+        2.0,
+        5.708,
+        0.483
+      ]
+    },
+    {
+      "step": 119,
+      "policy_source": "TEST_DRIVER_ONLY",
+      "applied_velocity": [
+        0.0,
+        0.8
+      ],
+      "pos": [
+        2.0,
+        5.727,
+        0.48
+      ]
+    }
+  ],
+  "total_trace_steps": 120
+}

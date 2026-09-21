@@ -1,10 +1,11 @@
-"""Autonomous Asset Compiler for FlyBrain V8/V9.
+"""Autonomous Asset Compiler for FlyBrain V10.
 
-Implements Sections 29, 32–36, 48:
+Implements Phase 6 Requirements:
 - Normalizes visual mesh into calibrated physical meters
 - Generates low-overhead physics collision proxy (Box / Capsule / Hull)
-- Emits schema_version 1 FlyAsset JSON package
+- Emits schema_version 1 FlyAsset JSON package with portable relative paths
 - Content-addressed hashing avoiding redundant generation
+- Authoritative mass, friction, and restitution
 """
 import os
 import json
@@ -13,6 +14,21 @@ import numpy as np
 from typing import Dict, Any, List, Optional
 
 from src.assets.compiler.types import FlyAsset, AssetClass, ColliderType, CollisionProxy, REFERENCE_SCALES_M
+
+
+def to_portable_relpath(path: Optional[str]) -> Optional[str]:
+    """Converts a local path to a portable, normalized forward-slash relative path."""
+    if not path:
+        return None
+    norm = os.path.normpath(path)
+    cwd = os.path.abspath(".")
+    if os.path.isabs(norm):
+        try:
+            rel = os.path.relpath(norm, cwd)
+            return rel.replace("\\", "/")
+        except ValueError:
+            return norm.replace("\\", "/")
+    return norm.replace("\\", "/")
 
 
 class AssetCompiler:
@@ -29,6 +45,7 @@ class AssetCompiler:
                       semantic_name: str,
                       category: AssetClass,
                       visual_mesh_path: str,
+                      visual_glb_path: Optional[str] = None,
                       generator_info: str = "procedural_builder",
                       input_hash: str = "seed42",
                       custom_dimensions: Optional[List[float]] = None,
@@ -40,7 +57,6 @@ class AssetCompiler:
             asset_id = self.compute_asset_id(semantic_name, input_hash, {"cat": category.value})
             full_asset_id = f"{semantic_name}_{asset_id}"
 
-        
         # 1. Physical Scale Normalization (Section 34)
         if custom_dimensions:
             target_dims = [float(x) for x in custom_dimensions]
@@ -58,7 +74,6 @@ class AssetCompiler:
                 target_dims = [1.0, 1.0, 1.0]
 
         # 2. Collision Proxy Generation (Section 35)
-        # Dedicated box or capsule collider
         if category in (AssetClass.STRUCTURE, AssetClass.STATIC):
             coll_type = ColliderType.BOX
         elif category in (AssetClass.CHARACTER, AssetClass.CREATURE):
@@ -79,14 +94,19 @@ class AssetCompiler:
             restitution=0.05
         )
 
-        # 3. Create Package
+        portable_mesh = to_portable_relpath(visual_mesh_path)
+        portable_glb = to_portable_relpath(visual_glb_path)
+
+        # 3. Create Package with Portable Relative Paths
         asset = FlyAsset(
             schema_version=1,
             asset_id=full_asset_id,
             asset_class=category,
             source_hash=input_hash,
             generator=generator_info,
-            visual_mesh=visual_mesh_path,
+            model_revision="v10.0",
+            visual_mesh=portable_mesh or "",
+            visual_glb=portable_glb,
             dimensions_m=target_dims,
             collision={
                 "type": collider.type.value,
@@ -98,12 +118,15 @@ class AssetCompiler:
             },
             physics={
                 "mass": collider.mass_kg,
+                "friction": collider.friction,
+                "restitution": collider.restitution,
                 "dynamic": category in (AssetClass.RIGID_DYNAMIC, AssetClass.CHARACTER, AssetClass.CREATURE)
             },
             provenance={
                 "created_at": os.path.getmtime(visual_mesh_path) if os.path.exists(visual_mesh_path) else None,
                 "semantic_name": semantic_name,
-                "scale_normalization": "APPLIED_PHYSICAL_METERS"
+                "scale_normalization": "APPLIED_PHYSICAL_METERS",
+                "path_portability": "RELATIVE_PROJECT_ROOT"
             }
         )
 
