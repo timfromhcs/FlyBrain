@@ -838,6 +838,20 @@ def v1_world_geometry():
     return {"api": "v1", **get_world().geometry()}
 
 
+@app.get("/api/v1/world/chunks")
+def v1_world_chunks():
+    return {"api": "v1", **get_world().chunks()}
+
+
+@app.post("/api/v1/world/plan")
+def v1_world_plan(prompt: str, seed: int = 42):
+    from src.world.integration import GenerativeLoopExecutor
+    executor = GenerativeLoopExecutor()
+    res = executor.run_acceptance_loop(prompt=prompt, seed=seed)
+    return {"api": "v1", **res}
+
+
+
 @app.post("/api/v1/world/step")
 def v1_world_step(ticks: int = 1):
     recs = get_world().step(max(1, min(ticks, 50)))

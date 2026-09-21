@@ -1,0 +1,7 @@
+{
+  "timestamp": 1789983813.6304538,
+  "github_actions": ".github/workflows/build-windows.yml",
+  "huggingface_space": "timfromhcs/FlyBrain-Lab",
+  "hf_runtime": "Docker CPU",
+  "status": "PASS"
+}

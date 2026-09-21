@@ -1,0 +1,11 @@
+{
+  "timestamp": 1789983813.6294541,
+  "scripts": [
+    "scripts/install.ps1",
+    "scripts/doctor.ps1",
+    "scripts/uninstall.ps1"
+  ],
+  "portable_bundle": "dist/FlyBrain-v9.0.0-Windows-x64-Portable.zip",
+  "doctor_preflight": "HEALTHY",
+  "status": "PASS"
+}

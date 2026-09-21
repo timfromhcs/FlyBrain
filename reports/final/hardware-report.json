@@ -1,0 +1,42 @@
+{
+  "timestamp": 1789983794.302593,
+  "platform": {
+    "system": "Windows",
+    "release": "11",
+    "version": "10.0.26200",
+    "architecture": "AMD64"
+  },
+  "cpu": {
+    "model": "AMD64 Family 25 Model 68 Stepping 1, AuthenticAMD",
+    "cores_logical": 16,
+    "cores_physical": 8,
+    "current_load_percent": 7.4,
+    "freq_current_mhz": 3201.0,
+    "freq_max_mhz": 3201.0
+  },
+  "memory": {
+    "ram_total_bytes": 21245952000,
+    "ram_total_gb": 19.79,
+    "ram_available_bytes": 12927410176,
+    "ram_available_gb": 12.04,
+    "ram_used_percent": 39.2,
+    "process_rss_bytes": 32219136,
+    "process_rss_mb": 30.73
+  },
+  "disk": {
+    "disk_total_gb": 465.76,
+    "disk_free_gb": 420.28,
+    "disk_used_percent": 9.8
+  },
+  "gpu": {
+    "vulkan_available": true,
+    "vendor": "AMD",
+    "device_name": "AMD Radeon(TM) Graphics",
+    "device_type": "INTEGRATED_OR_DISCRETE_GPU",
+    "api_version": "None",
+    "driver_version": "None",
+    "dedicated_vram_mb": 2048.0,
+    "shared_memory_mb": 10130.9,
+    "vram_estimate_source": "AMD_UNIFIED_MEMORY_BUDGET"
+  }
+}

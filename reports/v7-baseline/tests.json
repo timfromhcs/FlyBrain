@@ -1,0 +1,55 @@
+{
+  "all_pass": true,
+  "tests": {
+    "validate_malecns_data": {
+      "pass": true,
+      "returncode": 0,
+      "duration_s": 0.95,
+      "stdout_tail": " ],\n    \"max_nx_ny_nz\": [\n      93668.0,\n      53742.0,\n      56018.0\n    ],\n    \"mean_nx_ny_nz\": [\n      48326.722053128935,\n      29500.69807817953,\n      31168.79130878205\n    ]\n  },\n  \"tbars_summary\": {\n    \"total_tbars\": 25391204,\n    \"max_tbars\": 20330,\n    \"neurons_with_tbars\": 118738\n  },\n  \"body_size_summary\": {\n    \"min\": 237,\n    \"max\": 55553698386,\n    \"mean\": 313490046.91095245\n  }\n}\n",
+      "stderr_tail": ""
+    },
+    "test_suite": {
+      "pass": true,
+      "returncode": 0,
+      "duration_s": 18.35,
+      "stdout_tail": "o 'https://huggingface.co' to load this model, couldn't find it in the cached files and it looks like E:\\FlyBain LLM Evolve\\src\\models\\dreamlite-vae is not the path to a directory containing a config.json file.\nCheckout your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/diffusers/installation#offline-mode'.\nGenerated diagnostics/test_results.xml\n",
+      "stderr_tail": "riment_replication)\nTest bit-exact deterministic reproduction of research experiments. ... ok\ntest_11_single_simulation_engine_telemetry (__main__.TestFlyBrainSystem.test_11_single_simulation_engine_telemetry)\nTest SimulationEngine background execution, thread safety, and telemetry isolation. ... ok\n\n----------------------------------------------------------------------\nRan 11 tests in 8.858s\n\nOK\n"
+    },
+    "test_state_persistence": {
+      "pass": true,
+      "returncode": 0,
+      "duration_s": 3.2,
+      "stdout_tail": "in B and restoring from snapshot...\nStep 5 comparison after restore: pot diff=0.00e+00, act diff=0.00e+00, weight diff=0.00e+00\nExecuting identical steps 6..10 on Brain B...\nStep 10 comparison after continued execution: pot diff=0.00e+00, act diff=0.00e+00, weight diff=0.00e+00\nSaved manifest to diagnostics/brain_snapshot_manifest.json\nSUCCESS: State persistence and deterministic replay verified!\n",
+      "stderr_tail": ""
+    },
+    "test_dreaming": {
+      "pass": true,
+      "returncode": 0,
+      "duration_s": 2.99,
+      "stdout_tail": "n: speak). Counterfactual simulation 'generate_image' yielded predicted reward 0.40.\n\nRunning exploratory dream cycle (Seed 99)...\nExploratory Dream 1: Replayed episode #3 (orig action: act_in_environment). Counterfactual simulation 'generate_image' yielded predicted reward 0.40.\n\nPersisted dreams verified: 4 separate records in dream store.\nSUCCESS: Dream and experience replay pipeline verified!\n",
+      "stderr_tail": ""
+    },
+    "test_evolution": {
+      "pass": true,
+      "returncode": 0,
+      "duration_s": 3.06,
+      "stdout_tail": "core=0.5256, Neurons=268, Synapses=1545 | [NEW LEADER]\nCandidate 3: Score=0.5239, Neurons=264, Synapses=1515 | [REJECTED]\n-> Selected Candidate brain_gen3_c2_2b184a (Score: 0.5256)\n\nFinal Evolved Brain: 268 neurons, 1545 synapses\nTotal candidates evaluated: 12\nCandidates accepted: 4, Candidates rejected/rolled-back: 8\nSUCCESS: Evolution, mutation, structural growth/pruning, and rollback verified!\n",
+      "stderr_tail": ""
+    },
+    "verify_docs_consistency": {
+      "pass": true,
+      "returncode": 0,
+      "duration_s": 1.39,
+      "stdout_tail": "ce.json structure\nVerified verification-contract terminology: README.md\nVerified verification-contract terminology: docs/alife_architecture.md\nVerified verification-contract terminology: final_verification_report.md\nVerified diagnostics/verification_contract.json conformance\n============================================================\nALL DOCUMENTATION AND CODE CONSISTENCY CHECKS PASSED [100% OK]\n",
+      "stderr_tail": ""
+    },
+    "check_release_integrity": {
+      "pass": true,
+      "returncode": 0,
+      "duration_s": 17.9,
+      "stdout_tail": "release integrity: PASS -> E:\\FlyBain LLM Evolve\\diagnostics\\release_certificate.json\n",
+      "stderr_tail": "E:\\FlyBain LLM Evolve\\.venv\\Lib\\site-packages\\fastapi\\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.\n  from starlette.testclient import TestClient as TestClient  # noqa\n"
+    }
+  },
+  "timestamp": 1789982320.104717
+}

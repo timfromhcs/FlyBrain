@@ -16,6 +16,8 @@ from src.world3d.agent import EmbodiedAgent
 from src.world3d.spatial_memory import SpatialMemory
 from src.world3d.social import social_encounter
 
+from src.world.chunks.chunk_manager import WorldManager
+
 _SERVICE = None
 
 
@@ -35,6 +37,7 @@ class WorldService:
             spawn.append({"name": f"friend_{i}", "x": -2.0 - i, "y": 2.0})
         self.world = World3D(seed=seed, characters=spawn)
         self.spatial = SpatialMemory(db_path)
+        self.world_manager = WorldManager(seed=seed)
         self.agents: Dict[str, EmbodiedAgent] = {}
         self.agents["hero"] = EmbodiedAgent(
             _organism("hero", 101), "hero", self.world, self.spatial, yaw=0.0)
@@ -43,7 +46,16 @@ class WorldService:
             self.agents[oid] = EmbodiedAgent(
                 _organism(oid, 200 + i), oid, self.world, self.spatial, yaw=0.0)
 
+    def chunks(self) -> Dict[str, Any]:
+        hero_pos = self.world.physics.char_state("hero")["pos"]
+        active = self.world_manager.chunks.update_center(hero_pos[0], hero_pos[1], radius_chunks=2)
+        return {
+            "active_chunk_count": len(active),
+            "chunks": [self.world_manager.chunks.loaded_chunks[k].to_dict() for k in active]
+        }
+
     def step(self, agent_ticks: int = 1) -> List[Dict[str, Any]]:
+
         out = []
         for _ in range(max(1, agent_ticks)):
             for ag in self.agents.values():

@@ -63,6 +63,22 @@ def build_model_xml(spec: Dict[str, Any],
         parts.append(f'<geom name="rock_{rk["id"]}" type="sphere" '
                      f'pos="{rk["x"]} {rk["y"]} {rk["r"]}" size="{rk["r"]}" '
                      f'rgba="0.5 0.5 0.55 1"/>')
+    for st in spec.get("structures", []):
+        sid = st.get("id", "struct")
+        x, y, z = st.get("x", 0.0), st.get("y", 0.0), st.get("z", 0.0)
+        sx, sy, sz = st.get("sx", 1.0), st.get("sy", 1.0), st.get("sz", 0.5)
+        rgba = st.get("rgba", "0.55 0.35 0.15 1")
+        gtype = st.get("geom_type", "box")
+        if not st.get("dynamic", False):
+            parts.append(f'<geom name="struct_{sid}" type="{gtype}" '
+                         f'pos="{x} {y} {z + sz / 2}" size="{sx / 2} {sy / 2} {sz / 2}" '
+                         f'rgba="{rgba}"/>')
+        else:
+            parts.append(f'<body name="bod_struct_{sid}" pos="{x} {y} {z + sz / 2}">'
+                         f'<freejoint/><geom name="dyn_struct_{sid}" type="{gtype}" '
+                         f'size="{sx / 2} {sy / 2} {sz / 2}" mass="{st.get("mass", 50.0)}" '
+                         f'rgba="{rgba}"/></body>')
+
     # dynamic bodies: crates, doors (hinged), foods, characters
     for f in spec.get("furniture", []):
         if f["kind"] == "dynamic_box":
@@ -238,12 +254,23 @@ class PhysicsWorld:
                         "dist": round(float(c.dist), 5)})
         return out
 
-    def grounded(self, char_name: str) -> bool:
+    def char_contacts(self, char_name: str) -> List[str]:
         tag = f"char_{char_name}"
+        entities = []
         for c in self.contacts():
-            if tag in (c["geom1"], c["geom2"]) and "ground" in (c["geom1"], c["geom2"]):
+            if tag == c["geom1"]:
+                entities.append(c["geom2"])
+            elif tag == c["geom2"]:
+                entities.append(c["geom1"])
+        return entities
+
+    def grounded(self, char_name: str) -> bool:
+        contacts = self.char_contacts(char_name)
+        for name in contacts:
+            if "ground" in name or name.startswith("struct_") or "floor" in name:
                 return True
         return False
+
 
     def raycast(self, origin: List[float], direction: List[float],
                 max_dist: float = 20.0, exclude_body: str = "") -> Dict[str, Any]:

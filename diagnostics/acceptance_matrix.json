@@ -186,7 +186,7 @@
     },
     "version_metadata": {
       "status": "PASS",
-      "reason": "FlyBrain version metadata = 7.0.0 (v7.0.0)."
+      "reason": "FlyBrain version metadata = 9.0.0 (v9.0.0)."
     },
     "immutable_bio_baseline": {
       "status": "PASS",

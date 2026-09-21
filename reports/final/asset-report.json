@@ -1,0 +1,44 @@
+{
+  "timestamp": 1789983813.6253395,
+  "format": "FlyAsset v1",
+  "compiler": "AssetCompiler",
+  "scale_normalization": "METRIC_PHYSICAL_SCALING",
+  "collision_proxies": [
+    "BOX",
+    "CAPSULE",
+    "SPHERE",
+    "CONVEX_HULL"
+  ],
+  "sample_asset": {
+    "status": "CACHE_HIT",
+    "asset_id": "wooden_bridge_cc2b9d68d3d2ed1a",
+    "manifest_path": "E:\\FlyBain LLM Evolve\\assets\\compiled\\wooden_bridge_cc2b9d68d3d2ed1a.json",
+    "visual_mesh": "E:\\FlyBain LLM Evolve\\assets\\compiled\\wooden_bridge_cc2b9d68d3d2ed1a.obj",
+    "dimensions_m": [
+      4.0,
+      1.5,
+      0.18
+    ],
+    "collision": {
+      "type": "BOX",
+      "dimensions_m": [
+        4.0,
+        1.5,
+        0.18
+      ],
+      "offset_m": [
+        0.0,
+        0.0,
+        0.09
+      ],
+      "mass_kg": 1296.0,
+      "friction": [
+        0.8,
+        0.1,
+        0.01
+      ],
+      "restitution": 0.05
+    },
+    "category": "STRUCTURE"
+  }
+}

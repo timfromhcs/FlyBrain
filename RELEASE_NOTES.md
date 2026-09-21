@@ -1,3 +1,43 @@
+# FlyBrain Release Notes — v9.0.0 Stable
+
+**Tag:** `v9.0.0` · **Prior lines:** `v8.0.0`, `v7.0.0` · Full production release: Generative Endless World, Closed-Loop AI -> World -> Organism Pipeline, FlyAsset Compiler with Physical Scale Normalization, MuJoCo 3.13 Contact Resolution, and Autonomous Verification System.
+
+## V9.0 Highlights (Real, Empirical, Non-Mock)
+- **Generative Endless World Engine (`src/world/chunks/`):** Seeded deterministic procedural terrain generation (`WorldGenerator`), spatial bounds streaming with 25 active chunks in bounded RAM, and persistent chunk delta overlays (`WorldDeltaStore`). Exposed directly via `/api/v1/world/chunks`.
+- **Closed-Loop AI -> World -> Organism Pipeline (`src/world/integration.py`, `scripts/verify_v9_loop.py`):**
+  Full Section 90 acceptance loop verified:
+  `Prompt ("Create a small wooden bridge over the nearby stream") -> LLM structured WorldIntent -> Procedural World Planner -> FlyAsset Compilation -> MuJoCo Placement -> Organism Navigation -> Physical Contact Resolution -> Spatial Memory Update -> SHA-256 Provenance Recording`.
+- **FlyAsset Compiler & 3D Geometry Synthesizer (`src/assets/`):**
+  - Manifold 3D geometry engine emitting Wavefront OBJ and GLB.
+  - Scale normalization to calibrated metric units preventing out-of-scale generation.
+  - Automated physics collision proxies (Box, Capsule, Sphere, Convex Hull) with mass, friction, and restitution parameters.
+  - Content-addressed hashing avoiding redundant generation (0.06s cache hit).
+- **Central Runtime & Resource Management (`src/runtime/`):**
+  - Hardware prober detecting CPU cores, RAM, Disk, and Vulkan GPU (AMD Radeon 680M).
+  - 5-Tier profile selection (`MINIMAL`, `LOW`, `BALANCED`, `PERFORMANCE`, `MAXIMUM`).
+  - Hysteresis-governed memory pressure states (`GREEN` -> `YELLOW` -> `ORANGE` -> `RED` -> `CRITICAL`) with bounded OOM recovery.
+- **Provider-Independent Backups (`src/backup/provider.py`):**
+  Cryptographic archive verification across local filesystem, zip archives, and Hugging Face Storage.
+- **Self-Healing Windows Distribution (`installer/`, `scripts/`, `dist/`):**
+  - Portable bundle: `FlyBrain-v9.0.0-Windows-x64-Portable.zip` (0.56 MB), SHA256SUMS.txt, SBOM.json, release-manifest.json.
+  - PowerShell one-line installer (`scripts/install.ps1`), preflight doctor (`scripts/doctor.ps1`), uninstaller (`scripts/uninstall.ps1`).
+  - GitHub Actions cloud build workflow (`.github/workflows/build-windows.yml`).
+
+---
+
+# FlyBrain Release Notes — v8.0.0 Stable
+
+- **Autonomous Resource Manager (`src/runtime/resource_manager/`):** Real empirical hardware probing (CPU, RAM, GPU, Disk), dynamic profiling (`MINIMAL`, `LOW`, `BALANCED`, `PERFORMANCE`, `MAXIMUM`), subsystem memory budgeting with safety margins, priority eviction (P0 to P5), and bounded OOM recovery.
+- **Honest Capability Manager (`src/runtime/capability_manager.py`):** Explicit non-mock statuses (`AVAILABLE`, `DEGRADED`, `UNAVAILABLE`, `NOT_APPLICABLE`) reporting real system facts without fabricated readiness.
+- **Standardized Model Registry (`models/registry.yaml`, `src/models/registry_v8.py`):** Schema-validated model store supporting GGUF, SafeTensors, Checkpoints, with SHA-256 verification and size tracking.
+- **Typed Runtime Event Bus (`src/common/events.py`):** Thread-safe publish-subscribe system for 20+ domain events across physics, biology, cognition, assets, and watchdog.
+- **Provider-Independent Backups (`src/backup/provider.py`):** Extensible storage abstraction supporting LocalFilesystem, compressed LocalArchive (.zip), and HuggingFaceStorageBucket.
+- **Chunk-Streamed Endless World Foundation (`src/world/chunks/`):** Deterministic procedural terrain synthesis with bounded RAM streaming and persistent modification overlays.
+- **FlyAsset Compiler (`src/assets/compiler/`):** Physical meter scale normalization, automated physics collision proxy generation (Box, Capsule, Sphere), and schema_version 1 manifest generation.
+- **Self-Healing Windows Packaging (`scripts/install.ps1`, `scripts/doctor.ps1`):** One-line installation, preflight diagnostic doctor, and verified portable zip distribution.
+
+---
+
 # FlyBrain Release Notes — v7.0.0 Stable
 
 **Tag:** `v7.0.0` · **Prior line:** `v6.0.0` · Complete production release with end-to-end multimodal loop, instantaneous checkpoint loading, sub-second collision-proof backups, and live MuJoCo 3.13 3D world.

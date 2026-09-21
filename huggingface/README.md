@@ -12,9 +12,9 @@ short_description: Drosophila connectome research workstation
 
 # FlyBrain Lab — Hugging Face Space (CPU build)
 
-Production build of [timfromhcs/FlyBrain](https://github.com/timfromhcs/FlyBrain) v7.0.x:
+Production build of [timfromhcs/FlyBrain](https://github.com/timfromhcs/FlyBrain) v9.0.x:
 connectome research backend + embodied 3D world (MuJoCo physics runs for
-real on Space CPUs).
+real on Space CPUs) with chunk streaming and FlyAsset compilation.
 
 - **Graph:** `REAL_SUBGRAPH` — bounded sampled subgraph of Janelia MaleCNS v1.0
   (256 neurons by default; the full 125,506-neuron graph is not instantiated —
@@ -31,4 +31,5 @@ real on Space CPUs).
 
 Endpoints: `/api/health` · `/api/version` · `/api/doctor` · `/api/state` ·
 `/api/telemetry` · `/api/provenance` · `/api/connectome` · `/ws/telemetry` ·
-`/api/v1/world/state` · `/api/v1/world/geometry` · `/api/v1/models`.
+`/api/v1/world/state` · `/api/v1/world/geometry` · `/api/v1/world/chunks` · `/api/v1/models`.
+

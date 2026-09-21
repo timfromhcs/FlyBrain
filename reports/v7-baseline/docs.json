@@ -1,0 +1,19 @@
+{
+  "markdown_docs": [
+    "ARCHITECTURE.md",
+    "CODE_OF_CONDUCT.md",
+    "CONTRIBUTING.md",
+    "DEVELOPMENT.md",
+    "final_verification_report.md",
+    "GEMINI.md",
+    "README.md",
+    "RELEASE_NOTES.md",
+    "REPRODUCIBILITY.md",
+    "RESEARCH_STATUS.md",
+    "SECURITY.md",
+    "TESTING.md",
+    "THIRD_PARTY_NOTICES.md",
+    "TROUBLESHOOTING.md"
+  ],
+  "count": 14
+}

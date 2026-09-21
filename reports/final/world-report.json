@@ -1,0 +1,15 @@
+{
+  "timestamp": 1789983813.615773,
+  "engine": "Chunk-Streamed Endless World",
+  "generator_revision": "v9.0",
+  "active_chunk_radius": 2,
+  "active_chunks": 25,
+  "biomes_supported": [
+    "temperate_valley",
+    "pine_forest",
+    "river_basin",
+    "rocky_highlands",
+    "savanna_plains"
+  ],
+  "persistence_mechanism": "WorldDeltaStore + SQLite spatial"
+}

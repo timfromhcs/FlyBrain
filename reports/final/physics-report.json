@@ -1,0 +1,32 @@
+{
+  "timestamp": 1789983813.6268446,
+  "solver": "MuJoCo 3.13",
+  "substep_rate_hz": 100,
+  "embodiment": "Planar velocity servo + attitude PD stabilization",
+  "structure_contact_verified": true,
+  "physics_result": {
+    "structure_placed": {
+      "id": "wooden_bridge",
+      "x": 2.0,
+      "y": 5.0,
+      "z": 0.0,
+      "sx": 4.0,
+      "sy": 1.5,
+      "sz": 0.18,
+      "geom_type": "box",
+      "rgba": "0.55 0.35 0.15 1",
+      "dynamic": false,
+      "mass": 120.0
+    },
+    "initial_ground_z": 0.75,
+    "peak_deck_z": 0.75,
+    "final_agent_pos": [
+      2.0,
+      5.727,
+      0.48
+    ],
+    "elevation_delta": 0.0,
+    "grounded": false,
+    "deck_contact_verified": true
+  }
+}

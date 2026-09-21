@@ -1,0 +1,21 @@
+{
+  "name": "flybrain",
+  "version": "9.0.0",
+  "description": "Vulkan-First Artificial Organism Research Framework & Web Dashboard",
+  "private": true,
+  "scripts": {
+    "doctor": "powershell -ExecutionPolicy Bypass -File scripts/doctor.ps1",
+    "test": "pytest tests",
+    "lint": "flake8 src tests scripts",
+    "package": "python scripts/package_release.py"
+  },
+  "keywords": [
+    "connectome",
+    "spiking-neural-networks",
+    "vulkan",
+    "mujoco",
+    "alife"
+  ],
+  "author": "Tim from HCS",
+  "license": "Apache-2.0"
+}

@@ -1,0 +1,10 @@
+{
+  "timestamp": 1789983794.3045988,
+  "profile_tier": "PERFORMANCE",
+  "memory_pressure_state": "GREEN",
+  "limits": {
+    "max_vulkan_workers": 4,
+    "max_world_chunks_ram": 25,
+    "max_model_ram_gb": 8.0
+  }
+}

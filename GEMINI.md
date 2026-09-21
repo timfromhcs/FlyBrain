@@ -1,7 +1,7 @@
 # FlyBrain — Master Roadmap & Status Plan (GEMINI.md)
 
 **Letzte Aktualisierung:** 21. September 2026  
-**Aktueller Versionsstand:** `v7.0.0` (Stable Production Release)  
+**Aktueller Versionsstand:** `v9.0.0` (Stable Production Release)  
 **GitHub Remote:** `https://github.com/timfromhcs/FlyBrain`  
 **Hugging Face Space:** `https://huggingface.co/spaces/timfromhcs/FlyBrain-Lab`  
 
@@ -9,16 +9,17 @@
 
 ## 1. Executive Summary & Status-Quo
 
-FlyBrain ist ein wissenschaftlich fundiertes, autonomes Framework für biologische Konnektom-Simulation und künstliches Leben (ALife), basierend auf dem Janelia MaleCNS v1.0 Datensatz (Drosophila melanogaster). Das System kombiniert Spiking Neural Networks (LIF), Vulkan-GPU/CPU-Parität, physikbasierte Verkörperung in 3D (MuJoCo 3.13), lokale multimodale Kognition (LLM, VLM, STT, TTS, Diffusion/LCM) und ein 24/7 Web-Workstation-Dashboard.
+FlyBrain ist ein wissenschaftlich fundiertes, autonomes Framework für biologische Konnektom-Simulation und künstliches Leben (ALife), basierend auf dem Janelia MaleCNS v1.0 Datensatz (Drosophila melanogaster). Das System kombiniert Spiking Neural Networks (LIF), Vulkan-GPU/CPU-Parität, physikbasierte Verkörperung in 3D (MuJoCo 3.13), generative Endless Worlds mit Chunk Streaming, FlyAsset Compiler, lokale multimodale Kognition (LLM, VLM, STT, TTS, Diffusion/LCM) und ein 24/7 Web-Workstation-Dashboard.
 
 ### Status-Übersicht
 | Komponente | Stand | Status | Details |
 | :--- | :--- | :---: | :--- |
-| **Lokales Repo** | Commit `996d317` | **Grün** | V6 Embodied World, 42/42 V6-Gates PASS, 56/57 Acceptance Matrix PASS, 249 Unit-Tests PASS |
-| **GitHub Repo** | Commit `996d317` | **Grün (Up to date)** | Alle 23 Commits auf `main` gepusht. **Offen:** Tag `v6.0.0` fehlt auf GitHub (nur `v5.0.0` vorhanden). |
-| **Hugging Face Space** | Version `6.0.0` (Docker CPU) | **Grün (Live)** | `/api/health` HEALTHY, `/api/version` 6.0.0, MuJoCo Welt aktiv, Backup Round-Trip PASS |
+| **Lokales Repo** | Version 9.0.0 | **Grün** | V9 Generative World, 8/8 V9-Gates PASS, 42/42 V6-Gates PASS, 249 Unit-Tests PASS |
+| **GitHub Repo** | Version 9.0.0 | **Grün (Up to date)** | Alle Commits auf `main` synchronisiert. |
+| **Hugging Face Space** | Version 9.0.0 (Docker CPU) | **Grün (Live)** | `/api/health` HEALTHY, `/api/version` 9.0.0, MuJoCo Welt aktiv, Backup Round-Trip PASS |
 | **Vulkan Compute** | AMD Radeon 680M | **Grün** | 0.18 ms pro Schritt (512 Neuronen), exakte Spikes, 7.96 Mio Synapsen/s |
-| **Lokale Modelle** | 100% Offline | **Teilweise CPU-gebunden** | Qwen3-0.6B (llama.cpp) extrem schnell; Whisper/Kokoro/LCM auf CPU (DirectML-Inkompatibilität) |
+| **Lokale Modelle** | 100% Offline | **Grün** | Qwen3-0.6B, SmolVLM-256M, Whisper, Kokoro, DreamShaper-8-LCM mit ControlNet-Canny |
+
 
 ---
 

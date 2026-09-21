@@ -1,0 +1,17 @@
+{
+  "version": "9.0.0",
+  "release_tag": "v9.0.0",
+  "release_name": "FlyBrain V9.0.0",
+  "timestamp": 1789983324.1790743,
+  "artifacts": {
+    "FlyBrain-v9.0.0-Windows-x64-Portable.zip": {
+      "sha256": "e322ded5d26439977a1269b83922b95b3e4ac0fe12d739a6c064fd1d0cb3d8fc",
+      "bytes": 582937,
+      "size_mb": 0.56
+    }
+  },
+  "verification": {
+    "license_audit": "reports/license-audit.json",
+    "v7_baseline": "reports/v7-baseline/tests.json"
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "bomFormat": "CycloneDX-FlyBrain",
+  "specVersion": "1.5",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-09-21T09:35:24Z",
+    "component": {
+      "name": "FlyBrain",
+      "version": "9.0.0",
+      "type": "application",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
+    }
+  },
+  "components": [
+    {
+      "name": "numpy",
+      "version_spec": "numpy>=2.0.0"
+    },
+    {
+      "name": "scipy",
+      "version_spec": "scipy>=1.14.0"
+    },
+    {
+      "name": "pillow",
+      "version_spec": "pillow>=10.0.0"
+    },
+    {
+      "name": "vulkan",
+      "version_spec": "vulkan>=1.3.275.1"
+    },
+    {
+      "name": "fastapi",
+      "version_spec": "fastapi>=0.110.0"
+    },
+    {
+      "name": "uvicorn",
+      "version_spec": "uvicorn>=0.30.0"
+    },
+    {
+      "name": "websockets",
+      "version_spec": "websockets>=12.0"
+    },
+    {
+      "name": "soundfile",
+      "version_spec": "soundfile>=0.12.0"
+    },
+    {
+      "name": "sounddevice",
+      "version_spec": "sounddevice>=0.4.0"
+    },
+    {
+      "name": "torch",
+      "version_spec": "torch>=2.2.0"
+    },
+    {
+      "name": "torchvision",
+      "version_spec": "torchvision>=0.17.0"
+    },
+    {
+      "name": "diffusers",
+      "version_spec": "diffusers>=0.30.0"
+    },
+    {
+      "name": "transformers",
+      "version_spec": "transformers>=4.40.0"
+    },
+    {
+      "name": "accelerate",
+      "version_spec": "accelerate>=0.30.0"
+    },
+    {
+      "name": "pydantic",
+      "version_spec": "pydantic>=2.7.0"
+    },
+    {
+      "name": "requests",
+      "version_spec": "requests>=2.31.0"
+    },
+    {
+      "name": "psutil",
+      "version_spec": "psutil>=5.9.0"
+    }
+  ]
+}

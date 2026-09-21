@@ -1,8 +1,8 @@
 {
   "snapshot_path": "diagnostics/snapshots/brain_state_checkpoint.npz",
-  "sha256": "e30227121e8db2da55d25af7a4a771ede83e64ef0149f3d6c38c152ea5c6e7ee",
+  "sha256": "fd80c6f54fc6099fd1615326133191de5bcb5cf7d72fb395268be0401a4b2702",
   "num_neurons": 512,
-  "num_synapses": 6558,
+  "num_synapses": 6557,
   "step_at_snapshot": 5,
   "step_restored": 10,
   "continuity_verified": true,

@@ -1,0 +1,62 @@
+{
+  "timestamp": 1789983813.6137745,
+  "capabilities": {
+    "vulkan_compute": {
+      "status": "AVAILABLE",
+      "device": "AMD Radeon(TM) Graphics",
+      "reason": "Vulkan 1.3 physical device initialized"
+    },
+    "cpu_reference": {
+      "status": "AVAILABLE",
+      "device": "AMD64 Family 25 Model 68 Stepping 1, AuthenticAMD",
+      "reason": "Deterministic Python/NumPy LIF reference available"
+    },
+    "mujoco_physics": {
+      "status": "AVAILABLE",
+      "version": "3.13.0",
+      "reason": "MuJoCo 3.13.0 authoritative 3D physics ready"
+    },
+    "astar_navigation": {
+      "status": "AVAILABLE",
+      "reason": "Deterministic 0.25m grid navigator ready"
+    },
+    "local_llm": {
+      "status": "AVAILABLE",
+      "backend": "llama_cpp",
+      "reason": "Qwen3 GGUF model registered and present"
+    },
+    "image_generation": {
+      "status": "DEGRADED",
+      "checkpoint": "DreamShaper8_LCM.safetensors",
+      "reason": "DreamShaper8-LCM available (running on CPU inference mode)"
+    },
+    "speech_to_text": {
+      "status": "AVAILABLE",
+      "backend": "whisper_small",
+      "reason": "Whisper STT offline ready"
+    },
+    "text_to_speech": {
+      "status": "AVAILABLE",
+      "backend": "kokoro_82m",
+      "reason": "Kokoro-82M TTS offline ready"
+    },
+    "image_to_3d": {
+      "status": "UNAVAILABLE",
+      "backend": "trellis_native",
+      "reason": "Native trellis backend not installed (optional V9 generative 3D component)"
+    },
+    "automatic_rigging": {
+      "status": "NOT_APPLICABLE",
+      "reason": "Rigging enabled on demand for articulated biological models only"
+    }
+  },
+  "models_registered": [
+    "qwen3-0.6b-gguf",
+    "smolvlm-256m",
+    "whisper-small",
+    "kokoro-82m",
+    "dreamshaper8-lcm-sd15",
+    "controlnet-canny",
+    "minilm-l6-v2"
+  ]
+}

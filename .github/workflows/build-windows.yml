@@ -1,0 +1,57 @@
+name: Windows Portable Package & Cloud Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    name: Build Windows x64 Portable Bundle
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Compile Compute Shaders
+        uses: jakoch/install-vulkan-sdk-action@v1
+        with:
+          cache: true
+
+      - name: Compile SPIR-V
+        run: |
+          glslc shaders/brain_step.comp -o shaders/brain_step.spv
+          glslc shaders/plasticity.comp -o shaders/plasticity.spv
+
+      - name: Preflight Doctor Check
+        run: |
+          powershell -ExecutionPolicy Bypass -File scripts/doctor.ps1
+
+      - name: Package Portable Distribution
+        run: |
+          mkdir dist
+          Compress-Archive -Path src, shaders, manifests, malecns, scripts, README.md, LICENSE, pyproject.toml -DestinationPath dist/FlyBrain-Windows-x64-Portable.zip
+
+      - name: Generate Checksums
+        run: |
+          Get-FileHash dist/FlyBrain-Windows-x64-Portable.zip -Algorithm SHA256 | Out-File dist/SHA256SUMS.txt
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: FlyBrain-Windows-x64-Portable
+          path: dist/
+          retention-days: 14

@@ -1,0 +1,11 @@
+{
+  "timestamp": 1789983813.6284525,
+  "provider_independent": true,
+  "providers_tested": [
+    "LocalFilesystemProvider",
+    "LocalArchiveProvider (.zip)",
+    "HuggingFaceStorageBucketProvider"
+  ],
+  "sha256_verification": "ENFORCED_TAMPER_EVIDENT",
+  "subsecond_collision_fix": "APPLIED (%Y%m%d_%H%M%S_%f)"
+}

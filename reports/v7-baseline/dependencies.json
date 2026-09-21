@@ -1,0 +1,21 @@
+{
+  "dependencies": [
+    "numpy>=2.0.0",
+    "scipy>=1.14.0",
+    "pillow>=10.0.0",
+    "vulkan>=1.3.275.1",
+    "fastapi>=0.110.0",
+    "uvicorn>=0.30.0",
+    "websockets>=12.0",
+    "soundfile>=0.12.0",
+    "sounddevice>=0.4.0",
+    "torch>=2.2.0",
+    "torchvision>=0.17.0",
+    "diffusers>=0.30.0",
+    "transformers>=4.40.0",
+    "accelerate>=0.30.0",
+    "pydantic>=2.7.0",
+    "requests>=2.31.0",
+    "psutil>=5.9.0"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "timestamp": 1789983813.6447158,
+  "version": "9.0.0",
+  "git_commit": "c77a443d6f753326dbccdb4d11daae3ee0af2ee8",
+  "python_version": "3.12.13 (main, Jun  2 2026, 22:47:20) [MSC v.1944 64 bit (AMD64)]",
+  "random_seeds": {
+    "world": 42,
+    "agent": 7
+  },
+  "deterministic_contracts": [
+    "Janelia MaleCNS v1.0 SHA-256 connectome soma & synapses",
+    "Deterministic chunk terrain hash-coordinates",
+    "Vulkan SPIR-V compute shaders with exact trajectory CPU parity",
+    "MuJoCo 3.13 deterministic contact solver"
+  ]
+}

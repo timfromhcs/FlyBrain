@@ -1,0 +1,104 @@
+{
+  "audit_date": "2026-09-21",
+  "compliance_status": "PASS",
+  "policy": "Local-First / EU Distribution Compliance / Strict Licensing",
+  "components": [
+    {
+      "component": "FlyBrain Core",
+      "version": "7.0.0",
+      "license": "Apache-2.0",
+      "redistribution": "PERMITTED",
+      "commercial_use": "PERMITTED",
+      "eu_distribution": "PERMITTED",
+      "bundling": "INCLUDED"
+    },
+    {
+      "component": "Janelia MaleCNS v1.0",
+      "version": "1.0",
+      "license": "CC-BY-4.0",
+      "redistribution": "PERMITTED_WITH_ATTRIBUTION",
+      "commercial_use": "PERMITTED",
+      "eu_distribution": "PERMITTED",
+      "bundling": "INCLUDED_RAW_CSV"
+    },
+    {
+      "component": "MuJoCo",
+      "version": "3.13.0",
+      "license": "Apache-2.0",
+      "redistribution": "PERMITTED",
+      "commercial_use": "PERMITTED",
+      "eu_distribution": "PERMITTED",
+      "bundling": "DEPENDENCY"
+    },
+    {
+      "component": "Vulkan Python Bindings",
+      "version": "1.3.275.1",
+      "license": "Apache-2.0",
+      "redistribution": "PERMITTED",
+      "commercial_use": "PERMITTED",
+      "eu_distribution": "PERMITTED",
+      "bundling": "DEPENDENCY"
+    },
+    {
+      "component": "Qwen3-0.6B-GGUF",
+      "version": "main",
+      "license": "Apache-2.0",
+      "model_license": "Apache-2.0",
+      "redistribution": "PERMITTED",
+      "commercial_use": "PERMITTED",
+      "eu_distribution": "PERMITTED",
+      "bundling": "STANDALONE_MODEL_STORE"
+    },
+    {
+      "component": "DreamShaper-8-LCM",
+      "version": "main",
+      "license": "CreativeML-OpenRAIL-M",
+      "model_license": "OpenRAIL-M",
+      "redistribution": "PERMITTED_NON_MILITARY",
+      "commercial_use": "PERMITTED_WITH_RESTRICTIONS",
+      "eu_distribution": "PERMITTED",
+      "bundling": "STANDALONE_MODEL_STORE"
+    },
+    {
+      "component": "Whisper-small",
+      "version": "main",
+      "license": "MIT",
+      "model_license": "MIT",
+      "redistribution": "PERMITTED",
+      "commercial_use": "PERMITTED",
+      "eu_distribution": "PERMITTED",
+      "bundling": "STANDALONE_MODEL_STORE"
+    },
+    {
+      "component": "Kokoro-82M",
+      "version": "main",
+      "license": "Apache-2.0",
+      "model_license": "Apache-2.0",
+      "redistribution": "PERMITTED",
+      "commercial_use": "PERMITTED",
+      "eu_distribution": "PERMITTED",
+      "bundling": "STANDALONE_MODEL_STORE"
+    },
+    {
+      "component": "TRELLIS (Microsoft)",
+      "version": "main",
+      "license": "MIT",
+      "model_license": "MIT",
+      "redistribution": "PERMITTED",
+      "commercial_use": "PERMITTED",
+      "eu_distribution": "PERMITTED",
+      "bundling": "NATIVE_BACKEND_OPTIONAL"
+    },
+    {
+      "component": "Hunyuan3D-2.0/2.1 (Tencent)",
+      "version": "2.0/2.1",
+      "license": "Tencent Hunyuan Community License",
+      "model_license": "Tencent Hunyuan Community License (Excludes EU, UK, KR)",
+      "redistribution": "RESTRICTED",
+      "commercial_use": "RESTRICTED",
+      "eu_distribution": "PROHIBITED_FOR_PRODUCTION",
+      "bundling": "REFERENCE_ONLY",
+      "notes": "Explicitly flagged as REFERENCE_ONLY due to EU/Germany territorial exclusion clause in Tencent Community License."
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "timestamp": 1789983813.627447,
+  "diffusion_engine": "DreamShaper-8-LCM (SD1.5)",
+  "controlnet": "canny (lllyasviel/sd-controlnet-canny)",
+  "output_resolution": "512x512",
+  "visual_evidence_dir": "visual_evidence/imagined"
+}

@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "asset_id": "wooden_bridge_fb2ad752bfa729a5",
+  "asset_class": "STRUCTURE",
+  "source_hash": "bridge_hash_123",
+  "generator": "procedural_bridge_builder",
+  "model_revision": "v8.0",
+  "visual_mesh": "assets/meshes/bridge.glb",
+  "dimensions_m": [
+    4.0,
+    1.8,
+    0.8
+  ],
+  "origin": {
+    "x": 0.0,
+    "y": 0.0,
+    "z": 0.0
+  },
+  "materials": {},
+  "lod": {},
+  "collision": {
+    "type": "BOX",
+    "dimensions_m": [
+      4.0,
+      1.8,
+      0.8
+    ],
+    "offset_m": [
+      0.0,
+      0.0,
+      0.4
+    ],
+    "mass_kg": 6912.0,
+    "friction": [
+      0.8,
+      0.1,
+      0.01
+    ],
+    "restitution": 0.05
+  },
+  "parts": [],
+  "rig": {},
+  "animations": {},
+  "physics": {
+    "mass": 6912.0,
+    "dynamic": false
+  },
+  "provenance": {
+    "created_at": null,
+    "semantic_name": "wooden_bridge",
+    "scale_normalization": "APPLIED_PHYSICAL_METERS"
+  }
+}

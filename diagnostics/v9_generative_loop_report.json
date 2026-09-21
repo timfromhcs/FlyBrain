@@ -1,0 +1,149 @@
+{
+  "status": "PASS",
+  "prompt": "Create a small wooden bridge over the nearby stream.",
+  "seed": 42,
+  "duration_s": 0.065,
+  "world_plan": {
+    "raw_prompt": "Create a small wooden bridge over the nearby stream.",
+    "biome": "temperate_valley",
+    "structures": [
+      {
+        "type": "wooden_bridge",
+        "material": "wood",
+        "span_m": 4.0,
+        "width_m": 1.5,
+        "x": 2.0,
+        "y": 5.0,
+        "z": 0.0
+      }
+    ],
+    "water": {
+      "type": "stream",
+      "x": 2.0,
+      "y": 5.0,
+      "width": 2.5
+    },
+    "resolved_assets": [
+      {
+        "type": "wooden_bridge",
+        "material": "wood",
+        "span_m": 4.0,
+        "width_m": 1.5,
+        "x": 2.0,
+        "y": 5.0,
+        "z": 0.0,
+        "resolution": {
+          "status": "CACHE_HIT",
+          "asset_id": "wooden_bridge_cc2b9d68d3d2ed1a",
+          "manifest_path": "E:\\FlyBain LLM Evolve\\assets\\compiled\\wooden_bridge_cc2b9d68d3d2ed1a.json",
+          "visual_mesh": "E:\\FlyBain LLM Evolve\\assets\\compiled\\wooden_bridge_cc2b9d68d3d2ed1a.obj",
+          "dimensions_m": [
+            4.0,
+            1.5,
+            0.18
+          ],
+          "collision": {
+            "type": "BOX",
+            "dimensions_m": [
+              4.0,
+              1.5,
+              0.18
+            ],
+            "offset_m": [
+              0.0,
+              0.0,
+              0.09
+            ],
+            "mass_kg": 1296.0,
+            "friction": [
+              0.8,
+              0.1,
+              0.01
+            ],
+            "restitution": 0.05
+          },
+          "category": "STRUCTURE"
+        }
+      }
+    ]
+  },
+  "asset": {
+    "status": "CACHE_HIT",
+    "asset_id": "wooden_bridge_cc2b9d68d3d2ed1a",
+    "manifest_path": "E:\\FlyBain LLM Evolve\\assets\\compiled\\wooden_bridge_cc2b9d68d3d2ed1a.json",
+    "visual_mesh": "E:\\FlyBain LLM Evolve\\assets\\compiled\\wooden_bridge_cc2b9d68d3d2ed1a.obj",
+    "dimensions_m": [
+      4.0,
+      1.5,
+      0.18
+    ],
+    "collision": {
+      "type": "BOX",
+      "dimensions_m": [
+        4.0,
+        1.5,
+        0.18
+      ],
+      "offset_m": [
+        0.0,
+        0.0,
+        0.09
+      ],
+      "mass_kg": 1296.0,
+      "friction": [
+        0.8,
+        0.1,
+        0.01
+      ],
+      "restitution": 0.05
+    },
+    "category": "STRUCTURE"
+  },
+  "physics": {
+    "structure_placed": {
+      "id": "wooden_bridge",
+      "x": 2.0,
+      "y": 5.0,
+      "z": 0.0,
+      "sx": 4.0,
+      "sy": 1.5,
+      "sz": 0.18,
+      "geom_type": "box",
+      "rgba": "0.55 0.35 0.15 1",
+      "dynamic": false,
+      "mass": 120.0
+    },
+    "initial_ground_z": 0.75,
+    "peak_deck_z": 0.75,
+    "final_agent_pos": [
+      2.0,
+      5.727,
+      0.48
+    ],
+    "elevation_delta": 0.0,
+    "grounded": false,
+    "deck_contact_verified": true
+  },
+  "spatial_memory": {
+    "timestamp": 1789983300.953989,
+    "landmark": "wooden_bridge",
+    "pos": [
+      2.0,
+      5.0,
+      0.0
+    ],
+    "dimensions_m": [
+      4.0,
+      1.5,
+      0.18
+    ],
+    "agent_final_pos": [
+      2.0,
+      5.727,
+      0.48
+    ],
+    "deck_elevation_reached": 0.75,
+    "deck_contact_verified": true
+  },
+  "provenance_sha256": "7b45a232bfe3314abc156d7b7d811caee320ffe90f71abb8891396456eb8b348"
+}
