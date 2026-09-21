@@ -1,0 +1,240 @@
+{
+  "timestamp": 1789945703.840016,
+  "overall_status": "PASSED",
+  "total_categories": 57,
+  "passed": 56,
+  "failed": 0,
+  "skipped": 1,
+  "acceptance_schema": "verification/acceptance_schema.json",
+  "schema_drift": [],
+  "categories": {
+    "repository_cleanliness": {
+      "status": "PASS",
+      "reason": "All core repository directories intact and organized."
+    },
+    "provenance_manifest_integrity": {
+      "status": "PASS",
+      "reason": "Janelia MaleCNS soma and connection SHA-256 hashes match provenance manifest exactly."
+    },
+    "connectome_contract_separation": {
+      "status": "PASS",
+      "reason": "Explicit separation of GraphMode contracts: ['REAL', 'SPATIAL_SURROGATE', 'SYNTHETIC_TEST']; REAL canonicalizes to REAL_SUBGRAPH; REAL_FULL honestly raises."
+    },
+    "biological_vs_synthetic_separation": {
+      "status": "PASS",
+      "reason": "REAL graph verified from MaleCNS; SYNTHETIC_TEST marked EXPERIMENTAL with distinct topology."
+    },
+    "spatial_surrogate_behavior": {
+      "status": "PASS",
+      "reason": "Spatial surrogate generated 546 synapses via 3D k-d tree proximity."
+    },
+    "lif_dynamics_correctness": {
+      "status": "PASS",
+      "reason": "LIF integration correctly decays membrane potential, fires spike, and clamps to reset."
+    },
+    "refractory_period_invariance": {
+      "status": "PASS",
+      "reason": "Refractory period strictly prevents firing and decrements counter during active refraction."
+    },
+    "reset_potential_invariance": {
+      "status": "PASS",
+      "reason": "Membrane potential instantly clamped to V_reset (-70.0 mV) upon spike generation."
+    },
+    "vulkan_discovery_and_selection": {
+      "status": "PASS",
+      "reason": "Vulkan 1.3 physical device discovered and selected: 'AMD Radeon(TM) Graphics'"
+    },
+    "persistent_resource_lifecycle": {
+      "status": "PASS",
+      "reason": "Vulkan buffers, descriptor sets, and command buffers remain resident across simulation steps."
+    },
+    "cpu_vulkan_numerical_parity": {
+      "status": "PASS",
+      "reason": "Tolerance-based parity verified (9/9 cases): max abs diff < 1e-4 with exact spike trains (NOT bit-exact)."
+    },
+    "single_loop_telemetry_isolation": {
+      "status": "PASS",
+      "reason": "SimulationEngine executed 3 steps in background thread without blocking telemetry."
+    },
+    "thread_lock_concurrency": {
+      "status": "PASS",
+      "reason": "Thread-safe RLock prevented data races during concurrent telemetry and state reads."
+    },
+    "deterministic_experiment_replication": {
+      "status": "PASS",
+      "reason": "Exact 256-bit SHA-256 match (9ff3e4faca75180f...) across independent runs."
+    },
+    "local_model_degradation_honesty": {
+      "status": "PASS",
+      "reason": "System honestly declared cognitive status: OPERATIONAL"
+    },
+    "continuous_learning_weight_change": {
+      "status": "PASS",
+      "reason": "Synaptic plasticity modified weights. Max delta_w: 1.490564e-01."
+    },
+    "ui_no_blocking_alerts": {
+      "status": "PASS",
+      "reason": "FlyBrain Lab workstation contains zero blocking alert()/prompt() calls (non-intrusive toasts) and zero CDN runtime dependencies (vendored three.js)."
+    },
+    "full_pipeline_e2e_runnable": {
+      "status": "PASS",
+      "reason": "End-to-end pipeline (real connectome load -> runtime step -> snapshot save) executed flawlessly."
+    },
+    "documentation_claim_consistency": {
+      "status": "PASS",
+      "reason": "All documentation claims match datasets, shader descriptors, and API routes exactly."
+    },
+    "alife_branch_replay_determinism": {
+      "status": "PASS",
+      "reason": "Population snapshot branch replay produced identical hash (52f731d079a83912)."
+    },
+    "developmental_structural_integrity": {
+      "status": "PASS",
+      "reason": "Full developmental pipeline: 1 born, 6 synapses grown, 4 died; invariants hold, dead neurons edgeless."
+    },
+    "genome_mutation_crossover_provenance": {
+      "status": "PASS",
+      "reason": "Mutation/crossover deterministic with complete parent provenance."
+    },
+    "overlapping_reproduction": {
+      "status": "PASS",
+      "reason": "4 reproductions across generations [0, 1]; parents alive at every birth: True."
+    },
+    "cultural_transmission_gain": {
+      "status": "PASS",
+      "reason": "Measured learning gain 0.3766 with teacher chain ['mx-teacher']."
+    },
+    "real_mode_zero_surrogate_edges": {
+      "status": "PASS",
+      "reason": "REAL-64 graph: 100 edges, 0 non-empirical; metadata confirms zero surrogate."
+    },
+    "csr_directionality": {
+      "status": "PASS",
+      "reason": "A->B drives B, never A; reverse direction has no effect."
+    },
+    "biological_edge_semantics": {
+      "status": "PASS",
+      "reason": "REAL weight transform declared: w = min(0.8, 0.05 + 0.02 * synapse_count) [simulation transform, NOT a measured conductance]"
+    },
+    "real_annotation_integrity": {
+      "status": "PASS",
+      "reason": "Unavailable annotations flagged UNKNOWN; available ones EMPIRICAL/DERIVED."
+    },
+    "plasticity_causal_effect": {
+      "status": "PASS",
+      "reason": "reward=0 no change; reward>0 potentiation; reward<0 depression."
+    },
+    "checkpoint_continuation": {
+      "status": "PASS",
+      "reason": "Checkpoint/resume final population hash equals uninterrupted run."
+    },
+    "llm_model_discovery_and_inference": {
+      "status": "PASS",
+      "reason": "Discovered 1 GGUF; inference=SUCCESS; model=MiniCPM5-2B-Q8_0.gguf."
+    },
+    "llm_failure_mode_and_tool_safety": {
+      "status": "PASS",
+      "reason": "Unavailable model returns structured error (no fake text); shell/unknown tools rejected."
+    },
+    "living_brain_identity": {
+      "status": "PASS",
+      "reason": "Persistent identities + EMERGENT provenance; growth 32->33."
+    },
+    "structural_growth_resource_constrained": {
+      "status": "PASS",
+      "reason": "Zero growth budget blocks neurogenesis (energy is the constraint)."
+    },
+    "eligibility_neuromodulation": {
+      "status": "PASS",
+      "reason": "v2 traces + novelty-driven neuromodulation change weights (reward=0)."
+    },
+    "autonomy_self_generated_goals": {
+      "status": "PASS",
+      "reason": "All living organisms self-generate goals; no human task commands."
+    },
+    "grounded_language_and_social": {
+      "status": "PASS",
+      "reason": "Symbols bind to grounded concepts; trust emerges from outcomes."
+    },
+    "genome_v2_architecture_genes": {
+      "status": "PASS",
+      "reason": "v2 encodes learning architecture; v1 legacy remains valid."
+    },
+    "speciation_evidence": {
+      "status": "PASS",
+      "reason": "Divergence recorded only with measured genome distance."
+    },
+    "llm_control_plane_safety": {
+      "status": "PASS",
+      "reason": "Invalid/shell commands rejected; valid typed commands execute."
+    },
+    "research_memory_chain": {
+      "status": "PASS",
+      "reason": "Hash-chained append-only research memory; tamper-evident."
+    },
+    "deeptime_escalation_replay": {
+      "status": "PASS",
+      "reason": "Coarse deep-time escalates to full-res checkpoint; replay hash-verified."
+    },
+    "milestone_evidence": {
+      "status": "PASS",
+      "reason": "Detected ['STRUCTURAL_EXPANSION', 'OVERLAPPING_GENERATIONS'] with evidence + certificate."
+    },
+    "benchmark_fairness": {
+      "status": "PASS",
+      "reason": "Per-arm budgets documented; LLM arms SKIP with reason when unmet."
+    },
+    "version_metadata": {
+      "status": "PASS",
+      "reason": "FlyBrain version metadata = 5.0.0 (v5.0.0)."
+    },
+    "immutable_bio_baseline": {
+      "status": "PASS",
+      "reason": "Biological baseline fingerprint unchanged after lifetime development."
+    },
+    "synapse_identity_provenance": {
+      "status": "PASS",
+      "reason": "Stable synapse IDs; seed records cite source dataset; new synapses are EMERGENT, never BIOLOGICAL."
+    },
+    "brain_identity_layers": {
+      "status": "PASS",
+      "reason": "12-layer identity: same state -> same identity; weight change -> different identity."
+    },
+    "heredity_separation": {
+      "status": "PASS",
+      "reason": "Parent learned; child starts from deterministic development, not inherited learned weights."
+    },
+    "evolution_parent_identity": {
+      "status": "PASS",
+      "reason": "Accepted child never becomes its own parent in history."
+    },
+    "ablation_enforcement": {
+      "status": "PASS",
+      "reason": "no_growth grew=False; no_plasticity weights unchanged (enforced, verified by measurement)."
+    },
+    "deterministic_research_ids": {
+      "status": "PASS",
+      "reason": "Research IDs derive from content+sequence; no wall-clock identity."
+    },
+    "research_ledger_chain": {
+      "status": "PASS",
+      "reason": "Hash-chained ledger with code/dataset/shader provenance."
+    },
+    "deeptime_exact_mode": {
+      "status": "PASS",
+      "reason": "EXACT mode is tick-by-tick with no approximation claim; ACCELERATED labels its approximation model."
+    },
+    "doctor_functional": {
+      "status": "PASS",
+      "reason": "Doctor reports READY with 12 OK checks (real values)."
+    },
+    "ui_v4_endpoints": {
+      "status": "PASS",
+      "reason": "/api/version + /api/doctor serve real system state."
+    },
+    "portable_package": {
+      "status": "SKIP_ENVIRONMENT",
+      "reason": "No built portable bundle on this host; set FLYBRAIN_PORTABLE_DIR to a built dist for artifact self-test."
+    }
+  }
+}

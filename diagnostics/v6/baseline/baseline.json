@@ -1,0 +1,34 @@
+{
+  "phase": "v6_baseline_prefreeze",
+  "commit": "104710ce33272733fd6e022fc88c6d98c3ed9e80",
+  "version": "5.0.0",
+  "recorded_at": "2026-09-21T00:19:08Z",
+  "test_suite": {
+    "tests": 265,
+    "passed": 265,
+    "failed": 0,
+    "skipped": 0,
+    "note": "full discover run 2026-09-21, OK"
+  },
+  "acceptance": {
+    "overall": "PASSED",
+    "total": 57,
+    "passed": 56,
+    "failed": 0,
+    "skipped": 1
+  },
+  "environment": {
+    "os": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.13",
+    "numpy": "2.5.3"
+  },
+  "vulkan": {
+    "available": true,
+    "device": "AMD Radeon(TM) Graphics",
+    "type": "Integrated GPU"
+  },
+  "memory": {
+    "ram_total_gb": 19.8,
+    "ram_percent": 47.8
+  }
+}
