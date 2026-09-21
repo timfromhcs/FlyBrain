@@ -122,9 +122,18 @@ class SpatialMemory:
 
     # ---- retrieval: lexical (always) ----
     def search_places(self, query: str, limit: int = 5) -> List[Dict[str, Any]]:
-        rows = self.db.execute(
-            "SELECT label,note FROM places_fts WHERE places_fts MATCH ? LIMIT ?",
-            (query, limit)).fetchall()
+        import re as _re
+        words = _re.findall(r"[a-zA-Z0-9]+", query.lower())
+        if not words:
+            return []
+        # OR-query over sanitized terms (raw user text must never reach FTS)
+        match = " OR ".join(f'"{w}"' for w in words[:8])
+        try:
+            rows = self.db.execute(
+                "SELECT label,note FROM places_fts WHERE places_fts MATCH ? LIMIT ?",
+                (match, limit)).fetchall()
+        except Exception:
+            return []
         out = []
         for label, note in rows:
             r = self.db.execute("SELECT x,y,visits FROM places WHERE label=?",
