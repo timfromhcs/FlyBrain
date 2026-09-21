@@ -449,7 +449,9 @@ class Organism:
             "tick": self.tick, "position": list(self.position),
             "heading": list(self.heading), "last_food": self.last_food,
             "last_reward": self._last_reward,
-            "genome": self.genome.to_dict(),            "graph": {"neuron_ids": self.graph.neuron_ids.tolist(),
+            "genome": self.genome.to_dict(),
+            "genome_params_exact": {k: float(v) for k, v in self.genome.params.items()},
+            "graph": {"neuron_ids": self.graph.neuron_ids.tolist(),
                       "coordinates": self.graph.coordinates.tolist(),
                       "tbars": self.graph.tbars.tolist(), "sides": list(self.graph.sides),
                       "row_offsets": self.graph.row_offsets.tolist(),
@@ -464,6 +466,22 @@ class Organism:
                       "prediction_error": self.brain.state.prediction_error,
                       "predicted_reward": self.brain.state.predicted_reward,
                       "current_reward": self.brain.state.current_reward,
+                      "plasticity_mode": self.brain.plasticity_mode,
+                      "trace_decay": getattr(getattr(self.brain, "eligibility_engine",
+                                                     None), "trace_decay", 0.9),
+                      "prediction_influence": bool(self.brain.prediction_influence),
+                      "prediction_gain": float(self.brain.prediction_gain),
+                      "eligibility": (self.brain.eligibility.snapshot()
+                                      if self.brain.eligibility is not None else None),
+                      "neuromod": (self.brain.eligibility_engine.neuromod.to_dict()
+                                   if self.brain.eligibility_engine is not None
+                                   and hasattr(self.brain.eligibility_engine, "neuromod")
+                                   else None),
+                      "attention": self.brain.state.attention.tolist(),
+                      "goal_embedding": self.brain.state.goal_embedding.tolist(),
+                      "active_memory_refs": list(self.brain.state.active_memory_refs),
+                      "tool_associations": dict(self.brain.state.tool_associations),
+                      "active_goal": self.brain.state.active_goal,
                       "drives": {"energy": self.brain.state.drives.energy,
                                  "curiosity": self.brain.state.drives.curiosity,
                                  "social": self.brain.state.drives.social,
@@ -482,6 +500,10 @@ class Organism:
             "autonomy_mode": self.autonomy_mode,
             "autonomy": self.autonomy.snapshot() if self.autonomy is not None else None,
             "body": self.body.to_dict() if self.body is not None else None,
+            "body_exact": ({"energy": float(self.body.energy),
+                            "health": float(self.body.health),
+                            "damage": float(self.body.damage)}
+                           if self.body is not None else None),
             "living_brain": self.living.snapshot() if self.living is not None else None,
             "language": self.language.snapshot() if self.language is not None else None,
             "social": self.social_mem.snapshot() if self.social_mem is not None else None,
@@ -506,6 +528,10 @@ class Organism:
             col_indices=np.array(g["col_indices"], dtype=np.int32),
             weights=np.array(g["weights"], dtype=np.float32))
         genome = Genome.from_dict(snap["genome"])
+        if snap.get("genome_params_exact"):
+            for k, v in snap["genome_params_exact"].items():
+                if k in genome.params:
+                    genome.params[k] = float(v)
         org = cls.__new__(cls)
         org.genome, org.id, org.generation = genome, snap["id"], snap["generation"]
         org.parents, org.children = list(snap["parents"]), list(snap["children"])
@@ -516,14 +542,42 @@ class Organism:
         org._last_reward = float(snap.get("last_reward", 0.0))
         org.stage = stage_for_age(org.age) if org.alive else LifeStage.DEAD
         org.graph = graph
-        org.brain = BrainRuntime(graph, use_gpu=False, seed=int(org.seeds.get("organism_seed", 44)))
         b = snap["brain"]
+        # v2 learning architecture must be restored exactly: a restored
+        # autonomy organism that silently falls back to v1_hebbian (or loses
+        # eligibility traces) would diverge from uninterrupted execution.
+        _pmode = b.get("plasticity_mode", "v1_hebbian")
+        _neu = None
+        if b.get("neuromod"):
+            from src.brain.eligibility import (EligibilityEngine, EligibilityState,
+                                               NeuromodulationConfig)
+            _neu = NeuromodulationConfig.from_dict(b["neuromod"])
+        org.brain = BrainRuntime(
+            graph, use_gpu=False, seed=int(org.seeds.get("organism_seed", 44)),
+            plasticity_mode=_pmode,
+            neuromod=_neu,
+            trace_decay=float(b.get("trace_decay", 0.9)),
+            prediction_influence=bool(b.get("prediction_influence", False)),
+            prediction_gain=float(b.get("prediction_gain", 0.5)))
+        if b.get("eligibility") and org.brain.eligibility is not None:
+            from src.brain.eligibility import EligibilityState as _ES
+            org.brain.eligibility = _ES.restore(b["eligibility"])
         org.brain.state.membrane_potentials = np.array(b["potentials"], dtype=np.float32)
         org.brain.state.spikes = np.array(b["spikes"], dtype=np.float32)
         org.brain.state.refractory_steps = np.array(b["refractory"], dtype=np.int32)
         org.brain.state.activations = np.array(b["activations"], dtype=np.float32)
         org.brain.state.step_count = b["step_count"]; org.brain.state.total_spikes = b["total_spikes"]
         org.brain.state.num_neurons = graph.num_neurons
+        if "attention" in b and len(b["attention"]) == len(org.brain.state.attention):
+            org.brain.state.attention = np.array(b["attention"], dtype=np.float32)
+        if "goal_embedding" in b:
+            org.brain.state.goal_embedding = np.array(b["goal_embedding"], dtype=np.float32)
+        if "active_memory_refs" in b:
+            org.brain.state.active_memory_refs = [str(x) for x in b["active_memory_refs"]]
+        if "tool_associations" in b:
+            org.brain.state.tool_associations = dict(b["tool_associations"])
+        if "active_goal" in b:
+            org.brain.state.active_goal = b["active_goal"]
         org.brain.state.prediction_error = float(b.get("prediction_error", 0.0))
         org.brain.state.predicted_reward = float(b.get("predicted_reward", 0.0))
         org.brain.state.current_reward = float(b.get("current_reward", 0.0))
@@ -565,6 +619,10 @@ class Organism:
                 else AutonomyEngine(seed=int(org.seeds.get("organism_seed", 44)))
             org.body = BodyState.from_dict(snap["body"]) if snap.get("body") else BodyState(
                 energy=org.energy, health=org.health, position=org.position)
+            if snap.get("body_exact"):  # full precision wins for exact replay
+                org.body.energy = float(snap["body_exact"]["energy"])
+                org.body.health = float(snap["body_exact"]["health"])
+                org.body.damage = float(snap["body_exact"]["damage"])
             org.living = LivingBrain.attach(
                 org.graph, org.dev, org.dev_engine,
                 int(org.seeds.get("organism_seed", 44)),

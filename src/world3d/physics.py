@@ -266,6 +266,7 @@ class PhysicsWorld:
     def snapshot(self) -> Dict[str, Any]:
         return {"time": self.time, "qpos": self.data.qpos.copy().tolist(),
                 "qvel": self.data.qvel.copy().tolist(),
+                "qacc_warmstart": self.data.qacc_warmstart.copy().tolist(),
                 "spec_hash": self.spec.get("spec_hash", "")}
 
     def restore(self, snap: Dict[str, Any]) -> None:
@@ -273,5 +274,8 @@ class PhysicsWorld:
             raise ValueError("physics snapshot belongs to a different world spec")
         self.data.qpos[:] = np.asarray(snap["qpos"], dtype=np.float64)
         self.data.qvel[:] = np.asarray(snap["qvel"], dtype=np.float64)
+        if "qacc_warmstart" in snap:
+            self.data.qacc_warmstart[:] = np.asarray(
+                snap["qacc_warmstart"], dtype=np.float64)
         mujoco.mj_forward(self.model, self.data)
         self.time = float(snap.get("time", 0.0))

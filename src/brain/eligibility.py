@@ -56,7 +56,12 @@ class NeuromodulationConfig:
 
     @classmethod
     def from_dict(cls, d: Dict[str, float]) -> "NeuromodulationConfig":
-        cfg = cls(**{k: float(v) for k, v in d.items() if k in cls.__dataclass_fields__})
+        kwargs = {}
+        for k, v in d.items():
+            if k not in cls.__dataclass_fields__:
+                continue
+            kwargs[k] = v if k == "version" else float(v)
+        cfg = cls(**kwargs)
         cfg.validate()
         return cfg
 
